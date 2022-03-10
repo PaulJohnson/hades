@@ -1,0 +1,181 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="shareDir">
+            <Directory Id="dir3AD87690DF449B368A173AE0EE3ABFB4" Name="glib-2.0" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="shareGlib">
+            <Component Id="cmpAAE3D7D158824C6482B6394E8A4D8228" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{6D4B72ED-5B32-4BA5-B626-21FDFF3BC342}">
+                <File Id="filA14F592BBD0BA23875AD3D22B00A22E0" KeyPath="yes" Source="$(var.shareGlib)\codegen\codegen.py" />
+            </Component>
+            <Component Id="cmp573A38F6722C28C4F1A2644BF926E6E2" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{90DA8430-6504-48B9-A1FA-EA0E2743E6F0}">
+                <File Id="filDEAD477EDC53199620AF8DF628032A6C" KeyPath="yes" Source="$(var.shareGlib)\codegen\codegen_docbook.py" />
+            </Component>
+            <Component Id="cmpD1A783C3C3242EB377AAC4071729A982" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{AA3EA7BD-DA1D-44A9-9E5C-918BA40443C9}">
+                <File Id="filE71E1657B4E868F46698C9A12673A0B8" KeyPath="yes" Source="$(var.shareGlib)\codegen\codegen_main.py" />
+            </Component>
+            <Component Id="cmp66D037B947FF5F7AB0D69C0625C9EE1F" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{336A3AE3-81BF-48B9-AD24-2C7ED3F9224E}">
+                <File Id="filEE24D1436608D4690081D3ACC37DF190" KeyPath="yes" Source="$(var.shareGlib)\codegen\config.py" />
+            </Component>
+            <Component Id="cmp5F8E026AA541D8BE34E7DAB9224727B4" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{B171EA61-7C9E-4323-9C7F-59FD3FDCBCEB}">
+                <File Id="fil4437317DB45ADF823E3469B7FD5906A4" KeyPath="yes" Source="$(var.shareGlib)\codegen\dbustypes.py" />
+            </Component>
+            <Component Id="cmp2D6F3A8BB52A6C9AA2631ED9726E5300" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{DB33FB6B-0B7E-478F-9F7D-739E7A15820A}">
+                <File Id="filCC34D3AEDFC447FAC26BD671F6D53F73" KeyPath="yes" Source="$(var.shareGlib)\codegen\parser.py" />
+            </Component>
+            <Component Id="cmp8FDDEA599002141EE2D41C8677CDA0FE" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{D1EFC7AD-A5D4-494C-B86C-1D458C0B69D8}">
+                <File Id="filF7A8E0A21B489766162DE93C01F10479" KeyPath="yes" Source="$(var.shareGlib)\codegen\utils.py" />
+            </Component>
+            <Component Id="cmp6609820DFEB10D0B015BAB0A4E20BB6D" Directory="dir2176389C7441F2FD569F1B11033A3BE2" Guid="{D3A5256C-E2EA-4BDC-A6F6-7F5E69121BF0}">
+                <File Id="fil9692A78ED46FF272D04613D244E20EAE" KeyPath="yes" Source="$(var.shareGlib)\codegen\__init__.py" />
+            </Component>
+            <Component Id="cmp5F9FA16E0404611272A90FAE425AD213" Directory="dir052FC9ED661344A25B28E92892FC4B52" Guid="{37A5C5EE-86EA-4CBC-8AA2-1D8EC981FC20}">
+                <File Id="fil11E66915B9089721121C45BED97D011B" KeyPath="yes" Source="$(var.shareGlib)\gdb\glib_gdb.py" />
+            </Component>
+            <Component Id="cmp664E9281A4D3344C25527B7A8A8EAB6D" Directory="dir052FC9ED661344A25B28E92892FC4B52" Guid="{F1D7FC82-CA9F-475E-A239-6A97217362D6}">
+                <File Id="filE106B552947D1AA6EB7492F108FBCA56" KeyPath="yes" Source="$(var.shareGlib)\gdb\gobject_gdb.py" />
+            </Component>
+            <Component Id="cmp3E40060FD3CAD803DFAC89D30AE8CF44" Directory="dir272E5D44095D9A4FC22E51F048C370D9" Guid="{329D74A7-8B24-4D76-9B8A-FF9DD1B7EBAE}">
+                <File Id="filBE73375A48E05C5546262DB72063F08E" KeyPath="yes" Source="$(var.shareGlib)\gettext\po\Makefile.in.in" />
+            </Component>
+            <Component Id="cmp7CE611DD311648293081546B8CD8B975" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{2C9186E8-6DD0-47C6-BAA4-AAC8575D8642}">
+                <File Id="filB3D9E726BF68C66975C7DA25343655B6" KeyPath="yes" Source="$(var.shareGlib)\schemas\gschema.dtd" />
+            </Component>
+            <Component Id="cmpE2A0385BE50683CA9FEDFD5151930D0B" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{4BFC8291-1772-4116-9AB7-60D3F340BE05}">
+                <File Id="filBB83D250C650D31879CA5541DA8B741A" KeyPath="yes" Source="$(var.shareGlib)\schemas\gschemas.compiled" />
+            </Component>
+            <Component Id="cmp1DC46FB75BD71E2B8131EA9B4B924BC1" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{7CE0287D-2768-4B9E-AA3E-27263E087C81}">
+                <File Id="fil9B78A4E144ABD5204C1AB50313A7057C" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.freedesktop.Geoclue.gschema.xml" />
+            </Component>
+            <Component Id="cmp318EDD45D4E1210D65F4E8DE780A63C5" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{F524B2B7-71F0-45DA-A66A-27FC46ED81E8}">
+                <File Id="filA05DCDA000EA668D3129FD5C68B17685" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.a11y.applications.gschema.xml" />
+            </Component>
+            <Component Id="cmpAACAC49B93B4E2E36B3F265CA6EAFFA4" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{2948A82A-0675-4235-A435-4BE9AAC242D2}">
+                <File Id="fil676DD745CEEFAEBC763A11C7872404E6" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.a11y.gschema.xml" />
+            </Component>
+            <Component Id="cmpBD20F6DA2356EF6D0677A0767B944757" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{2EA909F3-09C6-4B5A-9D93-0AC782010759}">
+                <File Id="filAE3A37E6F3BF3FD613956D803F932D9E" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.a11y.keyboard.gschema.xml" />
+            </Component>
+            <Component Id="cmpB7CF2EBBCB6C70DD1238DB3D27229B52" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{6E959263-1BD2-4B57-9A38-9D2D8DD96F7F}">
+                <File Id="fil3703A9DBAF2DC7D7F387E78F2882C8D1" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.a11y.magnifier.gschema.xml" />
+            </Component>
+            <Component Id="cmp5D124439357B0176F7B901FA5071569F" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{261FEA23-D0CE-49DB-9CB1-7D12748A2126}">
+                <File Id="filC19621B04070612ED273571499309349" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.a11y.mouse.gschema.xml" />
+            </Component>
+            <Component Id="cmpA531516B3AF8B19AE705BBBB6149CD72" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{54DD2779-E348-4E9B-B680-B416E733ED23}">
+                <File Id="fil06184D85F3899A56D5C174AB379588CB" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.app-folders.gschema.xml" />
+            </Component>
+            <Component Id="cmpC744CDAEA547E0F61A1C33519EBC9D7A" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{628D5B72-98EE-40FF-884E-75693DF22DD0}">
+                <File Id="fil14F9943E1F53B93B65496EBEB013A5F7" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.background.gschema.xml" />
+            </Component>
+            <Component Id="cmp499F854508824798E90B4407A298640A" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{36CEC385-AF1A-40F4-87AD-C72FAFAEDD29}">
+                <File Id="fil7581F4D6CC65AD9CF868496264D45236" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.calendar.gschema.xml" />
+            </Component>
+            <Component Id="cmp2D4E5346822A4CF47520B2A9B2320D3D" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{F884096B-6617-4CAB-BE6D-CDD4C612594E}">
+                <File Id="filE379CD0209746CB2B6CD016C2DD8260B" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.datetime.gschema.xml" />
+            </Component>
+            <Component Id="cmpA2AA7C279C7E2DB6B328249C35F561EE" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{9745122A-5805-4EA1-9CD6-B58AEE481D91}">
+                <File Id="filC68CAEC21847EABC74E8A816FE13DBAA" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.default-applications.gschema.xml" />
+            </Component>
+            <Component Id="cmpFB7F8609856C57674E31C1FBC6EEA735" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{B07AC1F5-08D9-4E2E-8B89-26A13511E26F}">
+                <File Id="fil125FB80A57B47ED4AF42455D10A58512" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.enums.xml" />
+            </Component>
+            <Component Id="cmp79E2B6D65A826C20A9361569B0762856" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{9CE5A3E1-93A7-40A6-949D-7C1032AAFCD8}">
+                <File Id="filAD018ACE0276779AA13A44305B1F3C0C" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.input-sources.gschema.xml" />
+            </Component>
+            <Component Id="cmpD99A36F633102C8026B15B58D81FA910" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{36A2DC20-6F69-4C12-B354-CD9930515E79}">
+                <File Id="fil59052C1B644793FA73F36680899E0ED4" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.interface.gschema.xml" />
+            </Component>
+            <Component Id="cmp735AA434DB2C51E83C41B136037C6776" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{50691521-3F1A-43A3-ADD5-FB570C54AEB9}">
+                <File Id="filFBA8DA5B33872D00F7EC57816487BA3D" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.lockdown.gschema.xml" />
+            </Component>
+            <Component Id="cmp75693EC007C6BA4EAA50DB976FF7E5F1" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{C451DE89-7F05-41AE-B10D-105FAA58BC3B}">
+                <File Id="fil257274349CE7991414BF1522A6CE4AC1" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.media-handling.gschema.xml" />
+            </Component>
+            <Component Id="cmpD8A4FF235583A24BFCA35C8DF688C8DC" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{37329B02-8CE9-4F17-94A9-4D39140B9F2A}">
+                <File Id="fil0257BF08DDAF372A6FE028C01215561E" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.notifications.gschema.xml" />
+            </Component>
+            <Component Id="cmpC1CD1E5E19ECAE752B5652594E321077" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{8348F25E-E41F-4721-B93C-C469A19CF93D}">
+                <File Id="filCB4298523DD718648EDEE6C817E5C389" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.peripherals.gschema.xml" />
+            </Component>
+            <Component Id="cmp8FACD2BC974491B6B924CE8AA7EA28F6" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{0A1A21E7-CC52-450B-B5B3-4FDE69C6CFF9}">
+                <File Id="fil254F16061AA1A01E96C5113FD97C2E09" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.privacy.gschema.xml" />
+            </Component>
+            <Component Id="cmp0CAC94CF70205420155A0C7E38B16F00" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{B4486BF7-D26B-4FCA-860E-35DAB0407EAE}">
+                <File Id="fil79C33440FEB0E342281F3E0B5176C988" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.screensaver.gschema.xml" />
+            </Component>
+            <Component Id="cmp784665DE81C7BEFC24F68DE5E128D94C" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{BB4FA3FB-88CD-438F-AD22-D81B1BFE0B6C}">
+                <File Id="fil147432279082F836CDF2032F44D43EAB" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.search-providers.gschema.xml" />
+            </Component>
+            <Component Id="cmp6EED47E9E4CB43FA125134FB3BD9DA8B" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{5ADB4CC5-AD6F-46B2-A6FC-A5B3ABA236B4}">
+                <File Id="filEC997BFB66577EE0F102542BF4751045" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.session.gschema.xml" />
+            </Component>
+            <Component Id="cmp2BF4A396922C1B546FE84C415A891B1B" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{B37A32AA-5949-4828-B524-AE2F0DF6D258}">
+                <File Id="filF9DC4FE62B25C3278126003B29A49767" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.sound.gschema.xml" />
+            </Component>
+            <Component Id="cmp61D9B78B7474583056C3658350370993" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{9800D88E-37C2-4345-8C04-7B4D9DABB16F}">
+                <File Id="fil75F327E1CFCB8E17F9431C979A5008B5" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.thumbnail-cache.gschema.xml" />
+            </Component>
+            <Component Id="cmp55037F2D560C3CEA0413EA37F2A56E43" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{B49F983D-F77A-4092-BD39-DAC6F77C285C}">
+                <File Id="filF4F0C163A1145F25163233A55612BA48" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.thumbnailers.gschema.xml" />
+            </Component>
+            <Component Id="cmp058D6EE03CB1D403522E59043ADAA6EC" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{63AFB4B6-3A48-4654-A366-41B56C5A11FA}">
+                <File Id="fil27B9D9789EAC45E4E56165207AF0C6CA" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.wm.keybindings.gschema.xml" />
+            </Component>
+            <Component Id="cmp0E61DFA2305C7B009621CCB5F1941888" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{774A03B1-3347-4653-B83D-3F74E8AE06BF}">
+                <File Id="fil332613B1A377A1DB15CC20638ED3CD7B" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.desktop.wm.preferences.gschema.xml" />
+            </Component>
+            <Component Id="cmp04688E78E1CBFEF5C1A0E1B53EA2696D" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{A75E9333-D329-4C09-82B9-796DFAA906B7}">
+                <File Id="fil756526E44AFEB465E2A8FF576C91B1B0" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.system.locale.gschema.xml" />
+            </Component>
+            <Component Id="cmp5A05BE937D3DE59E088B0554D6297071" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{9CAAF3D7-A0EB-4924-AC3D-E50EADDE212A}">
+                <File Id="fil426A79B16A1962E183AA0DF25D042AF8" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.system.location.gschema.xml" />
+            </Component>
+            <Component Id="cmp1D430135C3A30EF1D3DCD355BBDC10B2" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{A02972B1-1BA8-405C-BBDA-DD0E8999E058}">
+                <File Id="filA63271122476A43A4F3EC00AD7C0DB4D" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gnome.system.proxy.gschema.xml" />
+            </Component>
+            <Component Id="cmp89B9D5D82DD8BE03D214CF1E9B2FC1A1" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{CCDA4AF0-EF4A-4FE1-8F0D-F901E6ED8006}">
+                <File Id="fil0229A2DDDD738E9D86F1740CF6620003" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gtk.Demo.gschema.xml" />
+            </Component>
+            <Component Id="cmpC7F5ACE0D53636378A4150A16D5EECE8" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{2C8ECA15-FC94-43E8-B35F-CB6C806A2971}">
+                <File Id="fil6589B34497E606083BF9D9C642B8C767" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gtk.Settings.ColorChooser.gschema.xml" />
+            </Component>
+            <Component Id="cmp73EF0962177C4DB26D2A7DEBABA49773" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{8AA8A550-EC35-40D9-BD4B-5DED73864627}">
+                <File Id="fil46AD4C4FD44164FA3D612A86FD8BDC32" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gtk.Settings.Debug.gschema.xml" />
+            </Component>
+            <Component Id="cmp68AEF397CB8C7F755C5773440338C449" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{BA38AFBC-66FE-4A6C-BC1B-3FD93DB4CE72}">
+                <File Id="fil718C85795DED48090FB5FBD89EC217A8" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gtk.Settings.EmojiChooser.gschema.xml" />
+            </Component>
+            <Component Id="cmp1654D2F6A52A908866D754FAC241D8B9" Directory="dirF43D1F3CAE3F3672CC12900F37FD9A60" Guid="{E045E238-3DCC-4A61-982A-D71EB2FD8619}">
+                <File Id="fil82F937FDC846AADC23FDE89C4705BC0A" KeyPath="yes" Source="$(var.shareGlib)\schemas\org.gtk.Settings.FileChooser.gschema.xml" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3AD87690DF449B368A173AE0EE3ABFB4">
+            <Directory Id="dir052FC9ED661344A25B28E92892FC4B52" Name="gdb" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3AD87690DF449B368A173AE0EE3ABFB4">
+            <Directory Id="dir2176389C7441F2FD569F1B11033A3BE2" Name="codegen" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirED7EF01ADAB175F97DDC2DCDCB88BB0C">
+            <Directory Id="dir272E5D44095D9A4FC22E51F048C370D9" Name="po" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3AD87690DF449B368A173AE0EE3ABFB4">
+            <Directory Id="dirED7EF01ADAB175F97DDC2DCDCB88BB0C" Name="gettext" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dir3AD87690DF449B368A173AE0EE3ABFB4">
+            <Directory Id="dirF43D1F3CAE3F3672CC12900F37FD9A60" Name="schemas" />
+        </DirectoryRef>
+    </Fragment>
+</Include>

@@ -1,0 +1,25 @@
+Notes on building hades on Windows.
+
+See https://github.com/haskell-gi/haskell-gi/wiki/Using-haskell-gi-in-Windows
+
+1: Install MSYS2.
+
+2: Within MSYS2 MinGW shell:
+
+	  pacman -S -q --noconfirm mingw64/mingw-w64-x86_64-pkg-config mingw64/mingw-w64-x86_64-gobject-introspection mingw64/mingw-w64-x86_64-gtksourceview3 mingw64/mingw-w64-x86_64-webkitgtk3
+
+2a: If using stack then make that:
+
+     stack exec -- pacman -S -q --noconfirm mingw64/mingw-w64-x86_64-pkg-config mingw64/mingw-w64-x86_64-gobject-introspection mingw64/mingw-w64-x86_64-gtksourceview3 mingw64/mingw-w64-x86_64-webkitgtk3
+
+   You may also need to try "stack exec -- pacman -Syyu" a couple of times.
+
+3: Go to "This PC" properties, Advanced System Settings, Environment Variables...
+   Prefix C:\msys64\mingw64\bin and C:\msys64\usr\bin to the user path.
+   Set XDG_DATA_DIRS to C:\msys64\mingw64\share.
+   Set PKG_CONFIG_PATH to C:\msys64\mingw64\lib\pkgconfig
+
+4: You may need to do the following if you get errors about "inflateValidate" entry point not found.
+   copy C:\msys64\mingw64\bin\zlib1.dll 'C:\Program Files\Haskell Platform\8.0.2-a\bin\'
+
+5: Use "cabal" in Windows Powershell.

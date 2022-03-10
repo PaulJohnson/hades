@@ -1,0 +1,47 @@
+cabal-version: >=1.18
+name: causality
+version: 1.3.19
+build-type: Simple
+license: BSD3
+license-file: LICENSE
+copyright: © 2020 Paul Johnson
+author: Paul Johnson
+maintainer: paul@cogito.org.uk
+synopsis: Diametric Safety Case Manager
+category: Modelling
+data-files:
+   hicolor/scalable/categories/*.svg
+   hicolor/index.theme
+   hicolor/icon-theme.cache
+
+library
+   exposed-modules:
+      Causality.FieldNames
+      Causality.Model
+      Causality.Risk
+   other-modules:
+      Paths_causality
+   autogen-modules:
+      Paths_causality
+   default-language: Haskell2010
+   default-extensions: ExistentialQuantification ExtendedDefaultRules
+                       FlexibleContexts FlexibleInstances FunctionalDependencies
+                       GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses
+                       OverloadedStrings Rank2Types RankNTypes RecursiveDo
+                       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
+                       ViewPatterns
+   ghc-options:        -Wall -j -O2
+   build-depends:
+      aeson -any,
+      banana-ui-base -any,
+      banana-ui-gtk -any,
+      base -any,
+      colour -any,
+      containers -any,
+      filepath -any,
+      gsn -any,
+      hades -any,
+      gi-pango -any,
+      lens -any,
+      text -any,
+      transformers -any

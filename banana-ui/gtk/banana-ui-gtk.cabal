@@ -1,0 +1,63 @@
+cabal-version: >=1.18
+name:          banana-ui-gtk
+version:       1.2.14
+license:       BSD3
+license-file:  LICENSE
+copyright:     © 2020 Paul Johnson
+maintainer:    paul@cogito.org.uk
+author:        Paul Johnson
+synopsis:      GTK integrationfor Reactive Banana.
+description:   Declarative user interfaces for GTK3 and Reactive Banana.
+category:      FRP, Graphics
+build-type:    Simple
+
+library
+   exposed-modules:
+      Reactive.Banana.GI
+      Reactive.Banana.GI.ArrowDialog
+      Reactive.Banana.GI.Common
+      Reactive.Banana.GI.Connect
+      Reactive.Banana.GI.Dialog
+      Reactive.Banana.GI.ErrorBox
+      Reactive.Banana.GI.Menu
+      Reactive.Banana.GI.Table
+
+   default-language:   Haskell2010
+   default-extensions:
+      DeriveFunctor ExistentialQuantification ExtendedDefaultRules
+      FlexibleContexts FlexibleInstances FunctionalDependencies
+      GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses
+      MultiWayIf OverloadedStrings Rank2Types RankNTypes RecursiveDo
+      ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
+      ViewPatterns
+
+   ghc-options:        -Wall -j -O2
+   build-depends:
+      base >=4.7,
+      banana-ui-base -any,
+      bytestring -any,
+      colour -any,
+      containers >=0.5,
+      data-default -any,
+      gi-cairo -any,
+      gi-cairo-connector -any,
+      gi-cairo-render -any,
+      gi-gdk -any,
+      gi-gdkpixbuf -any,
+      gi-gio -any,
+      gi-glib -any,
+      gi-gobject -any,
+      gi-gtk -any,
+      gi-gtk-hs -any,
+      gi-pango -any,
+      haskell-gi-base -any,
+      haskell-gi-overloading >=1.0,
+      lens -any,
+      mtl -any,
+      random -any,
+      reactive-banana -any,
+      text -any,
+      time -any,
+      transformers -any,
+      -- uuid -any,
+      vector -any

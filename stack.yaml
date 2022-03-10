@@ -1,0 +1,47 @@
+# Copyright © Paul Johnson 2019. See LICENSE file for details.
+
+
+flags: {}
+extra-package-dbs: []
+packages:
+   - .
+   - causality
+   - dsm
+   - gsn
+   - stress-test
+   - banana-ui/base
+   - banana-ui/gtk
+   - banana-ui/uuid-gen
+   # Extensions to reactive-banana not yet pulled into latest version.
+
+
+allow-newer: true
+   # Work-around for extra-deps javascript-bridge and the gi-cairo-* packages.
+
+extra-deps:
+   # - blank-canvas-0.7.3
+   - cairo-0.13.8.1
+   - cipher-aes128-0.7.0.5
+   - DRBG-0.5.5
+   - gi-cairo-connector-0.1.0
+   - gi-cairo-render-0.1.0
+   - gi-pangocairo-1.0.25
+   - gi-rsvg-2.0.2
+   - hjpath-3.0.1
+   - hjson-1.3.2
+   - javascript-bridge-0.2.0
+   - kansas-comet-0.4
+   - lens-xml-0.1.0.0
+   # - reactive-banana-1.2.2.0
+   - git: https://github.com/PaulJohnson/reactive-banana.git
+     commit: 684dd9eeabfaa66928d51515634bae0e53d3773c
+     subdir: reactive-banana
+   - QuickCheck-GenT-0.2.2
+   - regex-posix-clib-2.7
+   - text-icu-0.7.1.0
+
+flags:
+   regex-posix:
+      _regex-posix-clib: true
+
+resolver: lts-18.27

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="hadesLib">
+            <Directory Id="dirCCAA27395AF742660C4D4E975EF4636E" Name="gio" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="libGio">
+            <Component Id="cmpF519CD32AD3AFA2BE6B1F764BE87625A" Directory="dir9E175196D5301AFF49DB6F2459A2FFB2" Guid="{16BD0AA1-1FDA-483E-BB0D-914632AECCE6}">
+                <File Id="filD73902F0037E8ED2177BFDED25575F12" KeyPath="yes" Source="$(var.libGio)\modules\libgiognomeproxy.dll" />
+            </Component>
+            <Component Id="cmp07CA0E25F1D73E8F065FCA6636265EC3" Directory="dir9E175196D5301AFF49DB6F2459A2FFB2" Guid="{DCD3421C-86A3-405B-BF4F-4788BA03A431}">
+                <File Id="fil49BF9FEF7485014CB9A19FF3FCF213C6" KeyPath="yes" Source="$(var.libGio)\modules\libgiognutls.dll" />
+            </Component>
+            <Component Id="cmp7C0B764D6440BD039132D2667AABF23B" Directory="dir9E175196D5301AFF49DB6F2459A2FFB2" Guid="{C9F542D6-5639-44CE-B85C-E1326681A7D7}">
+                <File Id="fil2FE55DE91D164FD33CDE7D5C7EDCE48A" KeyPath="yes" Source="$(var.libGio)\modules\libgiolibproxy.dll" />
+            </Component>
+            <Component Id="cmp1F213A666A8E59E3F696BCDEA03DF77F" Directory="dir9E175196D5301AFF49DB6F2459A2FFB2" Guid="{1E738993-0D04-487F-83FB-7A09502EC0DE}">
+                <File Id="filB9E5094E1D2AE6DFE90AB4486748F0C2" KeyPath="yes" Source="$(var.libGio)\modules\libgioopenssl.dll" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+    <Fragment>
+        <DirectoryRef Id="dirCCAA27395AF742660C4D4E975EF4636E">
+            <Directory Id="dir9E175196D5301AFF49DB6F2459A2FFB2" Name="modules" />
+        </DirectoryRef>
+    </Fragment>
+</Include>

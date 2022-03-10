@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="gsn_option.svg"
+   width="48px"
+   height="48px"
+   viewBox="0 0 48 48"
+   version="1.1"
+   id="SVGRoot">
+  <sodipodi:namedview
+     inkscape:document-rotation="0"
+     inkscape:current-layer="SVGRoot"
+     inkscape:window-maximized="1"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:cy="15.770365"
+     inkscape:cx="1.9888789"
+     inkscape:zoom="9.4479165"
+     showgrid="true"
+     id="namedview53"
+     inkscape:window-height="1118"
+     inkscape:window-width="1920"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff">
+    <inkscape:grid
+       id="grid1026"
+       type="xygrid" />
+  </sodipodi:namedview>
+  <defs
+     id="defs815" />
+  <metadata
+     id="metadata818">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <rect
+     transform="rotate(45)"
+     ry="0"
+     y="-15.556349"
+     x="18.384777"
+     height="31.112698"
+     width="31.112698"
+     id="rect1374"
+     style="fill:#c0bfc3;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:3.17522;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:markers stroke fill" />
+  <text
+     id="text1024"
+     y="30.253868"
+     x="7.4976678"
+     style="font-size:20.447px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto, Normal';letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;stroke-width:0.69706"
+     xml:space="preserve"><tspan
+       style="stroke-width:0.69706"
+       y="30.253868"
+       x="7.4976678"
+       id="tspan1022"
+       sodipodi:role="line">Opt</tspan></text>
+</svg>

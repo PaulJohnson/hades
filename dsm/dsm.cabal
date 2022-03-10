@@ -1,0 +1,88 @@
+cabal-version: >=1.18
+name: dsm
+version: 1.3.20
+build-type: Simple
+license: BSD3
+copyright: © 2020 Paul Johnson
+author: Paul Johnson
+maintainer: paul@cogito.org.uk
+synopsis: Diametric Safety Case Manager
+category: Modelling
+
+library
+   exposed-modules: DSM.SafetyCase
+   default-language: Haskell2010
+   other-modules: Paths_dsm
+   autogen-modules: Paths_dsm
+   default-extensions: ExistentialQuantification ExtendedDefaultRules
+                       FlexibleContexts FlexibleInstances FunctionalDependencies
+                       GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses
+                       OverloadedStrings Rank2Types RankNTypes RecursiveDo
+                       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
+                       ViewPatterns
+   ghc-options:        -Wall -j -O2
+   build-depends:
+      aeson -any,
+      banana-ui-base -any,
+      banana-ui-gtk -any,
+      base -any,
+      base64-bytestring -any,
+      causality -any,
+      containers -any,
+      gsn -any,
+      gi-cairo -any,
+      gi-gtk -any,
+      gi-pango -any,
+      gi-pangocairo -any,
+      hades -any,
+      lens -any,
+      mtl -any,
+      reactive-banana -any,
+      text -any,
+      uuid -any,
+      unordered-containers -any,
+      vector -any
+
+
+executable dsm
+   main-is: Main.hs
+   default-language: Haskell2010
+   other-modules: DSM.SafetyCase Paths_dsm
+   autogen-modules: Paths_dsm
+   default-extensions: ExistentialQuantification ExtendedDefaultRules
+                        FlexibleContexts FlexibleInstances FunctionalDependencies
+                        GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses
+                        OverloadedStrings Rank2Types RankNTypes RecursiveDo
+                        ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
+                        ViewPatterns
+   build-depends:
+      aeson -any,
+      banana-ui-base -any,
+      banana-ui-gtk -any,
+      base -any,
+      base64-bytestring -any,
+      causality -any,
+      containers -any,
+      dsm -any,
+      filepath -any,
+      gsn -any,
+      gi-cairo -any,
+      gi-gtk -any,
+      gi-pango -any,
+      gi-pangocairo -any,
+      hades -any,
+      lens -any,
+      mtl -any,
+      reactive-banana -any,
+      text -any,
+      uuid -any,
+      unordered-containers -any,
+      vector -any
+
+   if os(windows)
+      ghc-options: -optl-mwindows -Wall -j -O2
+      -- ghc-options: -Wall -j -O2
+   else
+      -- ghc-options: -Wall -j +RTS -A32m -RTS
+      -- ghc-options: -Wall -j
+      ghc-options: -Wall -j

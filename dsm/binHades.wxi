@@ -1,0 +1,182 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Include xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <DirectoryRef Id="INSTALLDIR">
+            <Directory Id="dirCFD54C07EFB094CAD317543172D62CC3" Name="bin" />
+        </DirectoryRef>
+    </Fragment>
+    <Fragment>
+        <ComponentGroup Id="binContents">
+            <Component Id="dsmExeComponent" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="ed1714aa-8d45-4792-b400-2f10afe29e0a">
+               <File Id='DsmExe' Name='dsm.exe' DiskId='1' KeyPath='yes' Source='$(var.staging)\dsm.exe' />
+               <ProgId Id='Diametric Safety Case Manager' Description='Diametric Safety Model' Icon='file_diametric.ico'>
+                  <Extension Id='dsm' ContentType='application/dsm'>
+                     <Verb Id='open' Command='Open' TargetFile='DsmExe' Argument='"%1"' />
+                  </Extension>
+               </ProgId>
+            </Component>
+            <Component Id="cmp9E2C775C88C7B9276C773B42DF996527" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{909305B2-EA4E-488F-BA43-417A21EDEC25}">
+                <File Id="fil787E62205464EA50EB47D36CBB35813D" KeyPath="yes" Source="$(var.staging)\gspawn-win64-helper-console.exe" />
+            </Component>
+            <Component Id="cmp71EAFB0E2BCA13397861116937457891" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{060F68A7-1CC7-4DE7-8330-96F3040A309A}">
+                <File Id="filB267CE64BBFCD5684E3E902C224BA29F" KeyPath="yes" Source="$(var.staging)\gspawn-win64-helper.exe" />
+            </Component>
+            <Component Id="cmp798486124488F33DD23A99CE51565D0D" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{CD4FA1A7-891A-40D5-8348-FBCD56B4C285}">
+                <File Id="fil1CA85D6425A8C2F5C2C1EF08AFA7F350" KeyPath="yes" Source="$(var.mingw64)\libatk-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp_libbrotlicommon" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{6BE034D9-D99F-4D44-B3FF-9AC6E5B56C17}">
+               <File Id="file_libbrotlicommon" KeyPath="yes" Source="$(var.mingw64)\libbrotlicommon.dll" />
+            </Component>
+            <Component Id="cmp_libbrotlidec" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{D255A099-824F-4E9C-B0BF-289476B87A67}">
+               <File Id="file_libbrotlidec" KeyPath="yes" Source="$(var.mingw64)\libbrotlidec.dll" />
+            </Component>
+            <Component Id="cmp01321AB62502E4DF38D85A2D43C3050C" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{06024BC2-E8A6-49BA-BA84-D3B797FD6A20}">
+                <File Id="fil2ED51A696C443DE4FA3C17558BA7662C" KeyPath="yes" Source="$(var.mingw64)\libbz2-1.dll" />
+            </Component>
+            <Component Id="cmp2CCBF38D0A1B3B1D1E277982A1E5DE2E" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{FF271BE0-5140-4A2B-BAA8-CA4409BD7A78}">
+                <File Id="fil08C51FECB2BF05D2191DFBFA5638BD3E" KeyPath="yes" Source="$(var.mingw64)\libcairo-2.dll" />
+            </Component>
+            <Component Id="cmp7BCE18B78A8D7F492B4CB324D801BF27" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{B46ED170-C0EB-4BC7-9616-F01C820AF289}">
+                <File Id="fil5769C0D2EACD1E534309E5376C447D8F" KeyPath="yes" Source="$(var.mingw64)\libcairo-gobject-2.dll" />
+            </Component>
+            <Component Id="cmp6C74D5E55EDF5EC56148CD64B276ED33" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{62343679-514D-4C02-911B-91C14DF84DA1}">
+                <File Id="filD3BD4B237B7D7AB0D9690E8BB5FD0BF7" KeyPath="yes" Source="$(var.mingw64)\libcroco-0.6-3.dll" />
+            </Component>
+            <Component Id="cmpD02F596E9F37334AD9A9F1BFE04AA9ED" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{62F7818D-8113-4821-A08F-CC2CAFE9A030}">
+                <File Id="fil3297679A7D0E81266DDF65D65A8AA7EA" KeyPath="yes" Source="$(var.mingw64)\libdatrie-1.dll" />
+            </Component>
+            <Component Id="cmp19816CA8141672A10F1BADC9BC113F79" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{D37117A2-9C1C-4CB6-B753-0B9B41CE1968}">
+                <File Id="fil0DC140DAF918E5B584EFD0B423736D97" KeyPath="yes" Source="$(var.mingw64)\libepoxy-0.dll" />
+            </Component>
+            <Component Id="cmpCC4773750B4FCB504AFD16BE156771BE" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{0ED2FE60-922F-455C-9776-55F75C78C0F9}">
+                <File Id="filC73FB54DA6F8E55ACEFDF2DFF9D8EB0A" KeyPath="yes" Source="$(var.mingw64)\libexpat-1.dll" />
+            </Component>
+            <Component Id="cmp9DEAD4016E2942AB9E53C4D2EB49170B" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{14ce59a7-e896-4d43-9c2b-43efcc5fde55}">
+                <File Id="filD7A1C928668ADC1EE41A647172FE0B54" KeyPath="yes" Source="$(var.mingw64)\libffi-7.dll" />
+            </Component>
+            <Component Id="cmpD45C73E9D6AA38B7FFF680253A0578FE" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{A61F17A4-C097-4117-B677-7799B68F7028}">
+                <File Id="fil2A54C2E01F9419D1CD66E9259B409808" KeyPath="yes" Source="$(var.mingw64)\libfontconfig-1.dll" />
+            </Component>
+            <Component Id="cmpB1B2B2EEA4295B10F4CB6C2C588B89AD" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{2EAA061B-F49A-4439-87C4-F9F2A7B0204B}">
+                <File Id="filB3CE139CB761B86D7A31E35157FC424C" KeyPath="yes" Source="$(var.mingw64)\libfreetype-6.dll" />
+            </Component>
+            <Component Id="cmp728B7FB01AD0019693317CCEA69EB428" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{2E83C926-54F5-42B6-9403-38642A467EFA}">
+                <File Id="fil7F2CDE5DA9E1566A1ADACAF8FBD8EA10" KeyPath="yes" Source="$(var.mingw64)\libfribidi-0.dll" />
+            </Component>
+            <Component Id="cmpDF7CCB943426E575368E12FCA8BB3C29" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{7CA98199-8132-4B60-942B-AFE1FE9681BC}">
+                <File Id="fil43F05BF191876A802FB2DA7FD7311928" KeyPath="yes" Source="$(var.mingw64)\libgcc_s_seh-1.dll" />
+            </Component>
+            <Component Id="cmpE487EA3FE8DF98E8E993816F3140C94A" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{47DF3A27-D8D3-4731-91B9-514A7C572273}">
+                <File Id="fil868D4D4647273388ECE06B3B301D139F" KeyPath="yes" Source="$(var.mingw64)\libgdk-3-0.dll" />
+            </Component>
+            <Component Id="cmp67522CCC8D270588DDE3B53710EE98FF" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{3CD84CB8-BD31-403C-BD9C-085FAA591196}">
+                <File Id="filB175F335281E7648BE742B432B34B3A6" KeyPath="yes" Source="$(var.mingw64)\libgdk_pixbuf-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpD540CEE7AA8630140FF6A87708EF5D0D" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{4121ECD9-B8AF-4F2F-9E90-F8A320998FAB}">
+                <File Id="fil1EE1CB751E3BBC35EDE49845417D7AD1" KeyPath="yes" Source="$(var.mingw64)\libgio-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpB22DB457AEF731539F0DE99C4C1614AB" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{5B17F4F3-EDCF-406A-A448-1B8EBC8EF179}">
+                <File Id="filDBE2C43C03759BC1A700A02F4AD15073" KeyPath="yes" Source="$(var.mingw64)\libglib-2.0-0.dll" />
+            </Component>
+            <Component Id="cmpE1AB2D08C18211DCBF4AC259344C62C3" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{FFD9D029-0488-42AF-83BF-B7DDE9FC11DF}">
+                <File Id="fil9142678A0860B6E56667CD7D75C7ACFC" KeyPath="yes" Source="$(var.mingw64)\libgmodule-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp9288F508A9B128F1AD975650E4C7BEAC" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{0C55CD9C-DF4E-4780-9F42-D881DEC5F296}">
+                <File Id="fil4F0CD40134E74BADD0C19FAE660DD3B7" KeyPath="yes" Source="$(var.mingw64)\libgmp-10.dll" />
+            </Component>
+            <Component Id="cmp15DE79AF440664EF51E61C781767C0D3" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{3F363F20-C761-460B-BAD9-4FB89EF45F62}">
+                <File Id="fil7A7838229AAE616CCA3709C3BF2A2476" KeyPath="yes" Source="$(var.mingw64)\libgobject-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp18D7BB94D372728D5B4416A58CF21AB9" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{0F107B2A-CE1B-43E4-9B73-6C1B202E7C34}">
+                <File Id="filE60C9458F0F7EBF59395172E5F3EE1DD" KeyPath="yes" Source="$(var.mingw64)\libgraphite2.dll" />
+            </Component>
+            <Component Id="cmp5C48C9C9FFDAA5EFD577FC6E25E83203" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{B20D2C12-AF33-4BB9-9121-B7997C510B99}">
+                <File Id="filB34101D83ACD48CE8FEFA732552DDCCB" KeyPath="yes" Source="$(var.mingw64)\libgthread-2.0-0.dll" />
+            </Component>
+            <Component Id="cmp066063464CC9508D87B5481B086CC234" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{C480E00D-3E20-4822-B175-F6E2C04B9143}">
+                <File Id="filA27C074E1534655BD9B370BF51FFE8FE" KeyPath="yes" Source="$(var.mingw64)\libgtk-3-0.dll" />
+            </Component>
+            <Component Id="cmp773A268C580E929537A87AFC03FCA4F4" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{1E561B5A-78E8-4D22-A489-B7F9F462BEB1}">
+                <File Id="filBAA2C75C092B97793BDEBA28141E1585" KeyPath="yes" Source="$(var.mingw64)\libharfbuzz-0.dll" />
+            </Component>
+            <Component Id="cmpLibHarfbuzzGobject0" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{6D7E8DF7-CC4D-4BF4-BDEC-1C694B91F902}">
+                <File Id="filLibHarfBuzzGobject0" KeyPath="yes" Source="$(var.mingw64)\libharfbuzz-gobject-0.dll" />
+            </Component>
+            <Component Id="cmpLibHarfbuzzIcu0" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{EE07F584-C99D-4B8A-88DF-7D1A4657952D}">
+                <File Id="filLibHarfBuzzIcu0" KeyPath="yes" Source="$(var.mingw64)\libharfbuzz-icu-0.dll" />
+            </Component>
+            <Component Id="cmpLibHarfbuzzSubset0" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{B2B46045-889D-45F9-AEFE-19325889A36B}">
+                <File Id="filLibHarfBuzzSubset0" KeyPath="yes" Source="$(var.mingw64)\libharfbuzz-subset-0.dll" />
+            </Component>
+            <Component Id="cmp76DF3645AD066E1D3E36A90047D627A1" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{0E38CDB6-42D0-4FC9-AAAF-92C43642B527}">
+                <File Id="filCEF9A6A011A205D5EB11292AD662F19C" KeyPath="yes" Source="$(var.mingw64)\libiconv-2.dll" />
+            </Component>
+            <Component Id="cmpIcudt68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{e2170d38-bcac-43c3-bf0c-fa0f697f26ad}">
+                <File Id="fileIcudt68DLL" KeyPath="yes" Source="$(var.mingw64)\libicudt68.dll" />
+            </Component>
+            <Component Id="cmpIcuin68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{c04be683-3c7c-4839-ba05-4ddbc875c6db}">
+                <File Id="fileIcuin68DLL" KeyPath="yes" Source="$(var.mingw64)\libicuin68.dll" />
+            </Component>
+            <Component Id="cmpIcuio68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{e4ba0cd8-619b-4aca-9f43-459b3fe6a203}">
+                <File Id="fileIcuio68DLL" KeyPath="yes" Source="$(var.mingw64)\libicuio68.dll" />
+            </Component>
+            <Component Id="cmpIcutest68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{4f6c6f64-c780-4ab9-8a92-468e849699a6}">
+                <File Id="fileIcutest68DLL" KeyPath="yes" Source="$(var.mingw64)\libicutest68.dll" />
+            </Component>
+            <Component Id="cmpIcutu68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{692d3451-8843-42d5-966d-b2fec7e2351d}">
+                <File Id="fileIcutu68DLL" KeyPath="yes" Source="$(var.mingw64)\libicutu68.dll" />
+            </Component>
+            <Component Id="cmpIcuuc68DLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{905b6cd8-f623-4b6a-b658-8fd8ed279262}">
+                <File Id="fileIcuuc68DLL" KeyPath="yes" Source="$(var.mingw64)\libicuuc68.dll" />
+            </Component>
+            <Component Id="cmp2446262E7F6C5B1E7AFFA8A615348B1A" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{012212C0-6C06-4D92-A203-3298304AEE36}">
+                <File Id="fil02C5744FBD66EDBC643CC82DDB1457A4" KeyPath="yes" Source="$(var.mingw64)\libintl-8.dll" />
+            </Component>
+            <Component Id="cmpLibJpegDLL" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{bc96fee7-382e-4a62-8d95-6213ae4d7238}">
+                <File Id="fileLibJpegDLL" KeyPath="yes" Source="$(var.mingw64)\libjpeg-8.dll" />
+            </Component>
+            <Component Id="cmp557366ED1684BC7F758D87E232F41375" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{EBB56D8C-954E-406F-BC54-4A64D0574002}">
+                <File Id="fil0C126D559B4CB868DEFECD92860AB1E8" KeyPath="yes" Source="$(var.mingw64)\liblzma-5.dll" />
+            </Component>
+            <Component Id="cmp14DCF33C184E436426F42789C1513266" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{566F5D6F-E017-4590-9951-486EEE2D6A70}">
+                <File Id="filF9004477502AF0F1CA8BB1E5F77551B6" KeyPath="yes" Source="$(var.mingw64)\libpango-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp1F2A736BC709C3A5759273177FA47480" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{FFBAA155-C773-437D-A19A-CA6C142C9431}">
+                <File Id="filD206BE8AC9EFCFC53593CD4AC55F6B31" KeyPath="yes" Source="$(var.mingw64)\libpangocairo-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp36374B5A91065529817C7A51A73D4C99" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{7A1D3AD7-8E3E-4869-8517-87C27275B755}">
+                <File Id="fil1AFF421F69650298E09713AC5DC3BA62" KeyPath="yes" Source="$(var.mingw64)\libpangoft2-1.0-0.dll" />
+            </Component>
+            <Component Id="cmpB67EC76607F0B528EF7B4F19812A738E" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{647C3957-D859-4D31-8122-05C3A525100D}">
+                <File Id="fil79FD90A9CB6317FCCDD1EC94F67B55A4" KeyPath="yes" Source="$(var.mingw64)\libpangowin32-1.0-0.dll" />
+            </Component>
+            <Component Id="cmp03A81DB765454675F81F814D515AE63C" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{F833CD45-29FC-408B-98EE-1349CF8A2CFF}">
+                <File Id="fil529B0837D0818D6A7FCDE70623841A89" KeyPath="yes" Source="$(var.mingw64)\libpcre-1.dll" />
+            </Component>
+            <Component Id="cmp6ED67DE72F000821E643140A98C46D14" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{56F6AAE3-E89C-4F5B-A480-B8A942D36159}">
+                <File Id="fil5B5379441BC16F87354E08B069572DF3" KeyPath="yes" Source="$(var.mingw64)\libpixman-1-0.dll" />
+            </Component>
+            <Component Id="cmp145DF6713F1594C705EEBA98F280916D" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{BDE8937F-4C39-4B43-847D-49119E4AC709}">
+                <File Id="fil767A0E28634C3D828B326B1FE4E84A41" KeyPath="yes" Source="$(var.mingw64)\libpng16-16.dll" />
+            </Component>
+            <Component Id="cmp25F1A76D87FE6AB85BE217A2ACB0C2EF" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{B995E5AD-8744-4197-883D-6CF6E1184941}">
+                <File Id="fil9EB18AECDF57F4E13C892891AB863733" KeyPath="yes" Source="$(var.mingw64)\librsvg-2-2.dll" />
+            </Component>
+            <Component Id="cmp7EA3CE92AB92F430FEA54BD7D56061E3" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{11329BA8-1E29-4EB3-A016-B94015A1248D}">
+                <File Id="fil698CBAE4681A0E58B4D069E3DAF04E57" KeyPath="yes" Source="$(var.mingw64)\libstdc++-6.dll" />
+            </Component>
+            <Component Id="cmp72ACA6608317A8A9CEAC0D82B5C2BEA9" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{5305FA33-0129-4AAE-8977-23268BF4BFBE}">
+                <File Id="fil113088EB0CB7550C741FB608579A6154" KeyPath="yes" Source="$(var.mingw64)\libthai-0.dll" />
+            </Component>
+            <Component Id="cmpFABB4CAA0C2E043C916EAF9620555B3A" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{5AE74351-E477-4BAC-8331-257F10789C42}">
+                <File Id="fil81F356A38B6DB7EBBC7A2643AEC6139C" KeyPath="yes" Source="$(var.mingw64)\libwinpthread-1.dll" />
+            </Component>
+            <Component Id="cmp50AF4824CC06B0920F1A0D4CB951ADF8" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{4D6D9501-D807-4C22-B8D1-1371AFE68E6A}">
+                <File Id="filF2E72BDE7598B96B4522C61B9DBA5D37" KeyPath="yes" Source="$(var.mingw64)\libxml2-2.dll" />
+            </Component>
+            <Component Id="cmp0CE0902940EFB5C01B9D4F091E2BD1D6" Directory="dirCFD54C07EFB094CAD317543172D62CC3" Guid="{21ADB7D2-9260-4872-94E4-4495F3C1EE8E}">
+                <File Id="fil18AE9CC49CCBE4519D77D6B165857028" KeyPath="yes" Source="$(var.mingw64)\zlib1.dll" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Include>

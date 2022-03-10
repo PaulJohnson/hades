@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+   <Product Name='Diametric Safety Case Manager' Manufacturer='Paul Johnson.'
+         Id='*'
+         UpgradeCode='dcaad057-265f-4a16-bd6a-9da4c3cee7de'
+         Language='1033' Codepage='1252' Version='$(var.HadesVersion)'>
+      <Package Id='*' Keywords='Installer' Description="DSM Installer"
+            Comments='The DSM is open source, licensed under BSD3 terms.'
+            Manufacturer='Paul Johnson.'
+            InstallerVersion='200' Languages='1033' Compressed='yes' SummaryCodepage='1252' />
+      <Media Id='1' Cabinet='dsm.cab' EmbedCab='yes' />
+      <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+      <WixVariable Id="WixUIBannerBmp" Value="dsm/Assets/banner.bmp" />
+      <WixVariable Id="WixUIDialogBmp" Value="dsm/Assets/background.bmp" />
+      <WixVariable Id="WixUIInfoIco" Value="share/hades/diametric.ico" />
+      <WixVariable Id="WixUILicenseRtf" Value="dsm/license.rtf" />
+      <UIRef Id="MyWixUI_InstallDir" />
+      <MajorUpgrade
+            Schedule="afterInstallInitialize"
+            DowngradeErrorMessage="A later version of the DSM is already installed. Setup will now exit."/>
+      <Directory Id="TARGETDIR" Name="SourceDir">
+         <Directory Id="ProgramFiles64Folder">
+            <Directory Id="Diametric" Name="Diametric">
+               <Directory Id="INSTALLDIR" Name='DSM' />
+            </Directory>
+         </Directory>
+         <Directory Id="FontsFolder" />
+         <Directory Id="DesktopFolder" Name="Desktop" />
+         <Directory Id="ProgramMenuFolder">
+            <Directory Id="ApplicationProgramsFolder" Name="DSM"/>
+         </Directory>
+      </Directory>
+      <Icon Id="diametric.ico" SourceFile="..\share\hades\diametric.ico" />
+      <Property Id="ARPPRODUCTICON" Value="diametric.ico" />
+
+      <Feature Id="DefaultFeature" Level="1">
+         <ComponentGroupRef Id="shareHades" />
+         <ComponentGroupRef Id="shareIcons" />
+         <ComponentGroupRef Id="gsn" />
+         <ComponentGroupRef Id="causal" />
+         <ComponentGroupRef Id="evidence" />
+         <ComponentGroupRef Id="etc" />
+         <ComponentGroupRef Id="libPixbuf" />
+         <ComponentGroupRef Id="binContents" />
+         <ComponentGroupRef Id="shareGlib" />
+         <ComponentGroupRef Id="shareGtk" />
+         <ComponentGroupRef Id="libGio" />
+         <ComponentGroupRef Id="InstallFonts" />
+         <ComponentRef Id="StartMenuShortcut" />
+         <ComponentRef Id="DesktopShortcut" />
+      </Feature>
+
+   </Product>
+
+   <?define mingw64 = "C:\msys64\mingw64\bin" ?>
+   <?define staging = "..\Packages\Staging" ?>
+   <?include binHades.wxi ?>
+
+   <?define share = "..\share" ?>
+   <?define gsn = "..\gsn" ?>
+   <?define causal = "..\causality" ?>
+   <?define evidence = "..\evidence" ?>
+   <?include shareHades.wxi ?>
+
+   <?define shareIcons = "C:\msys64\mingw64\share\icons\hicolor" ?>
+   <?include shareicons.wxi ?>
+
+   <?define libPixbuf = "C:\msys64\mingw64\lib\gdk-pixbuf-2.0" ?>
+   <?include libPixbuf.wxi ?>
+
+   <?define shareGlib = "C:\msys64\mingw64\share\glib-2.0" ?>
+   <?include shareGlib.wxi ?>
+
+   <?define shareGtk = "C:\msys64\mingw64\share\gtk-3.0" ?>
+   <?include shareGtk.wxi ?>
+
+   <?define libGio = "C:\msys64\mingw64\lib\gio" ?>
+   <?include libGio.wxi ?>
+
+   <?include MyWixUI_InstallDir.wxi ?>
+
+   <Fragment>
+      <DirectoryRef Id="INSTALLDIR">
+         <Directory Id="etc_dir" Name="etc">
+            <Directory Id="gtk_3_0" Name="gtk-3.0" />
+         </Directory>
+      </DirectoryRef>
+   </Fragment>
+
+   <Fragment>
+      <ComponentGroup Id="etc">
+         <Component Id="gtk_settings" Directory="gtk_3_0" Guid="{e1e35248-e51d-4e32-8527-6fa4142d12bb}">
+            <File Id="settings_ini" Name="settings.ini" DiskId="1" KeyPath="yes" Source="..\etc\gtk-3.0\settings.ini" />
+         </Component>
+      </ComponentGroup>
+   </Fragment>
+
+   <Fragment>
+      <DirectoryRef Id="ApplicationProgramsFolder">
+         <Component Id="StartMenuShortcut" Guid="{0eac5c83-fe8d-46ad-8917-967288886ae9}">
+            <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall"/>
+            <RegistryValue Root="HKCU" Key="Software\Diametric\DSM" Name="StartMenuIcon" Type="integer" Value="1" KeyPath="yes"/>
+            <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="Diametric Safety Case Manager"
+                  Directory="ProgramMenuFolder"
+                  Description="Manage hazard data and safety assurance in a single integrated tool."
+                  WorkingDirectory="APPLICATIONROOTDIRECTORY"
+                  Target="[#DsmExe]"
+                  Icon="diametric.ico" IconIndex="0" />
+         </Component>
+      </DirectoryRef>
+   </Fragment>
+
+   <Fragment>
+      <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="{7efc82dc-2fc1-440d-a40b-8a10ec362d2b}">
+         <RemoveFolder Id="CleanUpDesktop" Directory="DesktopFolder" On="uninstall"/>
+         <RegistryValue Root="HKCU" Key="Software\Diametric\DSM" Name="DesktopIcon" Type="integer" Value="1" KeyPath="yes"/>
+         <Shortcut
+               Id="desktopDsm"
+               Directory="DesktopFolder"
+               Name="DSM"
+               Description="Diametric Safety Case Manager"
+               WorkingDirectory='INSTALLDIR'
+               Target="DsmExe"
+               Icon="diametric.ico" IconIndex="0" />
+      </Component>
+   </Fragment>
+
+   <Fragment>
+      <ComponentGroup Id="InstallFonts">
+         <Component Id="Roboto_Bold" Directory="FontsFolder" Guid="{ea70c1ae-ef56-4ee7-aa7a-99af83f56b1f}">
+            <File Id="Roboto_Bold_ttf" Source="..\Fonts\Roboto-Bold.ttf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="Roboto_Regular" Directory="FontsFolder" Guid="{01507db3-50be-4866-8fe2-3e4c3bcce0c1}">
+            <File Id="Roboto_Regular_ttf" Source="..\Fonts\Roboto-Regular.ttf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="STIX2Math" Directory="FontsFolder" Guid="{99ce9ee4-7cd2-4fee-8758-ef6fd090afe3}">
+            <File Id="STIX2Math_otf" Source="..\Fonts\STIX2Math.otf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="STIX2Text_Bold" Directory="FontsFolder" Guid="{6591d305-61ed-4d8c-9fff-96831bba8078}">
+            <File Id="STIX2Text_Bold_otf" Source="..\Fonts\STIX2Text-Bold.otf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="STIX2Text_BoldItalic" Directory="FontsFolder" Guid="{0e8602a5-7d32-47d6-aed8-4056298dbdc4}">
+            <File Id="STIX2Text_BoldItalic_otf" Source="..\Fonts\STIX2Text-BoldItalic.otf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="STIX2Text_Italic" Directory="FontsFolder" Guid="{451540a6-1ac0-49a0-9da8-534dd12f7cac}">
+            <File Id="STIX2Text_Italic_otf" Source="..\Fonts\STIX2Text-Italic.otf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="STIX2Text_Regular" Directory="FontsFolder" Guid="{b2da1bb8-2ebf-4b43-a38d-ef46c6ba9368}">
+            <File Id="STIX2Text_Regular_otf" Source="..\Fonts\STIX2Text-Regular.otf" TrueType="yes" KeyPath="yes" />
+         </Component>
+         <Component Id="Symbola_Hint" Directory="FontsFolder" Guid="{2da93526-46e2-4685-a4b7-686907ae10fc}">
+            <File Id="Symbola_Hint_ttf" Source="..\Fonts\Symbola_hint.ttf" TrueType="yes" KeyPath="yes" />
+         </Component>
+      </ComponentGroup>
+   </Fragment>
+</Wix>

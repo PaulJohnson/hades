@@ -1,0 +1,137 @@
+body {
+   font-family: "Roboto", sans-serif;
+   counter-reset: section1 figure-count table-count;
+}
+
+h1 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+   counter-reset: section2;
+}
+
+h2 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+      counter-reset: section3;
+}
+
+h3 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+   counter-reset: section4;
+}
+
+h4 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+   counter-reset: section5;
+}
+
+h5 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+   counter-reset: section6;
+}
+
+h6 {
+   font-family: "Roboto", sans-serif;
+   color: MidnightBlue;
+}
+
+h1::before {
+   counter-increment: section1 1;
+   content: counter(section1) ". ";
+}
+
+h2::before {
+   counter-increment: section2 1;
+   content: counter(section1) "." counter(section2) " ";
+}
+
+h3::before {
+   counter-increment: section3 1;
+   content: counter(section1) "." counter(section2) "." counter(section3) " ";
+}
+
+h4::before {
+   counter-increment: section4 1;
+   content: counter(section1) "." counter(section2) "." counter(section3) "."
+     counter(section4) " ";
+}
+
+h5::before {
+   counter-increment: section5 1;
+   content: counter(section1) "." counter(section2) "." counter(section3) "."
+     counter(section4) "." counter(section5) " ";
+}
+
+h6::before {
+   counter-increment: section6 1;
+   content: counter(section1) "." counter(section2) "." counter(section3) "."
+      counter(section4) "." counter(section5) "." counter(section6) " ";
+}
+
+table {
+   border-collapse: collapse;
+   margin: 10px;
+   border: 1px solid MidnightBlue;
+   caption-side: bottom;
+   justify-content: center;
+   margin-left:auto;
+   margin-right:auto;
+}
+
+
+th, td {
+   border: 1px solid MidnightBlue;
+   caption-side: bottom;
+}
+
+caption::before {
+   counter-increment: table-count 1;
+   content: "Table " counter(table-count) ": ";
+}
+
+caption {
+   color: MidnightBlue;
+   margin:5px
+   justify-content: center;
+}
+
+img.icon {
+   vertical-align: middle
+}
+
+
+img.diagram {
+   display: block;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+figure img {
+   border: 1px solid MidnightBlue;
+}
+
+figure figcaption {
+   text-align: center;
+}
+
+.diagramCaption::before {
+   counter-increment: figure-count 1;
+   content: "Figure " counter(figure-count) ": ";
+   color: MidnightBlue
+}
+
+.diagramCaption {
+   color: MidnightBlue;
+   margin:5px;
+   justify-content: center;
+}
+
+.DiagramBox {
+   display: grid;
+   max-width: 100vw;
+   margin: 10px;
+   justify-content: center
+}

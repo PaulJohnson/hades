@@ -1,0 +1,8 @@
+package:
+   base/banana-ui-base.cabal
+   gtk/banana-ui-gtk.cabal
+   webits/webits.cabal
+   uuid-gen/uuid-gen.cabal
+   demo-arrow/demo-arrow.cabal
+   demo-gi/demo-dialog-gi.cabal
+   demo-webit/demo-webit.cabal

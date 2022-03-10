@@ -1,0 +1,41 @@
+cabal-version: >=1.18
+name: stress
+version: 1.0.1
+build-type: Simple
+license: BSD3
+license-file: LICENSE
+copyright: © 2020 Paul Johnson
+author: Paul Johnson
+maintainer: paul@cogito.org.uk
+synopsis: Generate large model files to stress-test the DSM.
+category: Utilities
+
+executable dsm-stress
+   main-is: Stress.hs
+   default-language: Haskell2010
+   default-extensions: ExistentialQuantification ExtendedDefaultRules
+                       FlexibleContexts FlexibleInstances FunctionalDependencies
+                       GeneralizedNewtypeDeriving LambdaCase MultiParamTypeClasses
+                       OverloadedStrings Rank2Types RankNTypes RecursiveDo
+                       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
+                       ViewPatterns
+   build-depends:
+      aeson -any,
+      banana-ui-gtk -any,
+      base -any,
+      bytestring -any,
+      containers -any,
+      dsm -any,
+      gsn -any,
+      hades -any,
+      lens -any,
+      mtl -any,
+      QuickCheck -any,
+      QuickCheck-GenT -any,
+      reactive-banana -any,
+      text -any,
+      transformers -any,
+      unordered-containers -any,
+      uuid-gen -any,
+      uuid -any,
+      vector -any

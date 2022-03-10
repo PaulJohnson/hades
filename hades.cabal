@@ -1,0 +1,205 @@
+cabal-version: >=1.18
+name: hades
+version: 1.3.20
+build-type: Simple
+license: BSD3
+license-file: LICENSE
+copyright: © 2020 Paul Johnson
+author: Paul Johnson
+maintainer: paul@cogito.org.uk
+synopsis: Haskell Diagram Editing System (HADES)
+category: Graphics
+data-files:
+   evidence/hicolor/scalable/categories/*.svg
+   evidence/hicolor/index.theme
+   evidence/hicolor/icon-theme.cache
+   share/hades/hicolor/scalable/categories/*.svg
+   share/hades/hicolor/index.theme
+   share/hades/hicolor/icon-theme.cache
+   share/hades/hicolor/scalable/actions/*.svg
+   share/hades/hicolor/scalable/stock/image/*.svg
+   share/hades/editor-ui.glade
+   share/hades/report.css
+
+library
+   exposed-modules:
+      App.Appearance
+      App.GenericDiagram
+      App.ModelMain
+      App.Welcome
+      Control.Lens.Hades
+      Data.Aeson.Orphan
+      Evidence.Model
+      Hades.Abstract
+      Hades.Abstract.AutoBanana
+      Hades.Abstract.AutoMonad
+      Hades.Abstract.BasicShapes
+      Hades.Abstract.Commands
+      Hades.Abstract.Connections
+      Hades.Abstract.Delta
+      Hades.Abstract.Diagram
+      Hades.Abstract.Geometry
+      Hades.Abstract.Menus
+      Hades.Abstract.Primitives
+      Hades.Abstract.Toolbar
+      Hades.GI
+      Hades.GI.BasicShapes
+      Hades.GI.MouseMachine
+      Hades.GI.Rendering
+      Hades.GI.Saving
+      Hades.GI.Toolbar
+      Model.Abstract.BasicTypes
+      Model.Abstract.DiagramType
+      Model.Abstract.Import
+      Model.Abstract.ModelExport
+      Model.Abstract.PackageTree
+      Model.Abstract.Properties
+      Model.GI.ModelDiagrams
+      Model.GI.Notebooks
+      Model.GI.PackageTree
+      Model.GI.Export
+      Model.Lookups.Base
+      Model.Matrices.Base
+      Model.Matrices.Design
+      Model.Matrices.Excel
+      Model.Matrices.Screen
+      Model.Query.Base
+      Model.Query.Diagram
+      Model.Reflection.Dialogs
+      Model.Reflection.NamedRelation
+      Model.Reflection.Parser
+      Model.Reflection.References
+      Model.Reflection.Reflective
+      Model.Reflection.Types
+      Model.Reflection.Values
+      Model.Report.Base
+      Model.Report.Dialogs
+      Model.Report.Document
+      Model.Report.Docx
+      Model.Report.Docx.Document
+      Model.Report.Docx.Drawing
+      Model.Report.Docx.File
+      Model.Report.Docx.Utils
+      Model.Report.Html
+      Model.Report.Walkable
+      System.Hades.Autosave
+      System.Hades.DataFiles
+      System.Hades.EditLock
+      Text.NaturalOrder
+   hs-source-dirs: src, evidence
+   other-modules: Paths_hades
+   autogen-modules: Paths_hades
+   default-language: Haskell2010
+   default-extensions: Arrows DeriveFunctor ExistentialQuantification
+                        ExtendedDefaultRules FlexibleContexts FlexibleInstances
+                        FunctionalDependencies GADTs GeneralizedNewtypeDeriving LambdaCase
+                        MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
+                        RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
+                        TupleSections TypeFamilies ViewPatterns
+   ghc-options: -Wall -j
+   build-depends:
+      aeson -any,
+      array -any,
+      banana-ui-base -any,
+      banana-ui-gtk -any,
+      base >=4.8,
+      blaze-html -any,
+      blaze-markup -any,
+      bytestring -any,
+      colour -any,
+      conduit-extra -any,
+      containers -any,
+      data-default -any,
+      directory -any,
+      email-validate -any,
+      filepath -any,
+      fgl -any,
+      filelock -any,
+      filepath -any,
+      free -any,
+      gi-cairo -any,
+      gi-cairo-connector -any,
+      gi-cairo-render -any,
+      gi-gdk -any,
+      gi-gdkpixbuf -any,
+      gi-gio -any,
+      gi-glib -any,
+      gi-gobject -any,
+      gi-gtk -any,
+      gi-gtk-hs -any,
+      gi-pango -any,
+      gi-pangocairo -any,
+      gi-rsvg -any,
+      haskell-gi-overloading >=1.0,
+      haskell-gi-base -any,
+      http-conduit -any,
+      http-types -any,
+      JuicyPixels -any,
+      lens -any,
+      lens-xml -any,
+      megaparsec -any,
+      mtl -any,
+      network-uri -any,
+      optparse-applicative -any,
+      parser-combinators -any,
+      reactive-banana -any,
+      stm -any,
+      temporary -any,
+      text -any,
+      text-icu -any,
+      time -any,
+      transformers -any,
+      unordered-containers -any,
+      uuid -any,
+      uuid-gen -any,
+      vector -any,
+      xlsx -any,
+      xml -any,
+      zip-archive -any
+
+   if os(windows)
+        build-depends:
+            Win32 -any,
+            HUnit -any,
+            base64-bytestring -any
+   else
+        build-depends:
+            unix -any,
+            HUnit -any,
+            base64-bytestring -any
+
+
+test-suite tests
+    type: exitcode-stdio-1.0
+    main-is: Main.hs
+    hs-source-dirs: test
+    other-modules:
+        Test.GI.PackageTree
+        Test.Report.TestDocument
+        Test.Expression
+        Test.AutoMonad.Exceptions
+    default-language: Haskell2010
+    default-extensions: DeriveFunctor ExistentialQuantification
+                        ExtendedDefaultRules FlexibleContexts FlexibleInstances
+                        FunctionalDependencies GeneralizedNewtypeDeriving LambdaCase
+                        MultiParamTypeClasses OverloadedStrings Rank2Types RankNTypes
+                        RecursiveDo ScopedTypeVariables TemplateHaskell TupleSections
+                        TypeFamilies ViewPatterns
+    ghc-options: -Wall -j
+    build-depends:
+        base -any,
+        blaze-html -any,
+        bytestring -any,
+        containers -any,
+        crypto-api -any,
+        gi-gtk -any,
+        hades -any,
+        HUnit -any,
+        lens -any,
+        megaparsec -any,
+        mtl -any,
+        QuickCheck -any,
+        text -any,
+        time -any,
+        uuid -any,
+        HUnit -any

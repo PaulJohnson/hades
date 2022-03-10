@@ -1,0 +1,23 @@
+cradle:
+  stack:
+
+    - path: "base/"
+      component: "banana-ui-base:lib"
+
+    - path: "demo-arrow/"
+      component: "demo-arrow:exe:demo-arrow"
+
+    - path: "demo-gi/"
+      component: "demo-dialog-gi:exe:demo-dialog-gi"
+
+    - path: "demo-webit/"
+      component: "demo-webit:exe:demo-webit"
+
+    - path: "gtk/"
+      component: "banana-ui-gtk:lib"
+
+    - path: "uuid-gen/"
+      component: "uuid-gen:lib"
+
+    - path: "webits/"
+      component: "webits:lib"

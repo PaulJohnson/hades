@@ -1,0 +1,98 @@
+cabal-version: 1.18
+name: webits
+version: 0.1.1
+build-type: Simple
+license: BSD3
+license-file: LICENSE
+copyright: © 2021 Paul Johnson
+author: Paul Johnson
+maintainer: paul@cogito.org.uk
+synopsis: Enterprise Diametric Safety Case Manager
+category: Graphics
+data-files:
+   JS/favicon.ico
+   JS/arrowDialog.js
+   JS/AppendGrid.js
+   JS/AppendGrid-dev.js
+   JS/lib/*.js
+   JQuery/external/jquery/jquery.js
+   JQuery/images/*.png
+   JQuery/*.css
+   JQuery/*.min.css
+   JQuery/*.js
+   JQuery/*.min.js
+
+
+library
+   exposed-modules:
+      Control.Concurrent.TState
+      Data.ForestModel
+      Network.Webits
+      Network.Webits.ArrowDialog
+      Network.Webits.Icons
+      Network.Webits.Menu
+      Network.Webits.Table
+      Network.Webits.StyleSheets
+      Paths_webits
+   default-language: Haskell2010
+   default-extensions: Arrows DeriveFunctor ExistentialQuantification
+                       ExtendedDefaultRules FlexibleContexts FlexibleInstances
+                       FunctionalDependencies GADTs GeneralizedNewtypeDeriving LambdaCase
+                       MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
+                       RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
+                       TupleSections TypeFamilies ViewPatterns
+   ghc-options: -Wall -j
+   build-depends:
+      aeson -any,
+      base >= 4.8,
+      base64-bytestring -any,
+      banana-ui-base -any,
+      blank-canvas -any,
+      blaze-html -any,
+      blaze-markup -any,
+      bytestring -any,
+      clay -any,
+      colour -any,
+      containers -any,
+      directory -any,
+      filepath -any,
+      http-types -any,
+      image-type -any,
+      javascript-bridge -any,
+      lens -any,
+      lens-aeson -any,
+      modern-uri -any,
+      mtl -any,
+      scotty -any,
+      stm -any,
+      text -any,
+      transformers -any,
+      unordered-containers -any,
+      uuid -any,
+      uuid-gen -any,
+      vector -any,
+      wai -any,
+      warp -any,
+      hspec,
+      QuickCheck
+
+
+test-suite test
+   type: exitcode-stdio-1.0
+   main-is: TestMain.hs
+   hs-source-dirs: test
+   default-language: Haskell2010
+   default-extensions: Arrows DeriveFunctor ExistentialQuantification
+                       ExtendedDefaultRules FlexibleContexts FlexibleInstances
+                       FunctionalDependencies GADTs GeneralizedNewtypeDeriving LambdaCase
+                       MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
+                       RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
+                       TupleSections TypeFamilies ViewPatterns
+   build-depends:
+      base,
+      Cabal >= 1.9.2,
+      containers,
+      hspec,
+      lens,
+      QuickCheck,
+      webits

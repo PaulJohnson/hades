@@ -1,0 +1,35 @@
+cabal-version: >=1.18
+name:          demo-arrow
+version:       1.2.14
+license:       BSD3
+license-file:  LICENSE
+copyright:     © 2020 Paul Johnson
+maintainer:    paul@cogito.org.uk
+author:        Paul Johnson
+synopsis:      GTK integrationfor Reactive Banana.
+description:   Declarative user interfaces for GTK3 and Reactive Banana.
+category:      FRP, Graphics
+build-type:    Simple
+
+executable demo-arrow
+    main-is:          Main.hs
+    other-modules:
+        Demo.Cond
+        Demo.Dialog
+        Demo.Notebook
+        Demo.Table
+    default-language: Haskell2010
+    ghc-options:      -Wall -j
+    build-depends:
+        base >=4.7 && <5,
+        banana-ui-base -any,
+        banana-ui-gtk -any,
+        colour -any,
+        containers -any,
+        data-default -any,
+        gi-gtk -any,
+        lens -any,
+        reactive-banana >=1.1,
+        text >=1.2,
+        time -any,
+        banana-ui-gtk -any
