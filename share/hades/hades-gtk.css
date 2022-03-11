@@ -1,0 +1,33 @@
+/* Custom Hades backgrounds */
+@define-color hades_bg #FFFFFF;
+@define-color hades_bg_unfocused mix(@fg_color, @bg_color, 0.95);
+
+/* Custom CSS classes for HADES widgets */
+.hades-diagram {
+   background-color: @hades_bg_unfocused; }
+
+.hades-table {
+   min-height: 200px; }
+
+.hades-diagram.active-diagram {
+   background-color: @hades_bg; }
+
+/* Special case formatting for the welcome screen */
+.welcome {
+      min-width: 900px;
+      border: none;
+      padding: 10px;
+   }
+
+.welcome-gadget label {
+      color: white;
+      opacity: 1;
+   }
+
+.welcome-doc-button {
+      background-color: #28267c;
+   }
+
+.reportParameters {
+      min-width: 450px;
+   }

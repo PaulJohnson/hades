@@ -1,0 +1,90 @@
+/*
+This is the CSS file for GTK widgets created by the banana-ui-gtk library.
+
+Copyright © 2022 Paul Johnson. See LICENSE file for details.
+*/
+/* Custom CSS error colours */
+@define-color error_fg_color #000000;
+@define-color error_bg_color #FFC0C0;
+
+
+
+
+entry.find-string {
+      min-width: 20em;
+   }
+
+
+.table-cell {
+      border-width: 1px;
+      border-style: solid;
+      border-color: @borders;
+      border-radius: 0px;
+   }
+
+.table-cell * { border-width: 0; }  /* Prevent nested borders */
+
+.table-header {
+      border-width: 1px;
+      border-style: solid;
+      border-color: @borders;
+      font-weight: bold;
+   }
+
+.forest-table {
+      border-style: solid;
+      border-color: @borders;
+      border-radius: 0px;
+   }
+
+.memo-small {
+      min-width : 15em;
+      min-height: 2em;
+   }
+
+.memo-medium {
+      min-width: 20em;
+      min-height: 4em;
+   }
+
+.memo-large {
+      min-width: 30em;
+      min-height: 10em;
+   }
+
+.get-trial-button * {
+      background-color: #aaff7f;
+      font-size: 14px;
+   }
+
+.get-trial-dialog entry {
+      min-width: 20em
+   }
+
+.clickable-list {
+      padding: 2px 1px;
+      min-width: 10em;
+      min-height: 1em;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 0;
+      border-color: @borders;
+      background-color: @theme_base_color;
+   }
+
+.guid-entry {
+      min-width: 25em;
+   }
+
+.fixed-memo {
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 0;
+      border-color: @borders;
+   }
+
+
+/* Custom CSS class for data entry widgets which are not valid */
+.entry-error, *.entry-error *  {
+   color: @error_fg_color;
+   background-color: @error_bg_color; }

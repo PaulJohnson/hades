@@ -19,7 +19,9 @@ data-files:
    share/hades/hicolor/scalable/actions/*.svg
    share/hades/hicolor/scalable/stock/image/*.svg
    share/hades/editor-ui.glade
+   share/hades/hades-gtk.css
    share/hades/report.css
+   share/hades/welcome.svg
 
 library
    exposed-modules:

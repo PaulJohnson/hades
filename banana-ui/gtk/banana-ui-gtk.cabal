@@ -10,6 +10,7 @@ synopsis:      GTK integrationfor Reactive Banana.
 description:   Declarative user interfaces for GTK3 and Reactive Banana.
 category:      FRP, Graphics
 build-type:    Simple
+data-files: banana-gtk.css
 
 library
    exposed-modules:
@@ -21,7 +22,6 @@ library
       Reactive.Banana.GI.ErrorBox
       Reactive.Banana.GI.Menu
       Reactive.Banana.GI.Table
-
    default-language:   Haskell2010
    default-extensions:
       DeriveFunctor ExistentialQuantification ExtendedDefaultRules
@@ -30,8 +30,9 @@ library
       MultiWayIf OverloadedStrings Rank2Types RankNTypes RecursiveDo
       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
       ViewPatterns
-
    ghc-options:        -Wall -j -O2
+   other-modules: Paths_banana_ui_gtk
+   autogen-modules: Paths_banana_ui_gtk
    build-depends:
       base >=4.7,
       banana-ui-base -any,

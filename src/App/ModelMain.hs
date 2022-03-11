@@ -77,6 +77,7 @@ import System.FilePath
 import System.Hades.Autosave
 import System.Hades.DataFiles
 import System.Hades.EditLock
+import Reactive.Banana.GI.Common
 
 
 -- | True if the model has changed and hence may need to be saved.
@@ -319,22 +320,30 @@ modelMain descriptor = do
    void $ Gtk.init Nothing
    dataDir <- getProgramDataFolder
    -- Set up application GUI
-   theme <- Gtk.iconThemeGetDefault
-   evidenceIcons  <- getEvidenceDataFolder
-   let
-      hadesIcons = dataDir
-      iconPaths = programIconDirs descriptor ++ [hadesIcons, evidenceIcons]
-   mapM_ (Gtk.iconThemeAppendSearchPath theme) iconPaths
-   mapM_ putStrLn iconPaths
    builder <- Gtk.builderNewFromFile $ T.pack $ dataDir </> "editor-ui.glade"
    window <- Gtk.builderGetObject builder "app-window" >>= \case
       Nothing -> fail "Error: cannot get app-window"
       Just win -> Gtk.unsafeCastTo Gtk.ApplicationWindow win
-   Gtk.windowSetIconName window $ Just "diametric"
-   Gtk.windowSetDefaultIconName "diametric"
-   Gtk.set window [
-         Gtk.windowRole := ("\\hades\\Main" :: Text),
-         Gtk.windowTitle := programTitle descriptor <> ": <unknown>"]
+   do
+      theme <- Gtk.iconThemeGetDefault
+      evidenceIcons  <- getEvidenceDataFolder
+      let
+         hadesIcons = dataDir
+         iconPaths = programIconDirs descriptor ++ [hadesIcons, evidenceIcons]
+      mapM_ (Gtk.iconThemeAppendSearchPath theme) iconPaths
+      mapM_ putStrLn iconPaths
+      let pri = fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+      screen <- Gtk.windowGetScreen window
+      bc <- bananaCss
+      Gtk.styleContextAddProviderForScreen screen bc pri
+      hadesCss <- Gtk.cssProviderNew
+      getDataFileName "share/hades/hades-gtk.css" >>= Gtk.cssProviderLoadFromPath hadesCss . T.pack
+      Gtk.styleContextAddProviderForScreen screen hadesCss pri
+      Gtk.windowSetIconName window $ Just "diametric"
+      Gtk.windowSetDefaultIconName "diametric"
+      Gtk.set window [
+            Gtk.windowRole := ("\\hades\\Main" :: Text),
+            Gtk.windowTitle := programTitle descriptor <> ": <unknown>"]
    bx <- Gtk.builderGetObject builder "main-box" >>= \case
       Nothing -> fail "Error: cannot get application main-box widget."
       Just bx -> Gtk.unsafeCastTo Gtk.Box bx

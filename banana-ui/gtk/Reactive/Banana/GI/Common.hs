@@ -6,7 +6,7 @@
 Copyright © Paul Johnson 2019. See LICENSE file for details.
 
 This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
+proprietary and confidential. Copying is prohibited
 -}
 
 -- |
@@ -26,7 +26,7 @@ import qualified Data.GI.Gtk as MV  -- for ModelView
 import Data.List
 import Data.Maybe
 import Data.IORef
-import Data.Text (Text, unpack)
+import Data.Text (Text, unpack, pack)
 import Data.Time
 import Data.Tree
 import qualified GI.Gdk as Gdk
@@ -36,6 +36,7 @@ import qualified GI.Cairo as Cairo
 import qualified GI.Cairo.Render as Cairo
 import qualified GI.Cairo.Render.Connector as Cairo
 import qualified GI.Gtk as Gtk
+import Paths_banana_ui_gtk
 import Reactive.Banana.Combinators
 import Reactive.Banana.Common
 import Reactive.Banana.Frameworks
@@ -315,3 +316,13 @@ plainChanges w b = do
    stop <- reactimate1' $ fmap handle <$> eb
    forM_ w $ \w1 -> Gtk.onWidgetDestroy w1 stop
    return e
+
+
+-- | The Banana UI GTK CSS file. Pass this to "Gtk.styleContextAddproviderForScreen" with a
+-- priority of "Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION".
+bananaCss :: IO Gtk.CssProvider
+bananaCss = do
+   r <- Gtk.cssProviderNew
+   p <- getDataFileName "banana-gtk.css"
+   Gtk.cssProviderLoadFromPath r $ pack p
+   return r
