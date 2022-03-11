@@ -1,11 +1,7 @@
-{-# LANGUAGE DatatypeContexts #-}
-
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
 
 This file is part of the Haskell Diagram Editing System (HADES) software.
-
-
 -}
 
 
@@ -467,7 +463,7 @@ entityStampFields = M.fromList $ map mkPair [
 
 
 -- | The abstract concept of a model.
-data (EntityClass v) => Model v = Model {
+data Model v = Model {
       modelName :: Text,
       modelRoot :: Map Name ModelId,    -- ^ Top level of model name tree.
       modelContents :: Map ModelId (Entity v),  -- ^ Entities keyed by ModelID
@@ -479,7 +475,24 @@ data (EntityClass v) => Model v = Model {
       modelFields :: FieldTable,
       modelRefTypes :: RefTypeTable v,
       modelExtensions :: Map (Variant v) [FieldId]
-   } deriving (Eq)
+   }
+
+
+-- Haskell "deriving" can't deduce (Eq (PackageMeta v)), so we have an explicit instance instead.
+instance (Eq v, EntityClass v) => Eq (Model v) where
+   m1 == m2  = and [
+            by modelName,
+            by modelRoot,
+            by modelContents,
+            by modelMeta,
+            by modelRelations,
+            by modelFields,
+            by modelRefTypes,
+            by modelExtensions
+         ]
+      where
+         by :: (Eq a) => (Model v -> a) -> Bool
+         by f = f m1 == f m2
 
 
 instance (EntityClass v, ToJSON v) => ToJSON (Model v) where
