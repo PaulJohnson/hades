@@ -331,7 +331,6 @@ modelMain descriptor = do
          hadesIcons = dataDir
          iconPaths = programIconDirs descriptor ++ [hadesIcons, evidenceIcons]
       mapM_ (Gtk.iconThemeAppendSearchPath theme) iconPaths
-      mapM_ putStrLn iconPaths
       let pri = fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
       screen <- Gtk.windowGetScreen window
       bc <- bananaCss
@@ -1190,7 +1189,7 @@ actionAbout desc parent modelB = do
                   \Current model contains " <>
                   T.pack (show $ M.size $ modelContents model) <> " entities.",
                #copyright := "Copyright © Paul Johnson 2020. Licensed under BSD3 terms. \
-                  \See Credits for details.",
+                  \See License for details.",
                #iconName := "diametric",
                #license := licenseText,
                #logoIconName := "diametric",
