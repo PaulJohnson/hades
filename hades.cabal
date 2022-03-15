@@ -27,10 +27,12 @@ data-files:
    share/hades/documentation/Support.html
    share/hades/documentation/theme.css
    share/hades/documentation/LICENSE.txt
+   share/hades/docx/_rels/.rels
    share/hades/docx/docProps/*.xml
    share/hades/docx/word/_rels/document.xml.rels
    share/hades/docx/word/theme/theme1.xml
    share/hades/docx/word/*.xml
+   share/hades/docx/[Content_Types].xml
    share/hades/examples/*.dsm
 
 
