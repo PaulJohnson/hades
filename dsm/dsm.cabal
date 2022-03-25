@@ -8,6 +8,13 @@ author: Paul Johnson
 maintainer: paul@cogito.org.uk
 synopsis: Diametric Safety Case Manager
 category: Modelling
+data-files:
+   Diametric/48x48/general/*.png
+   Diametric/48x48/road-signs/*.png
+   Diametric/scalable/general/*.svg
+   Diametric/scalable/road-signs/*.svg
+   Diametric/icon-theme.cache
+   Diametric/index.theme
 
 library
    exposed-modules: DSM.SafetyCase

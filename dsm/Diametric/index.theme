@@ -1,0 +1,28 @@
+[Icon Theme]
+Name=Diametric
+Comment=Application icons for the Diametric Safety Case Manager
+Directories=scalable/general,scalable/road-signs,48x48/general,48x48/road-signs
+
+[scalable/general]
+MinSize=1
+Size=128
+MaxSize=256
+Context=General
+Type=Scalable
+
+[scalable/road-signs]
+MinSize=1
+Size=128
+MaxSize=256
+Context=Road Signs
+Type=Scalable
+
+[48x48/general]
+Size=48
+Context=General
+Type=Fixed
+
+[48x48/road-signs]
+Size=48
+Context=Road Signs
+Type=Fixed

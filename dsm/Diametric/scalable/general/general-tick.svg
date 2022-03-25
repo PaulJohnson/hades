@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="48.0px"
+   height="48.0px"
+   viewBox="0 0 48.0 48.0"
+   version="1.1"
+   id="SVGRoot"
+   sodipodi:docname="basic-tick.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview829"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="21.694052"
+     inkscape:cx="11.523896"
+     inkscape:cy="28.095259"
+     inkscape:window-width="3840"
+     inkscape:window-height="2070"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid892" />
+  </sodipodi:namedview>
+  <defs
+     id="defs824" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="opacity:0.998235;fill:#1fcc35;stroke:#040000;stroke-width:0;stroke-linecap:round;paint-order:markers stroke fill;fill-opacity:1"
+       id="path941"
+       sodipodi:type="arc"
+       sodipodi:cx="24"
+       sodipodi:cy="24"
+       sodipodi:rx="20"
+       sodipodi:ry="20"
+       sodipodi:start="0"
+       sodipodi:end="6.0336556"
+       sodipodi:open="true"
+       sodipodi:arc-type="arc"
+       d="M 44,24 A 20,20 0 0 1 25.24684,43.961097 20,20 0 0 1 4.1554609,26.488829 20,20 0 0 1 20.278865,4.34922 20,20 0 0 1 43.380573,19.061035" />
+    <g
+       aria-label="✓"
+       id="text22203"
+       style="font-size:42.1731px;line-height:1.25;font-family:Roboto;-inkscape-font-specification:'Roboto, Normal';font-variant-ligatures:none;letter-spacing:0px;word-spacing:0px;stroke-width:1.75722">
+      <path
+         d="m 16.704656,26.263079 q 0.803101,0 1.214948,1.317909 0.823693,2.47108 1.173763,2.47108 0.2677,0 0.555993,-0.411847 5.786446,-9.26655 10.708013,-14.991219 1.276725,-1.482648 4.05669,-1.482648 0.658955,0 0.885471,0.123554 0.226515,0.123554 0.226515,0.308885 0,0.288293 -0.679547,1.132579 -7.948641,9.554843 -14.744111,20.180487 -0.473623,0.741324 -1.935679,0.741324 -1.482648,0 -1.750349,-0.123554 -0.700139,-0.308885 -1.647386,-3.150627 -1.070802,-3.150627 -1.070802,-3.953728 0,-0.864878 1.441464,-1.667979 0.88547,-0.494216 1.565017,-0.494216 z"
+         id="path1539" />
+    </g>
+  </g>
+</svg>

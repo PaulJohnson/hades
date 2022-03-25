@@ -20,6 +20,9 @@ See https://github.com/haskell-gi/haskell-gi/wiki/Using-haskell-gi-in-Windows
    Set PKG_CONFIG_PATH to C:\msys64\mingw64\lib\pkgconfig
 
 4: You may need to do the following if you get errors about "inflateValidate" entry point not found.
-   copy C:\msys64\mingw64\bin\zlib1.dll 'C:\Program Files\Haskell Platform\8.0.2-a\bin\'
+
+	copy C:\msys64\mingw64\bin\zlib1.dll 'C:\Program Files\Haskell Platform\8.0.2-a\bin\'
+
+	Substitute the current version of Haskell in the destination name.
 
 5: Use "cabal" in Windows Powershell.

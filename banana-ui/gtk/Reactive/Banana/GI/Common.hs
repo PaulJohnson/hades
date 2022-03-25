@@ -127,6 +127,8 @@ iconThemeContents :: (MonadIO m, Gtk.IsIconTheme theme) =>
    -> (Text -> Bool)  -- ^ Filter for context names.
    -> m [(Text, [IconData])]
 iconThemeContents theme flag predicate = do
+   themeContexts <- Gtk.iconThemeListContexts theme
+   liftIO $ putStrLn $ "iconThemeContents: contexts = " <> show themeContexts
    ctxs <- sort . filter predicate <$> Gtk.iconThemeListContexts theme
    forM ctxs $ \ctx -> do
       iconNames <- sort <$> Gtk.iconThemeListIcons theme (Just ctx)

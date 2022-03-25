@@ -18,12 +18,12 @@ packages:
     git: https://github.com/PaulJohnson/reactive-banana.git
     commit: 684dd9eeabfaa66928d51515634bae0e53d3773c
 - completed:
-    hackage: javascript-bridge-0.2.0@sha256:851bf3abef5b7ee66dc2019d818288d9ea4dbeb8bc90de92eca75d08a5db6eec,3242
+    hackage: blank-canvas-0.7.3@sha256:b24a082cd7b37f6835ab87d4d99562ed1785e295e42472337aa92037c4014653,5103
     pantry-tree:
-      size: 753
-      sha256: a516002d05f3b2ba83d020e5c2370d9d462446853bdd9948810d5627e269fa7a
+      size: 1495
+      sha256: 433dd5877561055c40e82a6af79ff932b139c5d6fe42bf4ea36c7b079b53b0fc
   original:
-    hackage: javascript-bridge-0.2.0
+    hackage: blank-canvas-0.7.3
 - completed:
     hackage: cascading-0.1.0@sha256:53e76fce91858546d4eceebaa25d9ce5850506e6ddab39691e42402db6127ce8,2854
     pantry-tree:
@@ -66,6 +66,20 @@ packages:
       sha256: b5fdbe4fad60e5e48fc972667ae84db4ecf62a9f9f979abf4888235baa776819
   original:
     hackage: image-type-0.1.0.0
+- completed:
+    hackage: javascript-bridge-0.2.0@sha256:851bf3abef5b7ee66dc2019d818288d9ea4dbeb8bc90de92eca75d08a5db6eec,3242
+    pantry-tree:
+      size: 753
+      sha256: a516002d05f3b2ba83d020e5c2370d9d462446853bdd9948810d5627e269fa7a
+  original:
+    hackage: javascript-bridge-0.2.0
+- completed:
+    hackage: kansas-comet-0.4.1@sha256:5744f0dc96864c92f57e025c1546d9cac9ebe06a2b8deb7f05c87452161caf8a,2306
+    pantry-tree:
+      size: 383
+      sha256: bab79bb516dc9bbd97266e665b25c6d9f05ed334ebe4c3676b9fe77be736aea1
+  original:
+    hackage: kansas-comet-0.4.1
 - completed:
     hackage: web-routes-0.27.14.3@sha256:7d2f62e6bbc3687bdb95a190073f2edd5f4ad8de2ba28233dd62b3720da01c92,1947
     pantry-tree:

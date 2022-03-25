@@ -90,7 +90,8 @@ data MainDescriptor v = MainDescriptor {
    programTitle :: Text,  -- ^ Shown in the title bar of the main window.
    programXtn :: Text,   -- ^ Save file extension (without the dot).
    programStock :: Entity v -> Text,  -- ^ Stock icon names for type @v@.
-   programIconDirs :: [FilePath],  -- ^ Folders to be added to icon search path.
+   programIconDirs :: [FilePath],  -- ^ Folders to be added to global theme icon search path.
+   programDialogIcons :: Gtk.IconTheme,  -- ^ Icons that appear in "iconBox" gadgets.
    programFirstLoad :: Maybe FilePath,
       -- ^ File to load when first started, relative to data directory @share/hades/@.
    programAfterLoad :: ModelEdit v v ()
@@ -303,6 +304,7 @@ modelMain ::
       HasDiagrams p v, p ~ HadesRender, HasEvidence v) =>
    MainDescriptor v -> IO ()
 modelMain descriptor = do
+   let iconTheme = programDialogIcons descriptor
    -- Set working directory to be the user's document folder.
    catch
       (getUserDocumentsDirectory >>= setCurrentDirectory)
@@ -322,7 +324,7 @@ modelMain descriptor = do
    -- Set up application GUI
    builder <- Gtk.builderNewFromFile $ T.pack $ dataDir </> "editor-ui.glade"
    window <- Gtk.builderGetObject builder "app-window" >>= \case
-      Nothing -> fail "Error: cannot get app-window"
+      Nothing -> fail "Cannot get app-window"
       Just win -> Gtk.unsafeCastTo Gtk.ApplicationWindow win
    do
       theme <- Gtk.iconThemeGetDefault
@@ -344,19 +346,19 @@ modelMain descriptor = do
             Gtk.windowRole := ("\\hades\\Main" :: Text),
             Gtk.windowTitle := programTitle descriptor <> ": <unknown>"]
    bx <- Gtk.builderGetObject builder "main-box" >>= \case
-      Nothing -> fail "Error: cannot get application main-box widget."
+      Nothing -> fail "Cannot get application main-box widget."
       Just bx -> Gtk.unsafeCastTo Gtk.Box bx
    undoButtonWidget <- Gtk.builderGetObject builder "undo-button" >>= \case
-      Nothing -> fail "Error: cannot get undo button."
+      Nothing -> fail "Cannot get undo button."
       Just b -> Gtk.unsafeCastTo Gtk.MenuToolButton b
    redoButtonWidget <- Gtk.builderGetObject builder "redo-button" >>= \case
-      Nothing -> fail "Error: cannot get undo button."
+      Nothing -> fail "Cannot get undo button."
       Just b -> Gtk.unsafeCastTo Gtk.MenuToolButton b
    undoMenuItem <- Gtk.builderGetObject builder "menu-undo" >>= \case
-      Nothing -> fail "Error: cannot get undo menu item."
+      Nothing -> fail "Cannot get undo menu item."
       Just i -> Gtk.unsafeCastTo Gtk.Widget i
    redoMenuItem <- Gtk.builderGetObject builder "menu-redo" >>= \case
-      Nothing -> fail "Error: cannot get redo menu item."
+      Nothing -> fail "Cannot get redo menu item."
       Just i -> Gtk.unsafeCastTo Gtk.Widget i
    -- modelContainer holds the model tree.
    modelFrame <- Gtk.frameNew Nothing
@@ -364,7 +366,7 @@ modelMain descriptor = do
    -- Show the Welcome screen unless this has been disabled or we have a command-line filename.
    initialFilePath <- case fileToLoad options of
       Just path -> return $ Just path
-      Nothing -> welcomeScreen window False
+      Nothing -> welcomeScreen window iconTheme False
    initialModel <- case initialFilePath of
       Nothing -> return (Nothing, emptyModel "Model")
       Just target ->
@@ -421,7 +423,7 @@ modelMain descriptor = do
                actionDisplayFile "helpCredits" $ dataDir </> "documentation" </> "Credits.html"
             ]
          mapM_ (Gio.actionMapAddAction window) fileActions
-         actionExportDiagram window exportB >>= Gio.actionMapAddAction window
+         actionExportDiagram window iconTheme exportB >>= Gio.actionMapAddAction window
          gen <- fromPoll newGenerator  -- Used to execute import events.
          -- Track the current file in the window title.
          let
@@ -441,10 +443,11 @@ modelMain descriptor = do
                liftIO previewFolderClean
                -- Connect up the dialog actions.
                -- This also drops any previous instances of these actions from old editors.
-               (fieldEvents, fieldAction) <- actionFields window (modelFields <$> changesB modelC)
+               (fieldEvents, fieldAction) <-
+                     actionFields window iconTheme (modelFields <$> changesB modelC)
                Gio.actionMapAddAction window fieldAction
                (refTypeEvents, refTypeAction) <-
-                     actionRefTypes window (modelRefTypes <$> changesB modelC)
+                     actionRefTypes window iconTheme (modelRefTypes <$> changesB modelC)
                Gio.actionMapAddAction window refTypeAction
                selectionExport <- actionExportSelection descriptor window $ changesB modelC
                Gio.actionMapAddAction window selectionExport
@@ -457,6 +460,7 @@ modelMain descriptor = do
 
                output <- editorWindows
                      window
+                     iconTheme
                      (programStock descriptor)
 
                      newModel
@@ -489,7 +493,7 @@ modelMain descriptor = do
                         refTypeUpdate <$> changesB modelC <@> refTypeEvents
                      ]
                -- Connect up the extension menu.
-               modelExtensionUpdates <- extensionMenu window builder modelC
+               modelExtensionUpdates <- extensionMenu window iconTheme builder modelC
                -- Model updates.
                let
                   modelUpdates = editorUpdates output
@@ -621,8 +625,12 @@ fixOldRelations model = model {modelRelations = renameOld $ modelRelations model
 -- However the extension menu is defined using the "Reflective" interface and is then attached
 -- to the @ExtensionFields@ menu item.
 extensionMenu :: (Gtk.IsWidget parent, EntityClass v) =>
-   parent -> Gtk.Builder -> Changes (Model v) -> MomentIO (Event (ModelUpdate v (Maybe Text)))
-extensionMenu parent builder modelC = do
+   parent
+   -> Gtk.IconTheme
+   -> Gtk.Builder
+   -> Changes (Model v)
+   -> MomentIO (Event (ModelUpdate v (Maybe Text)))
+extensionMenu parent iconTheme builder modelC = do
       menu <- Gtk.new Gtk.Menu []
       model <- valueBLater $ changesB modelC
       let
@@ -645,7 +653,7 @@ extensionMenu parent builder modelC = do
       let
          extensionEvent = foldr (unionWith const) never events
          modelB = changesB modelC
-      updateEvent <- AD.mkGtkPopup parent modelC $ extFields <$> modelB <@> extensionEvent
+      updateEvent <- AD.mkGtkPopup parent iconTheme modelC $ extFields <$> modelB <@> extensionEvent
       return $ filterJust $ mkUpdate <$> changesB modelC <@> updateEvent
    where
       -- Marshal arguments for mkGtkPopup
@@ -878,27 +886,30 @@ actionRecovery descriptor parent changedB statusB = do
 -- | Prompt for a new file name and export the current diagram under that.
 actionExportDiagram :: (Gtk.IsWidget parent) =>
    parent     -- ^ Parent widget for confirmation dialog.
+   -> Gtk.IconTheme
    -> Behavior (Maybe DiagramExport)
    -> MomentIO Gio.SimpleAction
-actionExportDiagram parent exportB = do
+actionExportDiagram parent iconTheme exportB = do
    action <- Gio.simpleActionNew "exportDiagram" Nothing
    exportClicked <- registerIOSignal1 action Gio.onSimpleActionActivate
       (\_ -> return ((), ()))
-   reactimate $ exportDrawing parent <$> filterJust (exportB <@ exportClicked)
+   reactimate $ exportDrawing parent iconTheme <$> filterJust (exportB <@ exportClicked)
    return action
 
 
 -- | Pop up the field list dialog.
 actionFields :: (Gtk.IsWidget parent) =>
    parent         -- ^ Parent widget for dialogs.
+   -> Gtk.IconTheme
    -> Behavior FieldTable
    -> MomentIO (Event FieldTable, Gio.SimpleAction)
-actionFields window tbl = do
+actionFields window iconTheme tbl = do
       newIds <- fromPoll uuidStreamIO
       action <- Gio.simpleActionNew "fields" Nothing
       typesClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ \_ -> return ((), ())
       updates1 <- AD.mkGtkPopupSelect
             window
+            iconTheme
             (pure ())
             (AD.constantDialog (fieldDialog :: AD.Dialog' e () [Field]))
             (((),) . sortOn (T.toCaseFold . view fieldName) . M.elems <$> tbl <@ typesClicked)
@@ -920,13 +931,15 @@ actionFields window tbl = do
 -- | Pop up the reference type list dialog.
 actionRefTypes :: (Gtk.IsWidget parent, Reflective a) =>
    parent   -- ^ Parent widget for dialogs.
+   -> Gtk.IconTheme
    -> Behavior (RefTypeTable a)
    -> MomentIO (Event (RefTypeTable a), Gio.SimpleAction)
-actionRefTypes parent tbl = do
+actionRefTypes parent iconTheme tbl = do
    action <- Gio.simpleActionNew "refTypes" Nothing
    typesClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ \_ -> return ((), ())
    updates <- AD.mkGtkPopupSelect
          parent
+         iconTheme
          (pure ())
          (AD.constantDialog referenceListDialog)
          ((True, ) . refTypeTableToList <$> tbl <@ typesClicked)

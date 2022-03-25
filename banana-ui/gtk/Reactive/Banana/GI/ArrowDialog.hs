@@ -5,7 +5,7 @@
 Copyright © Paul Johnson 2019. See LICENSE file for details.
 
 This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
+proprietary and confidential. Copying is prohibited
 -}
 
 {- |
@@ -92,11 +92,12 @@ import System.Random hiding (split)
 -- pressed then the event contains @Nothing@.
 mkGtkPopupSelect :: (Gtk.IsWidget parent) =>
    parent   -- ^ The dialog will be kept above the window with this widget.
+   -> Gtk.IconTheme
    -> Changes e
    -> DialogSelector' e w a
    -> Event (k, a)
    -> MomentIO (Event (k, Maybe a))
-mkGtkPopupSelect parent env selector trigger = do
+mkGtkPopupSelect parent iconTheme env selector trigger = do
       result <- execute $ popupAction <$> changesB env <@> trigger
       newEvents <- accumE never (unionWith const <$> result)
       switchE newEvents
@@ -104,17 +105,18 @@ mkGtkPopupSelect parent env selector trigger = do
       popupAction e (k, v) =
          case selector e v of
             Nothing -> return never
-            Just dialog -> createDialog parent env (k, v, dialog)
+            Just dialog -> createDialog parent iconTheme env (k, v, dialog)
 
 
 -- | Similar to @mkGtkPopupSelect@, except with the Dialog being part of the event.
 mkGtkPopup :: (Gtk.IsWidget parent) =>
    parent
+   -> Gtk.IconTheme
    -> Changes e
    -> Event (k, a, Dialog' e w a)
    -> MomentIO (Event (k, Maybe a))
-mkGtkPopup parent env trigger = do
-   result <- execute $ createDialog parent env <$> trigger
+mkGtkPopup parent iconTheme env trigger = do
+   result <- execute $ createDialog parent iconTheme env <$> trigger
    newEvents <- accumE never (unionWith const <$> result)
    switchE newEvents
 
@@ -132,7 +134,8 @@ mkGtkPopup parent env trigger = do
 -- The dialog will be recomputed if the input key changes or if the selector event is triggered.
 -- This allows the application to filter updates to the dialog.
 mkDialogWidget :: (Eq k, Eq i) =>
-   (forall widget . (Gtk.IsWidget widget) => widget -> IO ()) -- ^ Run on all newly created widgets.
+   Gtk.IconTheme
+   -> (forall widget . (Gtk.IsWidget widget) => widget -> IO ()) -- ^ Run on all newly created widgets.
    -> e    -- ^ Initial value of environment.
    -> Changes e  -- ^ Current value of the environment.
    -> Behavior (DialogSelector e w i o)
@@ -140,7 +143,7 @@ mkDialogWidget :: (Eq k, Eq i) =>
    -> (k, Behavior i)   -- ^ Initial widget display.
    -> Event (k, Behavior i)   -- ^ Key-value pairs for widget updates.
    -> MomentIO (Gtk.Widget, Event (k, o), Event [w])
-mkDialogWidget newWidgetIO envInit envC selectorB initial inputE = do
+mkDialogWidget iconTheme newWidgetIO envInit envC selectorB initial inputE = do
       scrolledWidget <- Gtk.scrolledWindowNew noAdjustment noAdjustment
       liftIO $ newWidgetIO scrolledWidget
       frameWidget <- Gtk.frameNew Nothing
@@ -183,6 +186,7 @@ mkDialogWidget newWidgetIO envInit envC selectorB initial inputE = do
                return (never, never, delayedIO)
             Just (Dialog title _ gadget) -> do
                output <- renderGadget
+                     iconTheme
                      newWidgetIO
                      env
                      (GadgetData True initial1)
@@ -213,8 +217,8 @@ mkDialogWidget newWidgetIO envInit envC selectorB initial inputE = do
 
 -- | Run the dialog as a simple pop-up in the IO monad.
 runDialog :: (Gtk.IsWidget parent) =>
-   parent -> Dialog' e w a -> e -> a -> IO (Maybe a)
-runDialog parent d env initial = do
+   parent -> Gtk.IconTheme -> Dialog' e w a -> e -> a -> IO (Maybe a)
+runDialog parent iconTheme d env initial = do
       store <- newIORef initial  -- Wormhole for result to escape from reactive net.
       target <- Gtk.dialogNew
       style1 <- Gtk.widgetGetStyleContext target
@@ -229,6 +233,7 @@ runDialog parent d env initial = do
          net = mdo  -- MomentIO monad.
             -- Get the dialog widget tree and change event. Put widget tree into window.
             output <- renderGadget
+                  iconTheme
                   wInit
                   env
                   (GadgetData True initial)
@@ -275,8 +280,8 @@ runDialog parent d env initial = do
 
 -- | Create the dialog as specified.
 createDialog :: (Gtk.IsWidget parent) =>
-   parent -> Changes e -> (k, a, Dialog' e w a) -> MomentIO (Event (k, Maybe a))
-createDialog parent envC (key, initial, d) = mdo
+   parent -> Gtk.IconTheme -> Changes e -> (k, a, Dialog' e w a) -> MomentIO (Event (k, Maybe a))
+createDialog parent iconTheme envC (key, initial, d) = mdo
       -- Create the window.
       target <- Gtk.new Gtk.Dialog [#modal := True, #title := dialogTitle d]
       style <- Gtk.widgetGetStyleContext target
@@ -290,6 +295,7 @@ createDialog parent envC (key, initial, d) = mdo
       -- Get the dialog widget tree and change event. Put widget tree into window.
       envInit <- valueB $ changesB envC
       output <- renderGadget
+            iconTheme
             wInit
             envInit
             (GadgetData True initial)
@@ -470,7 +476,8 @@ displayClickables label (GadgetData True items) = do
 
 -- | Render a gadget as one or more GTK widgets.
 renderGadget ::
-   (forall widget . (Gtk.IsWidget widget) => widget -> IO ()) -- ^ Run on all newly created widgets.
+   Gtk.IconTheme
+   -> (forall widget . (Gtk.IsWidget widget) => widget -> IO ()) -- ^ Run on all newly created widgets.
    -> e   -- ^ The initial environment.
    -> GadgetData i   -- ^ The initial input.
    -> Changes e  -- ^ Updates to the environment. This must start equal to the first argument.
@@ -479,7 +486,7 @@ renderGadget ::
    -> Gadget e w i o
    -> MomentIO (GadgetOut w o)
 
-renderGadget _ _ initial _ e b Null = {-# SCC "renderGadget_Null" #-}
+renderGadget _ _ _ initial _ e b Null = {-# SCC "renderGadget_Null" #-}
    return $ GadgetOut {
          gadgetView = [],
          gadgetEvents = never,
@@ -488,7 +495,7 @@ renderGadget _ _ initial _ e b Null = {-# SCC "renderGadget_Null" #-}
          gadgetValue = b
       }
 
-renderGadget _ _ initial _ e b (Pure f) = {-# SCC "renderGadget_Pure" #-}
+renderGadget _ _ _ initial _ e b (Pure f) = {-# SCC "renderGadget_Pure" #-}
    return $ GadgetOut {
          gadgetView = [],
          gadgetEvents = never,
@@ -497,9 +504,10 @@ renderGadget _ _ initial _ e b (Pure f) = {-# SCC "renderGadget_Pure" #-}
          gadgetValue = fmap f <$> b
       }
 
-renderGadget wInit env initial envC e b (Dot g1 g2) = {-# SCC "renderGadget_Dot" #-} do
-      r2 <- renderGadget wInit env initial envC e b g2
+renderGadget iconTheme wInit env initial envC e b (Dot g1 g2) = {-# SCC "renderGadget_Dot" #-} do
+      r2 <- renderGadget iconTheme wInit env initial envC e b g2
       r1 <- renderGadget
+            iconTheme
             wInit
             env
             (r2 ^. to gadgetInitial)
@@ -515,26 +523,27 @@ renderGadget wInit env initial envC e b (Dot g1 g2) = {-# SCC "renderGadget_Dot"
             gadgetValue = gadgetValue r1
          }
 
-renderGadget wInit env initial envC e b (Prod g1 g2) = {-# SCC "renderGadget_Prod" #-} do
-   r1 <- renderGadget wInit env (fst <$> initial) envC (fmap fst <$> e) (fmap fst <$> b) g1
-   r2 <- renderGadget wInit env (snd <$> initial) envC (fmap snd <$> e) (fmap snd <$> b) g2
+renderGadget iconTheme wInit env initial envC e b (Prod g1 g2) = {-# SCC "renderGadget_Prod" #-} do
+   r1 <- renderGadget iconTheme wInit env (fst <$> initial) envC (fmap fst <$> e) (fmap fst <$> b) g1
+   r2 <- renderGadget iconTheme wInit env (snd <$> initial) envC (fmap snd <$> e) (fmap snd <$> b) g2
    return $ (,) <$> r1 <*> r2
 
 -- Loop :: Gadget (i, s) (o, s) -> Gadget i o
-renderGadget wInit env initial envC e b (Loop g) = {-# SCC "renderGadget_Loop" #-} mdo
+renderGadget iconTheme wInit env initial envC e b (Loop g) = {-# SCC "renderGadget_Loop" #-} mdo
       let
          loopInitialInput = (,) <$> initial <*> (snd <$> gadgetInitial output)
          newE = fb <@> e
          newB = fb <*> b
-      output <- renderGadget wInit env loopInitialInput envC newE newB g
+      output <- renderGadget iconTheme wInit env loopInitialInput envC newE newB g
       fb <- fmap (\s i -> (,) <$> i <*> s) <$> stepper
                (snd <$> loopInitialInput)
                (fmap snd <$> gadgetUser output)
       return $ fst <$> output
 
-renderGadget wInit env initial envC e b (Focusing lns g) = {-# SCC "renderGadget_Focusing" #-} do
+renderGadget iconTheme wInit env initial envC e b (Focusing lns g) = {-# SCC "renderGadget_Focusing" #-} do
    let extract x = x ^. getting lns
    out <- renderGadget
+         iconTheme
          wInit
          env
          (extract <$> initial)
@@ -543,10 +552,11 @@ renderGadget wInit env initial envC e b (Focusing lns g) = {-# SCC "renderGadget
          (fmap extract <$> b) g
    return $ set lns <$> out
 
-renderGadget wInit env initial envC e b (Prismatic d prsm g) = {-# SCC "renderGadget_Prismatic" #-}
+renderGadget iconTheme wInit env initial envC e b (Prismatic d prsm g) = {-# SCC "renderGadget_Prismatic" #-}
    withPrism prsm $ \inject extract -> do
       let extract1 = fromRight d . extract
       out <- renderGadget
+            iconTheme
             wInit
             env
             (extract1 <$> initial)
@@ -555,10 +565,11 @@ renderGadget wInit env initial envC e b (Prismatic d prsm g) = {-# SCC "renderGa
             (fmap extract1 <$> b) g
       return $ inject <$> out
 
-renderGadget wInit env initial envC e b (PrismaticOver d prsm g) =
+renderGadget iconTheme wInit env initial envC e b (PrismaticOver d prsm g) =
    {-# SCC "renderGadget_PrismaticOver" #-} do
       let extract x = fromMaybe d $ x ^? getting prsm
       out <- renderGadget
+            iconTheme
             wInit
             env
             (extract <$> initial)
@@ -568,10 +579,11 @@ renderGadget wInit env initial envC e b (PrismaticOver d prsm g) =
             g
       return $ (\f v -> view (re prsm) $ f $ extract v) <$> out
 
-renderGadget wInit env initial envC e b (Traversing d trv g) =
+renderGadget iconTheme wInit env initial envC e b (Traversing d trv g) =
    {-# SCC "renderGadget_Traversing" #-} do
       let extract x = fromMaybe d $ x ^? getting trv
       out <- renderGadget
+            iconTheme
             wInit
             env
             (extract <$> initial)
@@ -581,10 +593,11 @@ renderGadget wInit env initial envC e b (Traversing d trv g) =
             g
       return $ set trv <$> out
 
-renderGadget wInit env initial envC e b (TraversingOver d trv g) =
+renderGadget iconTheme wInit env initial envC e b (TraversingOver d trv g) =
    {-# SCC "renderGadget_TraversingOver" #-} do
       let extract x = fromMaybe d $ x ^? getting trv
       out <- renderGadget
+            iconTheme
             wInit
             env
             (extract <$> initial)
@@ -593,8 +606,8 @@ renderGadget wInit env initial envC e b (TraversingOver d trv g) =
             (fmap extract <$> b) g
       return $ over trv <$> out
 
-renderGadget wInit env initial envC e b (Accum g) = {-# SCC "renderGadget_Accum" #-} mdo
-      inner <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (Accum g) = {-# SCC "renderGadget_Accum" #-} mdo
+      inner <- renderGadget iconTheme wInit env initial envC e b g
       let outE = applyUpdate <$> b <@> gadgetUser inner
       return inner {
             gadgetInitial = applyUpdate initial $ gadgetInitial inner,
@@ -604,14 +617,14 @@ renderGadget wInit env initial envC e b (Accum g) = {-# SCC "renderGadget_Accum"
    where
       applyUpdate (GadgetData _ old) (GadgetData ok newF) = GadgetData ok $ newF old
 
-renderGadget _ _ _ _ e b (Initially v) = {-# SCC "renderGadget_Initiall" #-}
+renderGadget _ _ _ _ _ e b (Initially v) = {-# SCC "renderGadget_Initiall" #-}
    return $ GadgetOut [] never (GadgetData True v) e b
 
-renderGadget wInit env initial envC e b (GetInitial f) = {-# SCC "renderGadget_GetInitial" #-} do
+renderGadget iconTheme wInit env initial envC e b (GetInitial f) = {-# SCC "renderGadget_GetInitial" #-} do
    let g = initial ^. gdValue . to f
-   renderGadget wInit env initial envC e b g
+   renderGadget iconTheme wInit env initial envC e b g
 
-renderGadget _ env _ envC _ _ GetEnv = {-# SCC "renderGadget_GetEnv" #-} return GadgetOut {
+renderGadget _ _ env _ envC _ _ GetEnv = {-# SCC "renderGadget_GetEnv" #-} return GadgetOut {
       gadgetView = [],
       gadgetEvents = never,
       gadgetInitial = GadgetData True env,
@@ -619,18 +632,18 @@ renderGadget _ env _ envC _ _ GetEnv = {-# SCC "renderGadget_GetEnv" #-} return 
       gadgetValue = GadgetData True <$> changesB envC
    }
 
-renderGadget wInit env initial envC e b (GetInitialEnv f) = {-# SCC "renderGadget_GetInitialEnv" #-}
-      renderGadget wInit env initial envC e b $ f env
+renderGadget iconTheme wInit env initial envC e b (GetInitialEnv f) = {-# SCC "renderGadget_GetInitialEnv" #-}
+      renderGadget iconTheme wInit env initial envC e b $ f env
 
-renderGadget wInit env initial envC e b (WithEnv envG g) = {-# SCC "renderGadget_WithEnv" #-} do
-         envOut <- cleanOutput <$> renderGadget wInit env initial envC e b envG
+renderGadget iconTheme wInit env initial envC e b (WithEnv envG g) = {-# SCC "renderGadget_WithEnv" #-} do
+         envOut <- cleanOutput <$> renderGadget iconTheme wInit env initial envC e b envG
          let
             i2 = gadgetInitial envOut ^. gdValue
             e2 = _gdValue <$> gadgetUser envOut
          newEnvC <- makeChanges i2 e2
-         renderGadget wInit i2 initial newEnvC e b g
+         renderGadget iconTheme wInit i2 initial newEnvC e b g
 
-renderGadget _ _ initial _ e b (Send f) = {-# SCC "renderGadget_Send" #-} return $ GadgetOut {
+renderGadget _ _ _ initial _ e b (Send f) = {-# SCC "renderGadget_Send" #-} return $ GadgetOut {
          gadgetView = [],
          gadgetEvents = return <$> filterJust (f . _gdValue <$> filterE _gdOk e),
          -- "return" puts item into a list.
@@ -639,11 +652,11 @@ renderGadget _ _ initial _ e b (Send f) = {-# SCC "renderGadget_Send" #-} return
          gadgetValue = b
       }
 
-renderGadget wInit env initial envC e b (SendMap f g) = {-# SCC "renderGadget_SendMap" #-} do
-         inner <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (SendMap f g) = {-# SCC "renderGadget_SendMap" #-} do
+         inner <- renderGadget iconTheme wInit env initial envC e b g
          return inner {gadgetEvents = filterE (not . null) $ mapMaybe f <$> gadgetEvents inner}
 
-renderGadget wInit _ initial envC e b (Exec gadgetF) = {-# SCC "renderGadget_Exec" #-} do
+renderGadget iconTheme wInit _ initial envC e b (Exec gadgetF) = {-# SCC "renderGadget_Exec" #-} do
       parent <- Gtk.boxNew Gtk.OrientationVertical 5  -- A holder for widgets created by events.
       liftIO $ wInit parent
       currentArg <- stepper (fst <$> initial) $ fmap fst <$> e
@@ -680,7 +693,7 @@ renderGadget wInit _ initial envC e b (Exec gadgetF) = {-# SCC "renderGadget_Exe
       -- doExec :: (Gtk.IsWidget w) => w -> (Gadget i o, i) -> MomentIO (GadgetOut o, IO ())
       doExec parent (GadgetData ok (sub, newValue)) = do
          env <- valueB $ changesB envC
-         o <- renderGadget wInit env newValue envC (fmap snd <$> e) (fmap snd <$> b) sub
+         o <- renderGadget iconTheme wInit env newValue envC (fmap snd <$> e) (fmap snd <$> b) sub
          let
             replace = do  -- IO monad
                childs <- Gtk.containerGetChildren parent
@@ -689,7 +702,7 @@ renderGadget wInit _ initial envC e b (Exec gadgetF) = {-# SCC "renderGadget_Exe
                Gtk.widgetShowAll parent
          return (qualifyOutput ok o, replace )
 
-renderGadget wInit env initial envC e b (Cond opts) = {-# SCC "renderGadget_Cond" #-} do
+renderGadget iconTheme wInit env initial envC e b (Cond opts) = {-# SCC "renderGadget_Cond" #-} do
       -- Outputs are numbered so we can detect changes.
       (outputs :: [(i -> Bool, (GadgetOut w o, Int))]) <-
          forM (zip [(1 :: Int) ..] opts) $ \(n, PrismaticGadget d p g) ->
@@ -699,7 +712,7 @@ renderGadget wInit env initial envC e b (Cond opts) = {-# SCC "renderGadget_Cond
                   e1 = filterJust $
                         sequenceA . (gdValue %~ (either (const Nothing) Just . getter)) <$> e
                   b1 = (gdValue %~ (fromRight d . getter)) <$> b
-               o <- renderGadget wInit env initial1 envC e1 b1 $ g >>> arr setter
+               o <- renderGadget iconTheme wInit env initial1 envC e1 b1 $ g >>> arr setter
                return (isRight . getter, (o, n))
       let
          defaultOutput = case outputs of
@@ -741,10 +754,10 @@ renderGadget wInit env initial envC e b (Cond opts) = {-# SCC "renderGadget_Cond
             Gtk.containerCheckResize parent
             Gtk.widgetShowAll parent
 
-renderGadget _ _ _ _ _ _ (UnionTab []) =  -- Empty tab list.
+renderGadget _ _ _ _ _ _ _ (UnionTab []) =  -- Empty tab list.
    error "renderGadget UnionTab: empty list."
 
-renderGadget wInit env initial envC e b (UnionTab tabs) = {-# SCC "renderGadget_UnionTab" #-} do
+renderGadget iconTheme wInit env initial envC e b (UnionTab tabs) = {-# SCC "renderGadget_UnionTab" #-} do
       (appPageEvent, appH) <- newEvent  -- When the incoming Behavior triggers a page switch.
       book <- Gtk.new Gtk.Notebook [
             #margin := 5,
@@ -803,7 +816,7 @@ renderGadget wInit env initial envC e b (UnionTab tabs) = {-# SCC "renderGadget_
             initial1 = fromRight d . getter <$> initial
             e1 = filterJust $ sequenceA . (gdValue %~ (either (const Nothing) Just . getter)) <$> e
             b1 = (gdValue %~ (fromRight d . getter)) <$> b
-         subOutput <- renderGadget wInit env initial1 envC e1 b1 $ g >>> arr setter
+         subOutput <- renderGadget iconTheme wInit env initial1 envC e1 b1 $ g >>> arr setter
          widget <- boxWidgets wInit Vertical (gadgetView subOutput) >>= \case
             Nothing -> Gtk.labelNew (Just "") >>= Gtk.toWidget  -- Blank
             Just w -> return w
@@ -812,23 +825,24 @@ renderGadget wInit env initial envC e b (UnionTab tabs) = {-# SCC "renderGadget_
          void $ Gtk.notebookAppendPageMenu book widget (Just label) noWidget
          return subOutput
 
-renderGadget wInit env initial envC e b (Enabled g) = {-# SCC "renderGadget_Enabled" #-} do
-      result <- renderGadget wInit env (fst <$> initial) envC (fmap fst <$> e) (fmap fst <$> b) g
+renderGadget iconTheme wInit env initial envC e b (Enabled g) = {-# SCC "renderGadget_Enabled" #-} do
+      result <- renderGadget iconTheme wInit env (fst <$> initial) envC (fmap fst <$> e) (fmap fst <$> b) g
       forM_ (gadgetView result) $ \w -> do
          Gtk.widgetSetSensitive w $ initial ^. gdValue . _2
          eventLink w Gtk.widgetSetSensitive $ snd . _gdValue <$> e
          behaviorLink w Gtk.widgetSetSensitive $ snd . _gdValue <$> b
       return result
 
-renderGadget wInit env initial envC e b (Optional _ (TextBox p)) =
-      renderGadget wInit env initial envC e b $ TextBox $ prismToMaybe . p
+renderGadget iconTheme wInit env initial envC e b (Optional _ (TextBox p)) =
+      renderGadget iconTheme wInit env initial envC e b $ TextBox $ prismToMaybe . p
 
-renderGadget wInit env initial envC e b (Optional _ DisplayText) =
-      renderGadget wInit env initial envC e b $
+renderGadget iconTheme wInit env initial envC e b (Optional _ DisplayText) =
+      renderGadget iconTheme wInit env initial envC e b $
          arr (\t -> if T.null t then Nothing else Just t) <<< DisplayText <<< arr (fromMaybe "")
 
-renderGadget wInit env initial envC e b (Optional _ (MemoBox expand size)) =
+renderGadget iconTheme wInit env initial envC e b (Optional _ (MemoBox expand size)) =
       fmap outF <$> renderGadget
+            iconTheme
             wInit
             env
             (fromMaybe "" <$> initial)
@@ -841,37 +855,37 @@ renderGadget wInit env initial envC e b (Optional _ (MemoBox expand size)) =
       outF "" = Nothing
       outF txt = Just txt
 
-renderGadget wInit env initial envC e b (Optional _ (Combo itemF)) =
-      renderGadget wInit env initial envC e b $ Combo $ (nothingItem :) . map (fmap Just) . itemF
+renderGadget iconTheme wInit env initial envC e b (Optional _ (Combo itemF)) =
+      renderGadget iconTheme wInit env initial envC e b $ Combo $ (nothingItem :) . map (fmap Just) . itemF
    where
       nothingItem = ComboItem "" Nothing Nothing Nothing
 
-renderGadget wInit env initial envC e b (Optional _ TickBox) =
-   renderGadget wInit env initial envC e b $ Combo $ const [
+renderGadget iconTheme wInit env initial envC e b (Optional _ TickBox) =
+   renderGadget iconTheme wInit env initial envC e b $ Combo $ const [
          ComboItem "" Nothing Nothing Nothing,
          ComboItem "Yes" (Just "object-select-symbolic") Nothing (Just True),  -- Green tick
          ComboItem "No" (Just "list-remove-symbolic") Nothing (Just False)  -- Red cross
       ]
 
-renderGadget wInit env initial envC e b (Optional _ (FixedText textF Nothing)) =
-      renderGadget wInit env initial envC e b $ FixedText (maybe "" . textF) Nothing
+renderGadget iconTheme wInit env initial envC e b (Optional _ (FixedText textF Nothing)) =
+      renderGadget iconTheme wInit env initial envC e b $ FixedText (maybe "" . textF) Nothing
 
-renderGadget wInit env initial envC e b (Optional d (FixedText textF (Just selector1))) =
-      renderGadget wInit env initial envC e b $ FixedText (maybe "" . textF) $ Just selector2
+renderGadget iconTheme wInit env initial envC e b (Optional d (FixedText textF (Just selector1))) =
+      renderGadget iconTheme wInit env initial envC e b $ FixedText (maybe "" . textF) $ Just selector2
    where
       selector2 = promoteDialogSelector d _Just selector1
 
-renderGadget wInit env initial envC e b (Optional _ (FixedMemo expand size textF Nothing)) =
-      renderGadget wInit env initial envC e b $ FixedMemo expand size (maybe "" . textF) Nothing
+renderGadget iconTheme wInit env initial envC e b (Optional _ (FixedMemo expand size textF Nothing)) =
+      renderGadget iconTheme wInit env initial envC e b $ FixedMemo expand size (maybe "" . textF) Nothing
 
-renderGadget wInit env initial envC e b
+renderGadget iconTheme wInit env initial envC e b
          (Optional d (FixedMemo expand size textF (Just selector1))) =
-      renderGadget wInit env initial envC e b $
+      renderGadget iconTheme wInit env initial envC e b $
             FixedMemo expand size (maybe "" . textF) $ Just selector2
    where
       selector2 = promoteDialogSelector d _Just selector1
 
-renderGadget wInit _ initial _ e1 b1 (Optional _ (DateBox fmt)) =
+renderGadget _ wInit _ initial _ e1 b1 (Optional _ (DateBox fmt)) =
    {-# SCC "renderGadget_Optional_DateBox" #-} do
       let prsm = datePrism fmt
       (w, e2) <-
@@ -898,23 +912,26 @@ renderGadget wInit _ initial _ e1 b1 (Optional _ (DateBox fmt)) =
             gadgetValue = b1
          }
 
-renderGadget wInit _ initial _ e b (Optional _ (IconBox predicate)) =
+renderGadget iconTheme wInit _ initial _ e b (Optional _ (IconBox predicate)) =
    {-# SCC "renderGadget_Optional_IconBox" #-} do
-      pic <- Gtk.new Gtk.Image [
-            #sensitive := True,
-            #iconName := fromMaybe "no-icon" (initial ^. gdValue)
-         ]
+      currentName <- liftIO $ newIORef $ initial ^. gdValue
+      icon1 <- safeLoadIcon iconTheme $ fromMaybe "no-icon" $ initial ^. gdValue
+      pic <- Gtk.imageNewFromPixbuf $ Just icon1
+      Gtk.set pic [#sensitive := True]
       button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
       liftIO $ wInit pic
       liftIO $ wInit button
-      stop1 <- reactimate1 $ updateIcon pic . fromMaybe "no-icon" . _gdValue <$> e
-      ch <- changes $ updateIcon pic . fromMaybe "no-icon" . _gdValue <$> b
+      stop1 <- reactimate1 $ updateIcon currentName pic <$> e
+      ch <- changes $ updateIcon currentName pic <$> b
       stop2 <- reactimate1' ch
       void $ Gtk.onWidgetDestroy button $ stop1 >> stop2
       (nameE, handler) <- newEvent
       void $ Gtk.onButtonPressed button $ do
-         theme <- withWaitCursor button Gtk.iconThemeGetDefault
-         icons <- withWaitCursor button $ iconThemeContents theme False predicate
+         -- Debug code
+         ps <- Gtk.iconThemeGetSearchPath iconTheme
+         putStrLn $ "IconBox theme search path = " <> show ps
+         -- End debug
+         icons <- withWaitCursor button $ iconThemeContents iconTheme False predicate
          iconDialog pic icons $ \newIcon -> do
             let newValue = if newIcon == "no-icon" then Nothing else Just newIcon
             Gtk.set pic [#iconName := newIcon]
@@ -928,11 +945,15 @@ renderGadget wInit _ initial _ e b (Optional _ (IconBox predicate)) =
             gadgetValue = b
          }
    where
-      updateIcon pic nm = do
-         old <- Gtk.getImageIconName pic
-         when (Just nm /= old) $ Gtk.setImageIconName pic nm
+      updateIcon _ _ (GadgetData False _) = return ()
+      updateIcon ref pic (GadgetData True v) = do
+         oldName <- readIORef ref
+         when (oldName /= v) $ do
+            writeIORef ref v
+            icon1 <- safeLoadIcon iconTheme $ fromMaybe "no-icon" v
+            Gtk.imageSetFromPixbuf pic $ Just icon1
 
-renderGadget wInit _ initial _ e1 b1 (Optional _ ColourBox) =
+renderGadget _ wInit _ initial _ e1 b1 (Optional _ ColourBox) =
    {-# SCC "renderGadget_Optional_ColourBox" #-} do
       entry <- Gtk.new Gtk.Entry [#hexpand := True]
       liftIO $ wInit entry
@@ -984,9 +1005,9 @@ renderGadget wInit _ initial _ e1 b1 (Optional _ ColourBox) =
          old <- Gtk.getEntryText w
          when (old /= txt) $ Gtk.setEntryText w txt
 
-renderGadget wInit env initial envC e b (Optional _ s@FilePathSelector{}) =
+renderGadget iconTheme wInit env initial envC e b (Optional _ s@FilePathSelector{}) =
       fmap outFunc <$>
-         renderGadget wInit env (inFunc <$> initial) envC (fmap inFunc <$> e) (fmap inFunc <$> b) s
+         renderGadget iconTheme wInit env (inFunc <$> initial) envC (fmap inFunc <$> e) (fmap inFunc <$> b) s
    where
       inFunc Nothing = ""
       inFunc (Just str) = str
@@ -994,7 +1015,7 @@ renderGadget wInit env initial envC e b (Optional _ s@FilePathSelector{}) =
       outFunc "" = Nothing
       outFunc str = Just str
 
-renderGadget wInit _ initial _ e b (ImageDisplay sz) = {-# SCC "renderGadget_ImageDisplay" #-} do
+renderGadget _ wInit _ initial _ e b (ImageDisplay sz) = {-# SCC "renderGadget_ImageDisplay" #-} do
       imgWidget <- Gtk.imageNew
       liftIO $ wInit imgWidget
       liftIO $ updateImage imgWidget initial
@@ -1035,10 +1056,11 @@ renderGadget wInit _ initial _ e b (ImageDisplay sz) = {-# SCC "renderGadget_Ima
          MemoMedium -> (200, 300)
          MemoLarge -> (400, 600)
 
-renderGadget wInit env initial envC e b (Optional d g) = {-# SCC "renderGadget_Optional" #-} do
+renderGadget iconTheme wInit env initial envC e b (Optional d g) = {-# SCC "renderGadget_Optional" #-} do
       -- The general case for Optional decorates the inner widget with a check button. If there
       -- are no inner widgets then it just passes Nothing straight through.
       inner <- renderGadget
+            iconTheme
             wInit
             env
             (fromMaybe d <$> initial)
@@ -1095,10 +1117,11 @@ renderGadget wInit env initial envC e b (Optional d g) = {-# SCC "renderGadget_O
       outF True (GadgetData ok v) = GadgetData ok $ Just v
       outF False _ = GadgetData True Nothing
 
-renderGadget wInit env initial envC e b (Intercept dblFlag selector g) =
+renderGadget iconTheme wInit env initial envC e b (Intercept dblFlag selector g) =
    {-# SCC "renderGadget_Intercept" #-} mdo
       (activated, handler :: () -> IO ()) <- newEvent
       inner <- renderGadget
+            iconTheme
             (buttonIntercept handler)
             env
             initial
@@ -1107,7 +1130,7 @@ renderGadget wInit env initial envC e b (Intercept dblFlag selector g) =
             b
             g
       r <- case gadgetView inner of
-         w:_ -> mkGtkPopupSelect w envC selector $ ((),) . _gdValue <$> b <@ activated
+         w:_ -> mkGtkPopupSelect w iconTheme envC selector $ ((),) . _gdValue <$> b <@ activated
          _ -> return never
       return inner
    where
@@ -1127,25 +1150,31 @@ renderGadget wInit env initial envC e b (Intercept dblFlag selector g) =
                else
                   return False
 
-renderGadget wInit env initial envC e b (Icon iconF g) = {-# SCC "renderGadget_Icon" #-} do
-   boxWidget <- Gtk.boxNew Gtk.OrientationHorizontal 0
-   inner <- renderGadget wInit env initial envC e b g
-   liftIO $ wInit boxWidget
-   imageWidget <- Gtk.imageNewFromIconName (Just $ iconF $ initial ^. gdValue) $
-         fromIntegral $ fromEnum Gtk.IconSizeButton
-   Gtk.imageSetPixelSize imageWidget 16
-   liftIO $ wInit imageWidget
-   Gtk.boxPackStart boxWidget imageWidget False False 0
-   innerWidget <- boxWidgets wInit Vertical $ gadgetView inner
-   forM_ innerWidget $ \w -> Gtk.boxPackStart boxWidget w True True 0
-   eventLink imageWidget Gtk.setImageIconName $ iconF . _gdValue <$> e
-   behaviorLink imageWidget Gtk.setImageIconName $ iconF . _gdValue <$> b
-   w <- Gtk.toWidget boxWidget
-   return $ inner {gadgetView = [w]}
+renderGadget iconTheme wInit env initial envC e b (Icon iconF g) = {-# SCC "renderGadget_Icon" #-} do
+      boxWidget <- Gtk.boxNew Gtk.OrientationHorizontal 0
+      inner <- renderGadget iconTheme wInit env initial envC e b g
+      liftIO $ wInit boxWidget
+      icon1 <- Gtk.iconThemeLoadIcon
+            iconTheme
+            (iconF $ initial ^. gdValue)
+            (fromIntegral $ fromEnum Gtk.IconSizeButton)
+            []
+      imageWidget <- case icon1 of   -- If not found display broken icon rather than nothing.
+         Just i -> Gtk.imageNewFromPixbuf $ Just i
+         Nothing -> Gtk.imageNewFromIconName Nothing (fromIntegral $ fromEnum Gtk.IconSizeButton)
+      Gtk.imageSetPixelSize imageWidget 16
+      liftIO $ wInit imageWidget
+      Gtk.boxPackStart boxWidget imageWidget False False 0
+      innerWidget <- boxWidgets wInit Vertical $ gadgetView inner
+      forM_ innerWidget $ \w -> Gtk.boxPackStart boxWidget w True True 0
+      eventLink imageWidget Gtk.setImageIconName $ iconF . _gdValue <$> e
+      behaviorLink imageWidget Gtk.setImageIconName $ iconF . _gdValue <$> b
+      w <- Gtk.toWidget boxWidget
+      return $ inner {gadgetView = [w]}
 
-renderGadget wInit env initial envC e b (Coloured colourF g) =
+renderGadget iconTheme wInit env initial envC e b (Coloured colourF g) =
    {-# SCC "renderGadget_Coloured" #-} do
-      inner <- renderGadget wInit env initial envC e b g
+      inner <- renderGadget iconTheme wInit env initial envC e b g
       forM_ (gadgetView inner) $ \w ->
          widgetLinkColour
                w
@@ -1154,9 +1183,9 @@ renderGadget wInit env initial envC e b (Coloured colourF g) =
                (colourF . _gdValue <$> b)
       return inner
 
-renderGadget wInit env initial envC e b (Linked linkF g) =
+renderGadget iconTheme wInit env initial envC e b (Linked linkF g) =
    {-# SCC "renderGadget_Linked" #-} do
-      inner <- renderGadget wInit env initial envC e b g
+      inner <- renderGadget iconTheme wInit env initial envC e b g
       boxWidget <- Gtk.boxNew Gtk.OrientationHorizontal 0
       liftIO $ wInit boxWidget
       button <- Gtk.linkButtonNewWithLabel "" (Just "")
@@ -1184,8 +1213,8 @@ renderGadget wInit env initial envC e b (Linked linkF g) =
          Gtk.widgetSetTooltipText btn $ Just str
          Gtk.widgetSetSensitive btn True
 
-renderGadget wInit env initial envC e b (Styled textF g) = {-# SCC "renderGadget_Styled" #-} do
-      inner <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (Styled textF g) = {-# SCC "renderGadget_Styled" #-} do
+      inner <- renderGadget iconTheme wInit env initial envC e b g
       case gadgetView inner of
          w:_ -> do
             currentStyle <- liftIO $ newIORef Nothing
@@ -1207,8 +1236,8 @@ renderGadget wInit env initial envC e b (Styled textF g) = {-# SCC "renderGadget
             forM_ newStyle $ \txt ->
                forM_ ctxs $ \c -> Gtk.styleContextAddClass c txt
 
-renderGadget wInit env initial envC e b (Frame textF g) = {-# SCC "renderGadget_Frame" #-} do
-   inner <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (Frame textF g) = {-# SCC "renderGadget_Frame" #-} do
+   inner <- renderGadget iconTheme wInit env initial envC e b g
    boxWidget <- Gtk.frameNew $ textF $ initial ^. gdValue
    liftIO $ wInit boxWidget
    innerWidget <- boxWidgets wInit Vertical $ gadgetView inner
@@ -1220,7 +1249,7 @@ renderGadget wInit env initial envC e b (Frame textF g) = {-# SCC "renderGadget_
    w <- Gtk.toWidget boxWidget
    return $ inner {gadgetView = [w]}
 
-renderGadget wInit env initial envC e b (Form orient items) = {-# SCC "renderGadget_Form" #-} do
+renderGadget iconTheme wInit env initial envC e b (Form orient items) = {-# SCC "renderGadget_Form" #-} do
       tableWidget <- Gtk.new Gtk.Grid [#rowSpacing := 3, #columnSpacing := 3]
       liftIO $ wInit tableWidget
       let
@@ -1245,12 +1274,12 @@ renderGadget wInit env initial envC e b (Form orient items) = {-# SCC "renderGad
          case orient of
             Vertical -> Gtk.set label [#halign := Gtk.AlignEnd, #valign := Gtk.AlignCenter]
             Horizontal -> Gtk.set label [#halign := Gtk.AlignStart, #valign := Gtk.AlignCenter]
-         result <- renderGadget wInit env initial envC e b g
+         result <- renderGadget iconTheme wInit env initial envC e b g
          w1 <- Gtk.toWidget label
          w2 <- boxWidgets wInit Vertical $ gadgetView result
          return (w1, w2, result)
 
-renderGadget wInit env initial envC e b (TabForm tabs) = {-# SCC "renderGadget_TabForm" #-} do
+renderGadget iconTheme wInit env initial envC e b (TabForm tabs) = {-# SCC "renderGadget_TabForm" #-} do
       book <- Gtk.new Gtk.Notebook [
             #margin := 5,
             #scrollable := True,
@@ -1264,7 +1293,7 @@ renderGadget wInit env initial envC e b (TabForm tabs) = {-# SCC "renderGadget_T
       return (mergeOutputs results) {gadgetView = [w]}
    where
       addGadget book (l, g) = do
-         result <- renderGadget wInit env initial envC e b g
+         result <- renderGadget iconTheme wInit env initial envC e b g
          widget <- boxWidgets wInit Vertical (gadgetView result) >>= \case
             Nothing -> Gtk.labelNew (Just "") >>= Gtk.toWidget  -- Blank
             Just w -> return w
@@ -1273,7 +1302,7 @@ renderGadget wInit env initial envC e b (TabForm tabs) = {-# SCC "renderGadget_T
          void $ Gtk.notebookAppendPageMenu book widget (Just lbl) noWidget
          return result
 
-renderGadget wInit env initial envC e b (Box orient gss) = {-# SCC "renderGadget_Box" #-} do
+renderGadget iconTheme wInit env initial envC e b (Box orient gss) = {-# SCC "renderGadget_Box" #-} do
    (boxWidget, addSep) <-
       case orient of
          Vertical -> do
@@ -1290,7 +1319,7 @@ renderGadget wInit env initial envC e b (Box orient gss) = {-# SCC "renderGadget
                   sep <- Gtk.separatorNew Gtk.OrientationVertical
                   Gtk.boxPackStart boxWidget sep False False 0
             return (boxWidget, addSep)
-   outputss <- mapM (mapM $ renderGadget wInit env initial envC e b) gss
+   outputss <- mapM (mapM $ renderGadget iconTheme wInit env initial envC e b) gss
    let
       widgetss = filter (not . null) $ map (concatMap gadgetView) outputss  -- List of groups
       addGroup = mapM_ $ \w -> Gtk.boxPackStart boxWidget w True True 0
@@ -1299,7 +1328,7 @@ renderGadget wInit env initial envC e b (Box orient gss) = {-# SCC "renderGadget
    w <- Gtk.toWidget boxWidget
    return output {gadgetView = [w]}
 
-renderGadget wInit env initial envC e b (Grid colH rowH rows) = {-# SCC "renderGadget_Grid" #-} do
+renderGadget iconTheme wInit env initial envC e b (Grid colH rowH rows) = {-# SCC "renderGadget_Grid" #-} do
       gridWidget <- Gtk.new Gtk.Grid
          [#orientation := Gtk.OrientationHorizontal, #columnSpacing := 1]
       liftIO $ wInit gridWidget
@@ -1311,16 +1340,16 @@ renderGadget wInit env initial envC e b (Grid colH rowH rows) = {-# SCC "renderG
          Gtk.gridAttach gridWidget lbl 0 n 1 1
       evs <- forM (zip [1..] rows) $ \(rowNum, row) ->
          forM (zip [1..] row) $ \(colNum, cell) -> do
-            cellOut <- renderGadget wInit env initial envC e b cell
+            cellOut <- renderGadget iconTheme wInit env initial envC e b cell
             cellWidget <- boxWidgets wInit Vertical $ gadgetView cellOut
             forM_ cellWidget $ \w -> Gtk.gridAttach gridWidget w colNum rowNum 1 1
             return cellOut
       w <- Gtk.toWidget gridWidget
       return $ (mergeOutputs $ concat evs) {gadgetView = [w]}
 
-renderGadget wInit env initial envC e b (Validate predicate g) =
+renderGadget iconTheme wInit env initial envC e b (Validate predicate g) =
    {-# SCC "renderGadget_Validate" #-} do
-      result <- renderGadget wInit env initial envC e b g
+      result <- renderGadget iconTheme wInit env initial envC e b g
       currentState <- liftIO $ newIORef True
       let
          validInitial = validated env initial (gadgetInitial result) ^. gdOk
@@ -1349,9 +1378,9 @@ renderGadget wInit env initial envC e b (Validate predicate g) =
       showValid1 style False = Gtk.styleContextAddClass style "entry-error"
       showValid1 style True = Gtk.styleContextRemoveClass style "entry-error"
 
-renderGadget wInit env initial envC e b (ValidateText messageF g) =
+renderGadget iconTheme wInit env initial envC e b (ValidateText messageF g) =
    {-# SCC "renderGadget_ValidateText" #-} do
-      result <- renderGadget wInit env initial envC e b g
+      result <- renderGadget iconTheme wInit env initial envC e b g
       boxWidgets wInit Vertical (gadgetView result) >>= \case
          Nothing -> return result
          Just appWidget -> do
@@ -1397,7 +1426,7 @@ renderGadget wInit env initial envC e b (ValidateText messageF g) =
       showValid style True = Gtk.styleContextRemoveClass style "entry-error"
       showValid style False = Gtk.styleContextAddClass style "entry-error"
 
-renderGadget wInit env initial envC e b (TextBox prsmF) = {-# SCC "renderGadget_TextBox" #-} do
+renderGadget _ wInit env initial envC e b (TextBox prsmF) = {-# SCC "renderGadget_TextBox" #-} do
       currentPrism <- liftIO $ newIORef $ prsmF env
       let
          initialText = view (re $ prsmF env) <$> initial
@@ -1441,7 +1470,7 @@ renderGadget wInit env initial envC e b (TextBox prsmF) = {-# SCC "renderGadget_
             oldTxt <- Gtk.entryGetText w
             when (T.strip oldTxt /= T.strip newTxt) $ Gtk.setEntryText w newTxt
 
-renderGadget wInit _ initial _ e b DisplayText = {-# SCC "renderGadget_DisplayText" #-} do
+renderGadget _ wInit _ initial _ e b DisplayText = {-# SCC "renderGadget_DisplayText" #-} do
       -- Construct label in a button.
       label <- Gtk.new Gtk.Label [
             #label := initial ^. gdValue,
@@ -1490,7 +1519,7 @@ renderGadget wInit _ initial _ e b DisplayText = {-# SCC "renderGadget_DisplayTe
          Gtk.entrySetText entry txt
          Gtk.popoverPopup pop
 
-renderGadget wInit _ initial _ e b (MemoBox size vExpand) = {-# SCC "renderGadget_MemoBox" #-} do
+renderGadget _ wInit _ initial _ e b (MemoBox size vExpand) = {-# SCC "renderGadget_MemoBox" #-} do
       scroll <- Gtk.scrolledWindowNew noAdjustment noAdjustment
       liftIO $ wInit scroll
       style1 <- Gtk.widgetGetStyleContext scroll
@@ -1544,7 +1573,7 @@ renderGadget wInit _ initial _ e b (MemoBox size vExpand) = {-# SCC "renderGadge
          old <- Gtk.getTextBufferText buf
          when (Just v /= old) $ Gtk.setTextBufferText buf v
 
-renderGadget wInit _ initial _ e b DisplayMemo = {-# SCC "renderGadget_DisplayMemo" #-} do
+renderGadget _ wInit _ initial _ e b DisplayMemo = {-# SCC "renderGadget_DisplayMemo" #-} do
       -- Construct label in a button.
       label <- Gtk.new Gtk.Label [
             #label := initial ^. gdValue,
@@ -1614,7 +1643,7 @@ renderGadget wInit _ initial _ e b DisplayMemo = {-# SCC "renderGadget_DisplayMe
          Gtk.textBufferSetText buf txt (-1)
          Gtk.popoverPopup pop
 
-renderGadget wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_Combo" #-} do
+renderGadget _ wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_Combo" #-} do
       store <- MV.seqStoreNew $ makeEntries env
       MV.customStoreSetColumn store (MV.makeColumnIdString 0) (view _1) -- Item name
       MV.customStoreSetColumn store (MV.makeColumnIdString 1) (view _2) -- Icon name
@@ -1683,7 +1712,7 @@ renderGadget wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_Co
          in T.pack $ "rgba(" <> show r <> "," <> show g <> "," <> show b1 <> ",1)"
       toTextRGB c = C.luminance (getColour c) < 0.5
 
-renderGadget wInit env initial _ e b (Radio f) = {-# SCC "renderGadget_Radio" #-} do
+renderGadget _ wInit env initial _ e b (Radio f) = {-# SCC "renderGadget_Radio" #-} do
       let items = f env
       blocker <- liftIO $ newIORef False
       (buttons, clicks) <- unzip <$> mapM (mkButton blocker) items
@@ -1722,7 +1751,7 @@ renderGadget wInit env initial _ e b (Radio f) = {-# SCC "renderGadget_Radio" #-
                return $ if r then ((), Just $ GadgetData True v) else ((), Nothing)
          return (btn, filterJust usr)
 
-renderGadget wInit _ initial _ e b TickBox = {-# SCC "renderGadget_TickBox" #-} do
+renderGadget _ wInit _ initial _ e b TickBox = {-# SCC "renderGadget_TickBox" #-} do
       button <- Gtk.checkButtonNew
       liftIO $ wInit button
       (w, resultE) <-
@@ -1740,7 +1769,7 @@ renderGadget wInit _ initial _ e b TickBox = {-# SCC "renderGadget_TickBox" #-} 
          old <- Gtk.toggleButtonGetActive btn
          when (old /= v) $ Gtk.toggleButtonSetActive btn v
 
-renderGadget wInit env initial envC e b (Message textF) = {-# SCC "renderGadget_Message" #-} do
+renderGadget _ wInit env initial envC e b (Message textF) = {-# SCC "renderGadget_Message" #-} do
    label <- Gtk.labelNew $ Just $ textF env $ initial ^. gdValue
    liftIO $ wInit label
    let
@@ -1762,8 +1791,8 @@ renderGadget wInit env initial envC e b (Message textF) = {-# SCC "renderGadget_
          gadgetValue = b
       }
 
-renderGadget wInit env initial envC e b (Scrolled g) = {-# SCC "renderGadget_Scrolled" #-} do
-   result <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (Scrolled g) = {-# SCC "renderGadget_Scrolled" #-} do
+   result <- renderGadget iconTheme wInit env initial envC e b g
    widget <- boxWidgets wInit Vertical $ gadgetView result
    scroll <- forM widget $ \w -> do
       scroll <- Gtk.new Gtk.ScrolledWindow [
@@ -1775,7 +1804,7 @@ renderGadget wInit env initial envC e b (Scrolled g) = {-# SCC "renderGadget_Scr
       Gtk.toWidget scroll
    return result {gadgetView = maybeToList scroll}
 
-renderGadget wInit env initial envC e b (FixedText displayF nested) =
+renderGadget iconTheme wInit env initial envC e b (FixedText displayF nested) =
    {-# SCC "renderGadget_FixedText" #-} do
       let
          initText = displayF env $ initial ^. gdValue
@@ -1794,7 +1823,8 @@ renderGadget wInit env initial envC e b (FixedText displayF nested) =
                if btn == 1 && t == Gdk.EventType2buttonPress
                   then return (True, Just ())
                   else return (False, Nothing)
-            mkGtkPopupSelect entry envC selector $ ((),) . _gdValue <$> b <@ filterJust activated
+            mkGtkPopupSelect entry iconTheme envC selector $ ((),) . _gdValue <$>
+                  b <@ filterJust activated
       let
          allEvents = unionWith const editedValue e
          update w (env1, GadgetData True v1) = Gtk.setEntryText w $ displayF env1 v1
@@ -1804,7 +1834,7 @@ renderGadget wInit env initial envC e b (FixedText displayF nested) =
       w <- Gtk.toWidget entry
       return $ GadgetOut [w] never initial editedValue b
 
-renderGadget wInit env initial envC e b (FixedMemo size vExpand displayF nested) =
+renderGadget iconTheme wInit env initial envC e b (FixedMemo size vExpand displayF nested) =
    {-# SCC "renderGadget_FixedMemo" #-} do
       scroll <- Gtk.scrolledWindowNew noAdjustment noAdjustment
       liftIO $ wInit scroll
@@ -1842,6 +1872,7 @@ renderGadget wInit env initial envC e b (FixedMemo size vExpand displayF nested)
                   else return (False, Nothing)
             fmap (GadgetData True) . filterJust . fmap snd <$> mkGtkPopupSelect
                   vw
+                  iconTheme
                   envC
                   selector
                   (((),) . _gdValue <$> b <@ activated)
@@ -1859,7 +1890,7 @@ renderGadget wInit env initial envC e b (FixedMemo size vExpand displayF nested)
             gadgetValue = b
          }
 
-renderGadget wInit _ initial _ e b ClickableList = {-# SCC "renderGadget_ClickableList" #-} do
+renderGadget _ wInit _ initial _ e b ClickableList = {-# SCC "renderGadget_ClickableList" #-} do
       evBox <- Gtk.new Gtk.EventBox [#visibleWindow := True]
       label <- Gtk.labelNew Nothing
       ctx <- Gtk.widgetGetStyleContext label
@@ -1931,7 +1962,7 @@ renderGadget wInit _ initial _ e b ClickableList = {-# SCC "renderGadget_Clickab
             then return $ gclickBase <$> idxFunc (fromIntegral idx)
             else return Nothing
 
-renderGadget wInit _ initial _ e b (DateBox fmt) = {-# SCC "renderGadget_DateBox" #-} do
+renderGadget _ wInit _ initial _ e b (DateBox fmt) = {-# SCC "renderGadget_DateBox" #-} do
    let
       prsm :: Prism' Text Day
       prsm = datePrism fmt
@@ -1955,19 +1986,25 @@ renderGadget wInit _ initial _ e b (DateBox fmt) = {-# SCC "renderGadget_DateBox
          gadgetValue = b
       }
 
-renderGadget wInit _ initial _ e b (IconBox predicate) = {-# SCC "renderGadget_IconBox" #-} do
-      pic <- Gtk.new Gtk.Image [#sensitive := True, #iconName := initial ^. gdValue]
+renderGadget iconTheme wInit _ initial _ e b (IconBox predicate) = {-# SCC "renderGadget_IconBox" #-} do
+      currentName <- liftIO $ newIORef $ initial ^. gdValue
+      icon1 <- safeLoadIcon iconTheme $ initial ^. gdValue
+      pic <- Gtk.imageNewFromPixbuf $ Just icon1
+      Gtk.set pic [#sensitive := True]
       liftIO $ wInit pic
       button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
       liftIO $ wInit button
       (nameE, handler) <- newEvent
-      stop1 <- reactimate1 $ updateImage pic <$> e
-      ch <- changes $ updateImage pic <$> b
+      stop1 <- reactimate1 $ updateImage currentName pic <$> e
+      ch <- changes $ updateImage currentName pic <$> b
       stop2 <- reactimate1' ch
       void $ Gtk.onWidgetDestroy button $ stop1 >> stop2
       void $ Gtk.onButtonPressed button $ do
-         theme <- withWaitCursor button Gtk.iconThemeGetDefault
-         icons <- withWaitCursor button $ iconThemeContents theme False predicate
+         -- Debug code
+         ps <- Gtk.iconThemeGetSearchPath iconTheme
+         putStrLn $ "IconBox theme search path = " <> show ps
+         -- End debug
+         icons <- withWaitCursor button $ iconThemeContents iconTheme False predicate
          iconDialog pic icons $ \newIcon -> do
             Gtk.set pic [#iconName := newIcon]
             handler $ GadgetData True newIcon
@@ -1980,12 +2017,15 @@ renderGadget wInit _ initial _ e b (IconBox predicate) = {-# SCC "renderGadget_I
             gadgetValue = b
          }
    where
-      updateImage _ (GadgetData False _) = return ()
-      updateImage pic (GadgetData True v) = do
-         oldName <- Gtk.getImageIconName pic
-         when (oldName /= Just v) $ Gtk.setImageIconName pic v
+      updateImage _ _ (GadgetData False _) = return ()
+      updateImage ref pic (GadgetData True v) = do
+         oldName <- readIORef ref
+         when (oldName /= v) $ do
+            writeIORef ref v
+            icon1 <- safeLoadIcon iconTheme v
+            Gtk.imageSetFromPixbuf pic $ Just icon1
 
-renderGadget wInit _ initial _ e b ColourBox = {-# SCC "renderGadget_ColourBox" #-} do
+renderGadget _ wInit _ initial _ e b ColourBox = {-# SCC "renderGadget_ColourBox" #-} do
       entry <- Gtk.new Gtk.Entry [#hexpand := True]
       liftIO $ wInit entry
       widgetLinkColour
@@ -2039,7 +2079,7 @@ renderGadget wInit _ initial _ e b ColourBox = {-# SCC "renderGadget_ColourBox" 
          let new = c ^. re colourPrism
          when (old /= new) $ Gtk.setEntryText w new
 
-renderGadget wInit env initial _ e b (TreeSelector forestF) =
+renderGadget _ wInit env initial _ e b (TreeSelector forestF) =
    {-# SCC "renderGadget_TreeSelector" #-} do
       let items1 = trimForest $ forestF env
       store <- Gtk.treeStoreNew [Gtk.gtypeString, Gtk.gtypeString]
@@ -2156,7 +2196,7 @@ renderGadget wInit env initial _ e b (TreeSelector forestF) =
          -> m [([Int32], a)]
       addStoreForest store iter forest = concat <$> mapM (addStoreTree store iter) forest
 
-renderGadget wInit _ initial envC e b (Table flags columns nested) =
+renderGadget iconTheme wInit _ initial envC e b (Table flags columns nested) =
    {-# SCC "renderGadget_Table" #-} do
       (vw, store, activated, userEdit) <-
          mkTableView
@@ -2170,7 +2210,7 @@ renderGadget wInit _ initial envC e b (Table flags columns nested) =
       case nested of
          Nothing -> return ()
          Just selector -> do
-            editedRow <- mkGtkPopupSelect vw envC selector activated
+            editedRow <- mkGtkPopupSelect vw iconTheme envC selector activated
             stop <- reactimate1 $ editedRow <&> \(n, mv) ->
                   forM_ mv $ \v -> MV.seqStoreSetValue store n v
             void $ Gtk.onWidgetDestroy vw stop
@@ -2183,7 +2223,7 @@ renderGadget wInit _ initial envC e b (Table flags columns nested) =
             gadgetValue = b
          }
 
-renderGadget wInit env initial envC e b (ForestTable headerGroups lensForest) =
+renderGadget iconTheme wInit env initial envC e b (ForestTable headerGroups lensForest) =
    {-# SCC "renderGadget_ForestTable" #-} do
       -- Create the widget hierarchy.
       vbox <- Gtk.boxNew Gtk.OrientationVertical 0
@@ -2273,7 +2313,7 @@ renderGadget wInit env initial envC e b (ForestTable headerGroups lensForest) =
          v <- forM gs $ \g -> do
                let g2 = focusingOver (getLens lns1) $
                      send (Just . Right . (k,)) <<< sendMap (Just . Left) g
-               renderGadget wInit env initial envC e b g2 >>= boxGadget
+               renderGadget iconTheme wInit env initial envC e b g2 >>= boxGadget
          forestOut <- gadgetForest gss forest
          return $ Node v forestOut
       gadgetForest [] _ = return []
@@ -2403,7 +2443,7 @@ renderGadget wInit env initial envC e b (ForestTable headerGroups lensForest) =
       longZip f (x1:xs1) (x2:xs2) = f x1 x2 : longZip f xs1 xs2
       longestWord = fromIntegral . maximum . (0:) . map T.length . T.words
 
-renderGadget wInit _ _ _ e b (ButtonBar buttons) = {-# SCC "renderGadget_ButtonBar" #-} do
+renderGadget _ wInit _ _ _ e b (ButtonBar buttons) = {-# SCC "renderGadget_ButtonBar" #-} do
       buttonBox <- Gtk.buttonBoxNew Gtk.OrientationHorizontal
       liftIO $ wInit buttonBox
       Gtk.buttonBoxSetLayout buttonBox Gtk.ButtonBoxStyleCenter
@@ -2429,7 +2469,7 @@ renderGadget wInit _ _ _ e b (ButtonBar buttons) = {-# SCC "renderGadget_ButtonB
       u v@(GadgetData True _) (GadgetData False _) = v
       u (GadgetData False _) (GadgetData False _) = GadgetData False id
 
-renderGadget wInit _ _ envC _ b (ButtonIO label act) = {-# SCC "renderGadget_ButtonIO" #-} do
+renderGadget _ wInit _ _ envC _ b (ButtonIO label act) = {-# SCC "renderGadget_ButtonIO" #-} do
       button <- Gtk.new Gtk.Button [#label := label]
       liftIO $ wInit button
       click <- registerIOSignal button Gtk.onButtonClicked $ return ((), act)
@@ -2456,7 +2496,7 @@ renderGadget wInit _ _ envC _ b (ButtonIO label act) = {-# SCC "renderGadget_But
       errMsg err = "Could not complete the operation.\n\n\
             \Technical details: " <> T.pack (show err)
 
-renderGadget wInit _ initial _ e _ (Image path) = {-# SCC "renderGadget_Image" #-} do
+renderGadget _ wInit _ initial _ e _ (Image path) = {-# SCC "renderGadget_Image" #-} do
       imageWidget <- Gtk.imageNewFromFile path
       liftIO $ wInit imageWidget
       Gtk.widgetShow imageWidget
@@ -2479,7 +2519,7 @@ renderGadget wInit _ initial _ e _ (Image path) = {-# SCC "renderGadget_Image" #
             gadgetValue = resultB
          }
 
-renderGadget wInit env initial envC e b (ForestEditor labelFunc menuFunc legalParent dSel) =
+renderGadget iconTheme wInit env initial envC e b (ForestEditor labelFunc menuFunc legalParent dSel) =
    {-# SCC "renderGadget_ForestEditor" #-} mdo
       info <- liftIO $ getStdRandom random  -- Unique identifier for this tree editor instance.
       -- Configure the tree view with one column for the item text.
@@ -2529,7 +2569,7 @@ renderGadget wInit env initial envC e b (ForestEditor labelFunc menuFunc legalPa
                ((,) <$> changesB envC <@> insertion)
          Nothing -> return never
       inserts <- case dSel of
-         Just s -> mkGtkPopupSelect vw envC (disableApply1 s) insertion
+         Just s -> mkGtkPopupSelect vw iconTheme envC (disableApply1 s) insertion
          Nothing -> return never
       stop6 <- reactimate1 $ unionWith const inserts insertsNoDialog <&>
          (\((path, n), mVal) -> case mVal of
@@ -2548,7 +2588,7 @@ renderGadget wInit env initial envC e b (ForestEditor labelFunc menuFunc legalPa
                      $ return ((), Nothing)
                Just (Node frag _) -> return ((), Just (path2, frag)))
       edits <- case dSel of
-         Just s -> mkGtkPopupSelect vw envC s activations
+         Just s -> mkGtkPopupSelect vw iconTheme envC s activations
          Nothing -> return never
       stop4 <- reactimate1 $ edits <&> (\(path, mVal) -> case mVal of
             Nothing -> return ()
@@ -2751,7 +2791,7 @@ renderGadget wInit env initial envC e b (ForestEditor labelFunc menuFunc legalPa
          insertHandler ((path, 0), v)
       processMenuSelection _ _ _ _ = return ()   -- Do nothing.
 
-renderGadget wInit _ initial _ e b (FilePathSelector title purpose filterList confirmFlag) =
+renderGadget _ wInit _ initial _ e b (FilePathSelector title purpose filterList confirmFlag) =
    {-# SCC "renderGadget_FilePathSelector" #-} do
       entry <- Gtk.new Gtk.Entry [#hexpand := True, #widthChars := 30]
       liftIO $ wInit entry
@@ -2802,8 +2842,8 @@ renderGadget wInit _ initial _ e b (FilePathSelector title purpose filterList co
                Gtk.nativeDialogDestroy d
                return Nothing
 
-renderGadget wInit env initial envC e b (Trace lbl inF outF g) = {-# SCC "renderGadget_Trace" #-} do
-      result <- renderGadget wInit env initial envC e b g
+renderGadget iconTheme wInit env initial envC e b (Trace lbl inF outF g) = {-# SCC "renderGadget_Trace" #-} do
+      result <- renderGadget iconTheme wInit env initial envC e b g
       liftIO $ hPutStrLn stderr $
             "Initialising " <> lbl <>  ": " <>
             inF (initial ^. gdValue) <> " -> " <>
@@ -2937,6 +2977,34 @@ boxWidgets wInit orient ws = do
    forM_ ws $ \w -> Gtk.boxPackStart boxWidget w True True 0
    w <- Gtk.toWidget boxWidget
    return $ Just w
+
+
+-- | Load a named icon at "Gtk.IconSizeButton" or a broken icon if the icon is not found.
+--
+-- "Gtk.iconThemeLoadIcon" throws an error instead of returning "Nothing", so this checks first.
+safeLoadIcon :: (MonadIO m) => Gtk.IconTheme -> Text -> m Gdk.Pixbuf
+safeLoadIcon theme name =
+      Gtk.iconThemeHasIcon theme name >>= \case
+         True -> do
+            icon1 <- Gtk.iconThemeLoadIcon theme name sz []
+            maybe failIcon return icon1
+         False -> failIcon
+   where
+      sz = fromIntegral $ fromEnum Gtk.IconSizeButton
+      failIcon = do
+         i <- Gtk.imageNewFromIconName Nothing (fromIntegral $ fromEnum Gtk.IconSizeButton)
+         Gtk.imageGetPixbuf i >>= \case
+            Just pix -> return pix
+            Nothing ->  -- Ultimate fallback. Should never happen.
+               Gdk.pixbufNewFromXpmData [
+                  "! XPM2",
+                  "4 4 2 1",
+                  "* c #000000",
+                  ". c #ffffff",
+                  "*..*",
+                  ".**.",
+                  ".**.",
+                  "*..*"]
 
 
 -- Specialisations of Nothing to satisfy the type system.

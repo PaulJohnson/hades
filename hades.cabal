@@ -16,8 +16,20 @@ data-files:
    share/hades/hicolor/scalable/categories/*.svg
    share/hades/hicolor/index.theme
    share/hades/hicolor/icon-theme.cache
-   share/hades/hicolor/scalable/actions/*.svg
+   share/hades/hicolor/scalable-up-to-32/status/*.svg
+   share/hades/hicolor/16x16/stock/image/*.png
+   share/hades/hicolor/16x16/actions/*.symbolic.png
+   share/hades/hicolor/24x24/actions/*.symbolic.png
+   share/hades/hicolor/32x32/actions/*.symbolic.png
+   share/hades/hicolor/48x48/actions/*.symbolic.png
+   share/hades/hicolor/48x48/actions/*.png
+   share/hades/hicolor/48x48/categories/*.png
+   share/hades/hicolor/48x48/stock/image/*.png
+   share/hades/hicolor/64x64/actions/*.symbolic.png
+   share/hades/hicolor/96x96/actions/*.symbolic.png
+   share/hades/hicolor/scalable/categories/*.svg
    share/hades/hicolor/scalable/stock/image/*.svg
+   share/hades/hicolor/scalable/actions/*.svg
    share/hades/editor-ui.glade
    share/hades/hades-gtk.css
    share/hades/report.css

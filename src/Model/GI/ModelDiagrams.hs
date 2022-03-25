@@ -158,6 +158,7 @@ getInterpreterIOAction _ = Nothing
 -- set of entities, and an event for updates to the hint text.
 processModelScripts :: (EntityClass v, p ~ HadesRender, Gtk.IsWidget w) =>
    w                  -- ^ Widget to act as parent for dialogs.
+   -> Gtk.IconTheme
    -> BookManager p v
    -> Behavior (Set ModelId)  -- ^ Set of selected entities.
    -> Changes (Model v)
@@ -168,7 +169,7 @@ processModelScripts :: (EntityClass v, p ~ HadesRender, Gtk.IsWidget w) =>
          Event (Set ModelId),
          Event (Maybe Text),
          Event ModelError)
-processModelScripts widget book selection modelC scriptsIn = mdo
+processModelScripts widget iconTheme book selection modelC scriptsIn = mdo
       gen <- fromPoll newGenerator
       -- Some steps are instantaneous, so they must be fed back via a new event to prevent an
       -- effect being simultaneous with its cause.
@@ -184,7 +185,7 @@ processModelScripts widget book selection modelC scriptsIn = mdo
                (\((es, contF), r) -> (es, contF r)) <$> newPropertyEvents,
                newDialogEvents    -- Continuation when dialog OK or Apply clicked.
             ]
-         results = interpretScript widget modelC <$> selection <*> hintB <@> scripts
+         results = interpretScript widget iconTheme modelC <$> selection <*> hintB <@> scripts
          errors = filterJust $ getInterpreterError <$> results
          properties = filterJust $ getInterpreterOpenProperties <$> results
          dialogs = filterJust $ getInterpreterOpenDialog <$> results
@@ -195,7 +196,7 @@ processModelScripts widget book selection modelC scriptsIn = mdo
          output = filterJust $ getInterpreterUpdate <$> results
       -- Respond to different events.
       modelErrorWarningOn widget errors
-      propertyUpdates <- execute $ popupPropertiesEvent widget <$> properties
+      propertyUpdates <- execute $ popupPropertiesEvent widget iconTheme <$> properties
       newPropertyEvents <- switchE =<< accumE never (unionWith const <$> propertyUpdates)
       (nullDialogEvents, dialogUpdates) <- split <$> execute dialogs
       newDialogEvents <- switchE =<< accumE never (unionWith const <$> dialogUpdates)
@@ -209,7 +210,7 @@ processModelScripts widget book selection modelC scriptsIn = mdo
       void $ Gtk.onWidgetDestroy widget $ stop1 >> stop2 >> stop3 >> stop4 >> stop5
       return (output, snd <$> newSelections, snd <$> hints, errors)
    where
-      activateDiagram wrapper = openDiagramInBook book wrapper selection modelC
+      activateDiagram wrapper = openDiagramInBook iconTheme book wrapper selection modelC
       performIOAction resultH (act, state) =
          Ex.try act >>= \case
             Left (ex :: Ex.IOException) ->
@@ -220,12 +221,13 @@ processModelScripts widget book selection modelC scriptsIn = mdo
 -- | Compile the model extensions into a dialog selector and use that to display a dialog.
 popupPropertiesEvent :: (Gtk.IsWidget parent, EntityClass v) =>
    parent
+   -> Gtk.IconTheme
    -> ((ModelEditState v, cont), ModelId)
    -> MomentIO (Event (
          (ModelEditState v, cont),
          Maybe (Entity v, ReferenceValues)
       ))
-popupPropertiesEvent parent (k@(state, _), uuid) = do
+popupPropertiesEvent parent iconTheme (k@(state, _), uuid) = do
       let model = stateModel state
       case M.lookup uuid $ modelContents model of
          Nothing -> do
@@ -239,19 +241,20 @@ popupPropertiesEvent parent (k@(state, _), uuid) = do
                   Nothing ->
                      return never
                   Just (dialog :: Dialog' (Model v) () (Maybe (Entity v, ReferenceValues))) ->
-                     createDialog parent (pure model) (k, Just v, dialog)
+                     createDialog parent iconTheme (pure model) (k, Just v, dialog)
             return $ fmap (fmap (fromMaybe (ent, refs))) <$> r
 
 
 -- | Interprets a script and returns the next externally visible action.
 interpretScript :: (EntityClass v, Gtk.IsWidget parent) =>
    parent
+   -> Gtk.IconTheme
    -> Changes (Model v)
    -> Set ModelId  -- ^ Current selection set.
    -> Maybe Text   -- ^ Current hint value.
    -> (ModelEditState v, ModelScript p v v a)
    -> InterpreterResult p v a
-interpretScript parent modelC selection hint (state, script) =
+interpretScript parent iconTheme modelC selection hint (state, script) =
    case runModelEdit id state $ runFreeT $ stepScript script of
       Left err -> InterpreterError err
       Right (ModelUpdate result newModel newLogs, newState) ->
@@ -262,18 +265,20 @@ interpretScript parent modelC selection hint (state, script) =
                model <- valueB $ changesB modelC
                case dSel model v of
                   Just dialog -> do
-                     clicks <- createDialog parent modelC (nxt, v, dialog)
+                     clicks <- createDialog parent iconTheme modelC (nxt, v, dialog)
                      return $ Right $ (\(f, r) -> (newState, UserScript $ f r)) <$> clicks
                   Nothing ->
                      return $ Left (newState, UserScript $ nxt $ Just v)
             Free (ScriptOpenDiagram d nxt) ->
                InterpreterOpenEntity ((newState, UserScript nxt), d)
             Free (ScriptGetSelection nxt) ->
-               interpretScript parent modelC selection hint (state, UserScript $ nxt selection)
+               interpretScript parent iconTheme modelC selection hint
+                     (state, UserScript $ nxt selection)
             Free (ScriptSetSelection newSel nxt) ->
                InterpreterSelection ((newState, UserScript nxt), newSel)
             Free (ScriptGetHint nxt) ->
-               interpretScript parent modelC selection hint (newState, UserScript $ nxt hint)
+               interpretScript parent iconTheme modelC selection hint
+                     (newState, UserScript $ nxt hint)
             Free (ScriptSetHint newHint nxt) ->
                InterpreterSetHint ((newState, UserScript nxt), newHint)
             Free (ScriptPerformIO act) ->
@@ -286,13 +291,15 @@ interpretScript parent modelC selection hint (state, script) =
 -- entity. The return result is the active entity and an event which is triggered if
 -- this diagram hyperlinks to another one.
 entityEditor :: (p ~ HadesRender, EntityClass v, Eq v, Reflective v) =>
-   BookManager p v   -- ^ The notebook windows for new diagrams opened by this one.
+   Gtk.IconTheme
+   -> BookManager p v   -- ^ The notebook windows for new diagrams opened by this one.
    -> EntityWrapper p v
    -> Behavior (Set ModelId)  -- ^ The selected items in the model.
    -> Changes (Model v)  -- ^ The model that contains this diagram.
    -> MomentIO (Maybe (ActiveEntity p v))
 -- DiagramWrapper case
 entityEditor
+      iconTheme
       manager
       wrapper@(DiagramWrapper uuid diagram dPrism prsm dSel ctx menu toolbar)
       selectionB
@@ -400,7 +407,7 @@ entityEditor
          (propertyItems, itemH) <- newEvent
          stop <- reactimate1 $ events <&> mapM_ (\item -> itemH (identifier item, item))
          void $ Gtk.onWidgetDestroy parent stop
-         filterJust . fmap promoteMaybe <$> mkGtkPopupSelect parent modelC dSel propertyItems
+         filterJust . fmap promoteMaybe <$> mkGtkPopupSelect parent iconTheme modelC dSel propertyItems
       promoteMaybe :: (a, Maybe b) -> Maybe (a, b)
       promoteMaybe (_, Nothing) = Nothing
       promoteMaybe (v1, Just v2) = Just (v1, v2)
@@ -425,7 +432,7 @@ entityEditor
                   tellAll
                   yieldViews
 -- ViewWrapper case
-entityEditor _ wrapper@(ViewWrapper _ _ state1 inputState gadget) _ modelC = do
+entityEditor iconTheme _ wrapper@(ViewWrapper _ _ state1 inputState gadget) _ modelC = do
       (refreshE, refreshH) <- newEvent
       model1 <- valueB $ changesB modelC
       let
@@ -450,6 +457,7 @@ entityEditor _ wrapper@(ViewWrapper _ _ state1 inputState gadget) _ modelC = do
                widgetFocusInit = const $ return ()
             outputInit <- {-# SCC "Original-view" #-}
                renderGadget
+                     iconTheme
                      widgetFocusInit
                      model1
                      (GadgetData True (state1, input1))
@@ -459,7 +467,7 @@ entityEditor _ wrapper@(ViewWrapper _ _ state1 inputState gadget) _ modelC = do
                      gadget
             outputRefreshed <- {-# SCC "outputRefreshed" #-} execute $
                (\model initial ->
-                  renderGadget widgetFocusInit model initial modelC never loopB gadget)
+                  renderGadget iconTheme widgetFocusInit model initial modelC never loopB gadget)
                <$> changesB modelC
                <*> loopB
                <@ refreshE
@@ -542,16 +550,17 @@ diagramInsertEntity pt modelId =
 -- | If the diagram is already open then jump to it. Otherwise open it as a new page and return
 -- its updates to the model. Returns the IO action which actually displays the diagram.
 openDiagramInBook :: (EntityClass v, p ~ HadesRender) =>
-   BookManager p v            -- ^ The notebook where this editor is to be displayed.
+   Gtk.IconTheme
+   -> BookManager p v            -- ^ The notebook where this editor is to be displayed.
    -> EntityWrapper p v       -- ^ Details of the diagram to be edited.
    -> Behavior (Set ModelId)  -- ^ Set of selected entities.
    -> Changes (Model v)       -- ^ The model that contains the diagram.
    -> MomentIO (IO ())
-openDiagramInBook manager wrapper selection model = do
+openDiagramInBook iconTheme manager wrapper selection model = do
       contents <- liftIO $ readIORef $ bookManagerContents manager
       case find (sameEntityView wrapper . activeWrapper) contents of
          Nothing ->   -- Create a new entry in the book manager.
-            entityEditor manager wrapper selection model >>= \case
+            entityEditor iconTheme manager wrapper selection model >>= \case
                Nothing -> return $ return ()  -- Nothing to show.
                Just newDiagram -> do
                   books <- allBooks manager
@@ -639,13 +648,14 @@ data EditorOutput v = EditorOutput {
 -- | Set up a model editor with the tree widget and empty notebook in a Horizontal Pane.
 editorWindows :: (Gtk.IsWindow window, Editable p v, EntityClass v, Eq v, p ~ HadesRender) =>
    window  -- ^ The top level window in which the editor is displayed.
+   -> Gtk.IconTheme
    -> StockFunc v  -- ^ The stock icons to use with each @v@.
    -> Model v              -- ^ The initial value of the model to display.
    -> Changes (Model v)   -- ^ The model.
    -> Event ()            -- ^ Refresh button clicks.
    -> Event (ModelScript p v v (Maybe Text))  -- ^ Other scripts sent in by the outer GUI.
    -> MomentIO (EditorOutput v)
-editorWindows window picF modelInit modelC refreshE scriptE = mdo
+editorWindows window iconTheme picF modelInit modelC refreshE scriptE = mdo
       width <- liftIO $ fst <$> Gtk.windowGetSize window
             -- To set sensible widths for the children.
       (initialBook, manager) <- newBookManager zoomE refreshE
@@ -679,6 +689,7 @@ editorWindows window picF modelInit modelC refreshE scriptE = mdo
       let latestProperty = entityPropertyData <$> propertySelectionE2
       (propertiesFrame, propertiesUpdates, propertyScriptE) <-
          mkDialogWidget
+               iconTheme
                mempty
                modelInit
                modelC
@@ -686,7 +697,7 @@ editorWindows window picF modelInit modelC refreshE scriptE = mdo
                (U.nil, pure Nothing)
                latestProperty
       (modelUpdates, scriptSelections, hintE, exceptionE) <-
-         processModelScripts treeWidget manager selectB modelC $
+         processModelScripts treeWidget iconTheme manager selectB modelC $
                foldr (unionWith mergeScripts) never [
                      treeScripts,
                      updateFromProperty <$> propertiesUpdates,
@@ -804,10 +815,11 @@ newTabLabel widget textB = do
 -- | Export a drawing to a file in one of the supported formats.
 exportDrawing :: (Gtk.IsWidget parent) =>
    parent    -- ^ Widget in parent window for dialog.
+   -> Gtk.IconTheme
    -> DiagramExport    -- ^ Drawing to be exported.
    -> IO ()
-exportDrawing parent (drawing, boxWidget) = do
-      runDialog parent typeDialog () (head exportTypes) >>= \case
+exportDrawing parent iconTheme (drawing, boxWidget) = do
+      runDialog parent iconTheme typeDialog () (head exportTypes) >>= \case
          -- "head" is safe because exportTypes is constant
          Nothing -> return ()
          Just (typName, typ, glob) -> do

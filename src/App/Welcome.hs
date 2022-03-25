@@ -1,4 +1,3 @@
-{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE CPP #-}
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
@@ -46,8 +45,8 @@ welcomeExample = lens _welcomeExample $ \r p -> r{_welcomeExample = p}
 
 -- | Display a welcome screen unless the Boolean @force@ argument is @False@ and user has
 -- previously clicked the \"Don't show me this again\" box.
-welcomeScreen :: (Gtk.IsWidget parent) => parent -> Bool -> IO (Maybe FilePath)
-welcomeScreen parent force = do
+welcomeScreen :: (Gtk.IsWidget parent) => parent -> Gtk.IconTheme -> Bool -> IO (Maybe FilePath)
+welcomeScreen parent iconTheme force = do
    dataDir <- getProgramDataFolder
    let
       imageFile = dataDir </> "welcome.svg"
@@ -63,7 +62,7 @@ welcomeScreen parent force = do
       d = welcomeDialog imageFile uri examples
    if force || not don'tShow
       then
-         runDialog parent d () defaultWelcome >>= \case
+         runDialog parent iconTheme d () defaultWelcome >>= \case
             Nothing -> return Nothing
             Just r -> do
                catch

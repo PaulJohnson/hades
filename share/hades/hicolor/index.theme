@@ -2,7 +2,7 @@
 Name=hicolor
 Comment=hicolor Icon Theme
 
-Directories=scalable-up-to-32/status,scalable/stock/image,scalable/stock,scalable/categories,scalable/actions,96x96/actions,64x64/actions,48x48/actions,32x32/actions,24x24/actions,16x16/stock/image,16x16/stock,16x16/actions,
+Directories=scalable-up-to-32/status,scalable/stock/image,scalable/stock,scalable/categories,scalable/actions,96x96/actions,64x64/actions,48x48/stock/image,48x48/stock,48x48/categories,48x48/actions,32x32/actions,24x24/actions,16x16/stock/image,16x16/stock,16x16/actions,
 
 [96x96/actions]
 Size=96
@@ -13,6 +13,24 @@ MaxSize=512
 [64x64/actions]
 Size=64
 Context=actions
+Type=Fixed
+MaxSize=512
+
+[48x48/stock/image]
+Size=48
+Context=image
+Type=Fixed
+MaxSize=512
+
+[48x48/stock]
+Size=48
+Context=stock
+Type=Fixed
+MaxSize=512
+
+[48x48/categories]
+Size=48
+Context=categories
 Type=Fixed
 MaxSize=512
 

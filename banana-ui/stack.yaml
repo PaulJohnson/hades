@@ -20,13 +20,15 @@ extra-deps:
   - git: https://github.com/PaulJohnson/reactive-banana.git
     commit: 684dd9eeabfaa66928d51515634bae0e53d3773c
     subdir: reactive-banana
-  - javascript-bridge-0.2.0
+  - blank-canvas-0.7.3
   - cascading-0.1.0
   - cipher-aes128-0.7.0.5
   - DRBG-0.5.5
   - gi-cairo-connector-0.1.0
   - gi-cairo-render-0.1.0
   - image-type-0.1.0.0
+  - javascript-bridge-0.2.0
+  - kansas-comet-0.4.1
   - web-routes-0.27.14.3
 
 resolver: lts-18.27
