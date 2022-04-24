@@ -7,9 +7,6 @@ Copyright © Paul Johnson 2019. See LICENSE file for details.
 This file is part of the banana-ui-gtk library.
 -}
 
--- |
-
-
 module Reactive.Banana.GI.Table (
    mkTableView,
    mkTableColumn,
@@ -42,14 +39,15 @@ import Reactive.Banana.Table
 -- | A table allowing you to edit a list of items. Returns a widget containing the list, the
 -- data store, an event for row activation, and an event for an edit to the list.
 mkTableView :: (Eq row) =>
-   [TableEditing row]  -- ^ Flags for how this table may be edited.
+   Gtk.IconTheme
+   -> [TableEditing row]  -- ^ Flags for how this table may be edited.
    -> Bool   -- ^ If True then send row activation events (see return value).
    -> Table row   -- ^ Definition of table columns.
    -> [row]  -- ^ Initial content for table.
    -> Event [row]  -- ^ Updates for table content.
    -> Behavior [row]
    -> MomentIO (Gtk.Box, MV.SeqStore row, Event (Int32, row), Event [row])
-mkTableView flags activationFlag cols initial e b = do
+mkTableView iconTheme flags activationFlag cols initial e b = do
       store <- MV.seqStoreNew initial
       scroll <- Gtk.scrolledWindowNew noAdjustment noAdjustment
       style <- Gtk.widgetGetStyleContext scroll
@@ -91,7 +89,7 @@ mkTableView flags activationFlag cols initial e b = do
       -- Selection plumbing.
       sel <- Gtk.treeViewGetSelection vw
       Gtk.treeSelectionSetMode sel Gtk.SelectionModeSingle
-      forM_ cols $ mkTableColumn (modifyStore store) vw store >=> Gtk.treeViewAppendColumn vw
+      forM_ cols $ mkTableColumn iconTheme (modifyStore store) vw store >=> Gtk.treeViewAppendColumn vw
       buttons <- Gtk.buttonBoxNew Gtk.OrientationHorizontal
       Gtk.buttonBoxSetLayout buttons Gtk.ButtonBoxStyleCenter
       editEvents <- forM flags $ \case
@@ -190,12 +188,13 @@ mkTableView flags activationFlag cols initial e b = do
 
 -- | Create a column within a table.
 mkTableColumn :: (MonadIO m, MV.IsTypedTreeModel s, Gtk.IsTreeModel (s row)) =>
-   (Gtk.TreePath -> (row -> row) -> IO ())
+   Gtk.IconTheme
+   -> (Gtk.TreePath -> (row -> row) -> IO ())
    -> Gtk.TreeView
    -> s row
    -> TableColumn row
    -> m Gtk.TreeViewColumn
-mkTableColumn modifyModel vw model (TableColumn (col :: TableField row a)) = do
+mkTableColumn iconTheme modifyModel vw model (TableColumn (col :: TableField row a)) = do
       tvCol <- Gtk.new Gtk.TreeViewColumn [
                #reorderable := False,
                #resizable := True,
@@ -208,7 +207,7 @@ mkTableColumn modifyModel vw model (TableColumn (col :: TableField row a)) = do
             Gtk.cellLayoutPackStart tvCol icon False
             MV.cellLayoutSetAttributes tvCol icon model $ \item ->
                   [#iconName := item ^. fieldValue col . to iconF]
-      void $ makeRenderer modifyModel model vw col tvCol
+      void $ makeRenderer iconTheme modifyModel model vw col tvCol
       return tvCol
 
 
@@ -216,12 +215,13 @@ mkTableColumn modifyModel vw model (TableColumn (col :: TableField row a)) = do
 -- | A table allowing you to edit a tree of items. Each individual row can be edited, but
 -- rows cannot be added, deleted or moved.
 mkTreeTableView :: (Eq row) =>
-   Bool   -- ^ If True then send row activation events (see return value).
+   Gtk.IconTheme
+   -> Bool   -- ^ If True then send row activation events (see return value).
    -> [Table row]   -- ^ Each sublist is used for one level of the tree.
    -> Forest row  -- ^ Initial content for table.
    -> Changes (Forest row)  -- ^ Updates for table content.
    -> MomentIO (Gtk.Box, MV.ForestStore (Int, row), Event (Gtk.TreePath, row))
-mkTreeTableView activationFlag groups initial value = do
+mkTreeTableView iconTheme activationFlag groups initial value = do
       store <- MV.forestStoreNew $ mungForest 0 initial
       scroll <- Gtk.scrolledWindowNew noAdjustment noAdjustment
       Gtk.set scroll [
@@ -243,7 +243,7 @@ mkTreeTableView activationFlag groups initial value = do
       forM_ (zip [0..] groups) $ \(n, cols) ->
          forM_ cols $ \(TableColumn field) -> do
             let field1 = mungTableField n field
-            tc <- mkTableColumn (modifyStore store) vw store $ TableColumn field1
+            tc <- mkTableColumn iconTheme (modifyStore store) vw store $ TableColumn field1
             Gtk.treeViewAppendColumn vw tc
       buttons <- Gtk.buttonBoxNew Gtk.OrientationHorizontal
       Gtk.buttonBoxSetLayout buttons Gtk.ButtonBoxStyleCenter
@@ -295,13 +295,14 @@ mungTableField level field = field {fieldValue = mung . fieldValue field}
 -- | Low level function to create the appropriate renderer and attach it to the
 -- "Gtk.TreeViewColumn".
 makeRenderer :: (MonadIO m, MV.IsTypedTreeModel s, Gtk.IsTreeModel (s row)) =>
-   (Gtk.TreePath -> (row -> row) -> IO ())  -- ^ Modify a value in the store.
+   Gtk.IconTheme
+   -> (Gtk.TreePath -> (row -> row) -> IO ())  -- ^ Modify a value in the store.
    -> s row                    -- ^ Data store that this renderer accesses.
    -> Gtk.TreeView             -- ^ The widget where the renderer will be displayed.
    -> TableField row a         -- ^ Abstract description of the table column.
    -> Gtk.TreeViewColumn       -- ^ The GTK column that this renderer must be appended to.
    -> m ()
-makeRenderer modifyStore store vw col tvCol = renderer $ fieldEditor col
+makeRenderer iconTheme modifyStore store vw col tvCol = renderer $ fieldEditor col
    where
       renderer = \case
          EditBool -> do
@@ -385,16 +386,18 @@ makeRenderer modifyStore store vw col tvCol = renderer $ fieldEditor col
          EditIcon predicate -> do
             pic <- Gtk.new Gtk.CellRendererPixbuf [#sensitive := True]
             Gtk.cellLayoutPackEnd tvCol pic True
-            MV.cellLayoutSetAttributes tvCol pic store $ \item ->
-                  [#iconName := item ^. fieldValue col]
+            MV.cellLayoutSetDataFunction tvCol pic store $ \item -> do
+               let icon = item ^. fieldValue col
+               safeLoadIcon iconTheme icon tableIconSize >>= \case
+                  Just pb -> Gtk.set pic [#pixbuf := pb]
+                  Nothing -> Gtk.set pic [#iconName := ""]
             void $ Gtk.onTreeViewRowActivated vw $ \path activeCol -> do
                path1 <- Gtk.treePathCopy path  -- path is no longer valid once the callback exits.
                let
                   Gtk.TreeViewColumn p1 = activeCol
                   Gtk.TreeViewColumn p2 = tvCol
                when (Gtk.managedForeignPtr p1 == Gtk.managedForeignPtr p2) $ do
-                  theme <- withWaitCursor vw Gtk.iconThemeGetDefault
-                  icons <- withWaitCursor vw $ iconThemeContents theme False predicate
+                  icons <- withWaitCursor vw $ iconThemeContents iconTheme False predicate
                   iconDialog vw icons $ \newIcon ->
                      modifyStore path1 $ fieldValue col .~ newIcon
          EditCombo vs -> void $ createComboRenderer id vs tvCol
@@ -484,18 +487,20 @@ makeRenderer modifyStore store vw col tvCol = renderer $ fieldEditor col
          Opt (EditIcon predicate) -> do
             pic <- Gtk.new Gtk.CellRendererPixbuf [#sensitive := True]
             Gtk.cellLayoutPackEnd tvCol pic True
-            MV.cellLayoutSetAttributes tvCol pic store $ \item ->
-                  [#iconName := fromMaybe "no-icon" (item ^. fieldValue col)]
+            MV.cellLayoutSetDataFunction tvCol pic store $ \item -> do
+               let icon = fromMaybe noIconName $ item ^. fieldValue col
+               safeLoadIcon iconTheme icon tableIconSize >>= \case
+                  Just pb -> Gtk.set pic [#pixbuf := pb]
+                  Nothing -> Gtk.set pic [#iconName := ""]
             void $ Gtk.onTreeViewRowActivated vw $ \path activeCol -> do
                path1 <- Gtk.treePathCopy path  -- path is not valid after the callback exits.
                let
                   Gtk.TreeViewColumn p1 = activeCol
                   Gtk.TreeViewColumn p2 = tvCol
                when (Gtk.managedForeignPtr p1 == Gtk.managedForeignPtr p2) $ do
-                  theme <- Gtk.iconThemeGetDefault   -- ToDo: create a custom theme for application.
-                  icons <- withWaitCursor vw $ iconThemeContents theme True predicate
+                  icons <- withWaitCursor vw $ iconThemeContents iconTheme True predicate
                   iconDialog vw icons $ \newIcon -> do
-                     let v = if newIcon == "no-icon" then Nothing else Just newIcon
+                     let v = if newIcon == noIconName then Nothing else Just newIcon
                      modifyStore path1 $ fieldValue col .~ v
          Opt (EditCombo vs) ->
             void $ createComboRenderer (fromMaybe "") (Nothing : map Just vs) tvCol
@@ -584,6 +589,10 @@ makeRenderer modifyStore store vw col tvCol = renderer $ fieldEditor col
             bg <- colourToRGBA c
             fg <- colourToRGBA $ contrastText c
             return [#cellBackgroundRgba := bg, #foregroundRgba := fg]
+
+-- | Size of data icons in tables.
+tableIconSize :: Int
+tableIconSize = 22
 
 -- | Nothing specialised to a type.
 noAdjustment :: Maybe Gtk.Adjustment

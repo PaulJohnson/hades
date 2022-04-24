@@ -7,12 +7,10 @@
 
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
 -}
 
--- |
+-- | This is the legacy dialog code. It is being phased out. Various parts are bitrotted and
+-- should not be used in any new code.
 module Reactive.Banana.GI.Dialog (
    mkGtkPopupSelect,
    mkGtkPopup,
@@ -27,8 +25,6 @@ import Control.Lens
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Trans.Maybe
-import qualified Data.Colour.CIE as C
-import qualified Data.Colour.SRGB as C
 import Data.Function
 import qualified Data.GI.Base.Signals as Gtk
 import qualified Data.GI.Base.GType as Gtk
@@ -59,6 +55,7 @@ import Reactive.Banana.Dialog
 import Reactive.Banana.Frameworks
 import Reactive.Banana.GI.Common
 import Reactive.Banana.GI.Connect
+import Reactive.Banana.GI.DataIconTheme
 import Reactive.Banana.GI.ErrorBox
 import Reactive.Banana.GI.Menu
 import Reactive.Banana.GI.Table
@@ -600,7 +597,7 @@ renderUnionTab newWidgetIO initial value unionLens tabs = do
       tabValidity <- switchB initialValidity $ snd <$> tabResults
       w <- Gtk.toWidget book
       liftIO $ newWidgetIO w
-      return (w, unions $ tabSetter : map changesE (map fst setters), tabValidity)
+      return (w, unions $ tabSetter : map (changesE . fst) setters, tabValidity)
    where
       tabMatches x (UnionTabData _ prsm _ _) = isJust $ x ^? unionLens . prsm
       clickValue :: (MonadMoment m) =>
@@ -887,58 +884,6 @@ renderSpecifier (FixedMemoSpec displayF nested) initial value userHandler = do
    w <- Gtk.toWidget box
    return (w, result)
 
-renderSpecifier (MenuSpec entries) initial value userHandler = do
-      store <- MV.seqStoreNew $ map
-            (\(nm, i, clr, _) ->
-               (nm, fromMaybe blankIconName i, maybe "" toRGBA clr, maybe True toTextRGB clr))
-            entries
-      MV.customStoreSetColumn store (MV.makeColumnIdString 0) (view _1) -- Item name
-      MV.customStoreSetColumn store (MV.makeColumnIdString 1) (view _2) -- Icon name
-      MV.customStoreSetColumn store (MV.makeColumnIdString 2) (view _3) -- Colour in CSS format.
-      MV.customStoreSetColumn store (MV.makeColumnIdBool 3) (view _4) -- True for white
-      menu <- Gtk.comboBoxNewWithModel store
-      menuText <- Gtk.cellRendererTextNew
-      menuIcon <- Gtk.cellRendererPixbufNew
-      -- Kludge to stop combo boxes responding to scroll events.
-      void $ Gtk.onWidgetScrollEvent menu $ const $ return True
-      -- End kludge
-      if any (isJust . view _2) entries
-         then do
-            Gtk.cellLayoutPackStart menu menuIcon False
-            MV.cellLayoutSetAttributes menu menuIcon store $ \(_, icon, _, _) -> [#iconName := icon]
-         else return ()
-      Gtk.cellLayoutPackStart menu menuText True
-      MV.cellLayoutSetDataFunction menu menuText store $ \(nm, _, clr, fg) -> do
-         if (clr /= "")
-            then Gtk.set menuText [
-                  #background := clr,
-                  #foreground := (if fg then "white" else "black") ]
-            else do
-               Gtk.clearCellRendererTextForeground menuText
-               Gtk.clearCellRendererTextBackground menuText
-         Gtk.set menuText [#text := nm]
-      let
-         displayVal v = fromIntegral $ fromMaybe (-1) $ elemIndex v (map (view _4) entries)
-         limit = genericLength entries
-      (w, b) <- makeField
-            menu
-            Gtk.onComboBoxChanged
-            Gtk.comboBoxSetActive
-            (displayVal initial)
-            (displayVal <$> value)
-            userHandler
-            $ do
-               sel <- Gtk.comboBoxGetActive menu
-               if sel >= 0 && sel < limit
-                  then return $ Just $ view _4 $ genericIndex entries sel
-                  else return Nothing
-      return (w, b)
-   where
-      toRGBA c =
-         let C.RGB r g b = C.toSRGB24 $ getColour c
-         in T.pack $ "rgba(" <> show r <> "," <> show g <> "," <> show b <> ",1)"
-      toTextRGB c = C.luminance (getColour c) < 0.5
-
 {-
 Design note: This only supports multiple selection because when single selection modes are used
 GTK3 executes the selectionChanged callback before the rest of the Reactive Banana network is set
@@ -1114,42 +1059,6 @@ renderSpecifier (DateSpecMaybe fmt) initial value userHandler = do
       Gtk.popoverPopdown overlay
    return (w, b)
 
-renderSpecifier (IconSpec predicate) initial value userHandler = do
-   pic <- Gtk.new Gtk.Image [#sensitive := True, #iconName := initial]
-   button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
-   stop <- reactimate1 $ Gtk.setImageIconName pic <$> changesE value
-   void $ Gtk.onWidgetDestroy pic stop
-   (nameE, handler) <- newEvent
-   void $ Gtk.onButtonPressed button $ do
-      theme <- withWaitCursor button Gtk.iconThemeGetDefault
-      icons <- withWaitCursor button $ iconThemeContents theme False predicate
-      iconDialog pic icons $ \newIcon -> do
-         Gtk.set pic [#iconName := newIcon]
-         userHandler newIcon
-         handler newIcon
-   w <- Gtk.toWidget button
-   return (w, const <$> nameE)
-
-renderSpecifier (IconSpecMaybe predicate) initial value userHandler = do
-      pic <- Gtk.new Gtk.Image [#iconName := maybeName initial]
-      button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
-      stop <- reactimate1 $ Gtk.setImageIconName pic . maybeName <$> changesE value
-      void $ Gtk.onWidgetDestroy pic stop
-      (nameE, handler) <- newEvent
-      void $ Gtk.onButtonPressed button $ do
-         theme <- withWaitCursor pic Gtk.iconThemeGetDefault
-         icons <- withWaitCursor pic $ iconThemeContents theme False predicate
-         iconDialog button icons $ \newIcon -> do
-            let newValue = if newIcon == "no-icon" then Nothing else Just newIcon
-            Gtk.set pic [#iconName := newIcon]
-            userHandler newValue
-            handler newValue
-      w <- Gtk.toWidget button
-      return (w, const <$> nameE)
-   where
-      maybeName Nothing = "no-icon"
-      maybeName (Just str) = str
-
 renderSpecifier ColourSpec initial value userHandler = do
       entry <- Gtk.new Gtk.Entry [#hexpand := True]
       styleCtx <- Gtk.widgetGetStyleContext entry
@@ -1226,7 +1135,9 @@ renderSpecifier ColourSpecMaybe initial value userHandler = do
       setEntryValue w (Just c) = Gtk.setEntryText w $ c ^. re colourPrism
 
 renderSpecifier (TableSpec flags columns nested) initial value userHandler = do
+   iconTheme <- getDataIconTheme
    (vw, store, activated, _) <- mkTableView
+         iconTheme
          flags
          (isJust nested)
          columns

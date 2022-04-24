@@ -83,7 +83,7 @@ demoDialog = Dialog "Demo Dialog" OkApplyButton $
                   ("Demo Set:", focusing demoSet demoSetPopup)
                ],
             focusing demoTable $ table
-               [TableAdd "new row" $ DemoTable False 0 "no-icon", TableDelete, TableShuffle]
+               [TableAdd "new row" $ DemoTable False 0 noIconName, TableDelete, TableShuffle]
                demoTableColumns
                Nothing
                --  (Just $ constantDialog demoTableForm)

@@ -4,9 +4,6 @@
 
 {- |
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
 -}
 
 module Demo.TreeTable where
@@ -48,7 +45,6 @@ demoTreeTable = [
       ]), ("Level 2", [
             LensElement (const True) "Text" simpleTextBox tableText mempty,
             LensElement (const True) "Colour" ColourSpec tableColour mempty,
-            LensElement (const True) "Icon" (IconSpec isStandardContext) tableIcon mempty,
             LensElement (const True) "Combo" comboSpec tableCombo mempty
       ])
    ]
@@ -66,30 +62,6 @@ demoTreeTable = [
          | v ^. tableNum < 100 = Colour $ blend (fromIntegral (v ^. tableNum) / 100) C.green C.red
          | otherwise = Colour C.green
 
-
-{- demoTreeTable :: [Table TableData]
-demoTreeTable = [[
-         mkField "Text" tableText Nothing (EditEntry id) Nothing,
-         mkField "Number" tableNum (Just numIcon) (EditEntry textPrism) (Just numColour),
-         mkField "Enumeration" tableEnum (Just enumIcon) (EditEnum allValues) (Just enumColour),
-         mkField "Date" tableDate Nothing (EditDate shortDate) Nothing
-      ],[
-         mkField "Text" tableText Nothing (EditEntry id) Nothing,
-         mkField "Colour" tableColour Nothing EditColour Nothing,
-         mkField "Icon" tableIcon Nothing (EditIcon $ const True) Nothing,
-         mkField "Combo" tableCombo Nothing (EditCombo comboOptions) Nothing
-      ]]
-   where
-      numIcon n
-         | n < 25 = "face-sad"
-         | n < 50 = "face-plain"
-         | n < 75 = "face-smile"
-         | otherwise = "face-smile-big"
-      numColour n
-         | n < 0 = C.red
-         | n < 100 = blend (fromIntegral n / 100) C.green C.red
-         | otherwise = C.green
--}
 
 testTreeTable :: Forest TableData
 testTreeTable = [

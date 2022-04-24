@@ -48,26 +48,25 @@ import Model.Abstract.DiagramType
 import Model.Abstract.Import
 import Model.Abstract.ModelExport
 import Model.Abstract.PackageTree as Pkg
+import Reactive.Banana.GI.DataIconTheme
+import Model.GI.Export
+import Model.GI.ModelDiagrams
+import Model.GI.PackageTree
 import Model.Reflection.Dialogs
 import Model.Reflection.NamedRelation (renameRelation, edgeFromRelation, edgeToRelation)
 import Model.Reflection.References
 import Model.Reflection.Reflective
 import Model.Reflection.Types
 import Model.Reflection.Values
-import Model.GI.Export
-import Model.GI.ModelDiagrams
-import Model.GI.PackageTree
 import qualified Options.Applicative as Opt
 import Paths_hades
 import Prelude hiding (id, (.))
-import qualified Reactive.Banana.ArrowDialog as AD
+import Reactive.Banana.ArrowDialog
 import Reactive.Banana.Combinators hiding ((<>))
 import Reactive.Banana.Common
-import Reactive.Banana.Dialog as Old
 import Reactive.Banana.Frameworks
-import qualified Reactive.Banana.GI.ArrowDialog as AD
+import Reactive.Banana.GI.ArrowDialog
 import Reactive.Banana.GI.Connect
-import qualified Reactive.Banana.GI.Dialog as Old
 import Reactive.Banana.GI.ErrorBox
 import Reactive.Banana.GI.Menu
 import Reactive.Banana.Menu
@@ -84,14 +83,24 @@ import Reactive.Banana.GI.Common
 type Changed = Bool
 
 
--- | Parameters for the "modelMain" routine.
+{- | Parameters for the "modelMain" routine.
+
+There are two sets of icons used by the model editor:
+
+1. Icons used by specialised entity types for toolbar buttons and the model tree.
+These are passed in the 'programIconDirs' field, from where they are added to the GTK default
+icon theme search path.
+
+2. Icons associated with field values in the \"Data\" menu. These are stored in a separate global
+icon theme accessed by `getDataIconTheme`. This theme is initially empty. The caller should
+populate this theme using 'Gtk.iconThemeSetSearchPath' and 'Gtk.iconThemeSetCustomTheme'.
+-}
 data MainDescriptor v = MainDescriptor {
    programName :: AppName,  -- ^ Short alphanumeric identifier, used in pathnames and the like.
    programTitle :: Text,  -- ^ Shown in the title bar of the main window.
    programXtn :: Text,   -- ^ Save file extension (without the dot).
    programStock :: Entity v -> Text,  -- ^ Stock icon names for type @v@.
-   programIconDirs :: [FilePath],  -- ^ Folders to be added to global theme icon search path.
-   programDialogIcons :: Gtk.IconTheme,  -- ^ Icons that appear in "iconBox" gadgets.
+   programIconDirs :: [FilePath],  -- Folders to be added to the default icon theme search path.
    programFirstLoad :: Maybe FilePath,
       -- ^ File to load when first started, relative to data directory @share/hades/@.
    programAfterLoad :: ModelEdit v v ()
@@ -304,7 +313,7 @@ modelMain ::
       HasDiagrams p v, p ~ HadesRender, HasEvidence v) =>
    MainDescriptor v -> IO ()
 modelMain descriptor = do
-   let iconTheme = programDialogIcons descriptor
+   iconTheme <- getDataIconTheme
    -- Set working directory to be the user's document folder.
    catch
       (getUserDocumentsDirectory >>= setCurrentDirectory)
@@ -326,7 +335,7 @@ modelMain descriptor = do
    window <- Gtk.builderGetObject builder "app-window" >>= \case
       Nothing -> fail "Cannot get app-window"
       Just win -> Gtk.unsafeCastTo Gtk.ApplicationWindow win
-   do
+   do  -- Set up GTK parameters
       theme <- Gtk.iconThemeGetDefault
       evidenceIcons  <- getEvidenceDataFolder
       let
@@ -340,7 +349,6 @@ modelMain descriptor = do
       hadesCss <- Gtk.cssProviderNew
       getDataFileName "share/hades/hades-gtk.css" >>= Gtk.cssProviderLoadFromPath hadesCss . T.pack
       Gtk.styleContextAddProviderForScreen screen hadesCss pri
-      Gtk.windowSetIconName window $ Just "diametric"
       Gtk.windowSetDefaultIconName "diametric"
       Gtk.set window [
             Gtk.windowRole := ("\\hades\\Main" :: Text),
@@ -449,9 +457,9 @@ modelMain descriptor = do
                (refTypeEvents, refTypeAction) <-
                      actionRefTypes window iconTheme (modelRefTypes <$> changesB modelC)
                Gio.actionMapAddAction window refTypeAction
-               selectionExport <- actionExportSelection descriptor window $ changesB modelC
+               selectionExport <- actionExportSelection descriptor window modelC
                Gio.actionMapAddAction window selectionExport
-               (importEvent, importAction) <- actionImportData descriptor window $ changesB modelC
+               (importEvent, importAction) <- actionImportData descriptor window modelC
                Gio.actionMapAddAction window importAction
                (findEvent, findAction) <- actionFind
                Gio.actionMapAddAction window findAction
@@ -653,12 +661,12 @@ extensionMenu parent iconTheme builder modelC = do
       let
          extensionEvent = foldr (unionWith const) never events
          modelB = changesB modelC
-      updateEvent <- AD.mkGtkPopup parent iconTheme modelC $ extFields <$> modelB <@> extensionEvent
+      updateEvent <- mkGtkPopup parent iconTheme modelC $ extFields <$> modelB <@> extensionEvent
       return $ filterJust $ mkUpdate <$> changesB modelC <@> updateEvent
    where
       -- Marshal arguments for mkGtkPopup
       extFields :: (EntityClass v) =>
-         Model v -> Variant v -> (Variant v, [FieldId], AD.Dialog' (Model v) () [FieldId])
+         Model v -> Variant v -> (Variant v, [FieldId], Dialog' (Model v) () [FieldId])
       extFields model variant =
          let
             fields = M.findWithDefault [] variant $ modelExtensions model
@@ -850,13 +858,13 @@ actionRecovery descriptor parent changedB statusB = do
                      return $ Just (autosavePath f, autosaveFor content, autosaveWhen f)
             )
          let dflt = if null tbl then "" else head tbl ^. _1
-         return (False, dflt, dflt, recoveryDialog tbl)
-      recoveryEvent <- Old.mkGtkPopup parent recoveryConfirmed
+         return ((), dflt, recoveryDialog tbl)
+      theme <- Gtk.iconThemeGetDefault
+      recoveryEvent <- mkGtkPopup parent theme (pure ()) recoveryConfirmed
       (recoveryComplete, handler) <- newEvent
       reactimate $ ((,) <$> statusB <@> recoveryEvent) <&> (\case
          (_, (_, Nothing)) -> return ()
-         (oldStatus, (dflt, Just f)) -> do
-            let path = f dflt
+         (oldStatus, (_, Just path)) -> do
             autosaveGetContents path >>= \case
                Nothing -> errorBox (Just parent) "Could not recover autosave file."
                Just result -> case eitherDecode' $ autosaveData result of
@@ -872,14 +880,20 @@ actionRecovery descriptor parent changedB statusB = do
          )
       return (recoveryComplete, action)
    where
-      recoveryDialog contents = do
+      recoveryDialog :: [(FilePath, FilePath, UTCTime)] -> Dialog' e w FilePath
+      recoveryDialog contents =
          let
-            spec = MenuSpec $ flip map contents $ \(path, content, time) -> (
-               let nm = if null content then "<unnamed file>" else content
-                  in T.pack $ formatTime defaultTimeLocale "%d/%m/%y %R" time <> ": " <> nm,
-               Nothing, Nothing, path)
-         return $ Old.Dialog "Recover from auto-save" $ BigElement $
-               LensElement (pure True) "File to recover: " spec id mempty
+            spec = comboBox $ const $ flip map contents $ \(path, content, time) ->
+               let
+                  nm = if null content then "<unnamed file>" else content
+                  tStr = T.pack $ formatTime defaultTimeLocale "%d/%m/%y %R" time
+               in ComboItem {
+                     menuItemLabel = tStr <> ": " <> T.pack nm,
+                     menuItemIcon = Nothing,
+                     menuItemColour = Nothing,
+                     menuItemValue = path
+                  }
+         in Dialog "Recover from auto-save" OkButton $ simpleFrame "File to recover: " spec
 
 
 
@@ -907,11 +921,11 @@ actionFields window iconTheme tbl = do
       newIds <- fromPoll uuidStreamIO
       action <- Gio.simpleActionNew "fields" Nothing
       typesClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ \_ -> return ((), ())
-      updates1 <- AD.mkGtkPopupSelect
+      updates1 <- mkGtkPopupSelect
             window
             iconTheme
             (pure ())
-            (AD.constantDialog (fieldDialog :: AD.Dialog' e () [Field]))
+            (constantDialog (fieldDialog :: Dialog' e () [Field]))
             (((),) . sortOn (T.toCaseFold . view fieldName) . M.elems <$> tbl <@ typesClicked)
       let
          updates2 = replaceNullIds <$> newIds <@> filterJust (snd <$> updates1)
@@ -937,11 +951,11 @@ actionRefTypes :: (Gtk.IsWidget parent, Reflective a) =>
 actionRefTypes parent iconTheme tbl = do
    action <- Gio.simpleActionNew "refTypes" Nothing
    typesClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ \_ -> return ((), ())
-   updates <- AD.mkGtkPopupSelect
+   updates <- mkGtkPopupSelect
          parent
          iconTheme
          (pure ())
-         (AD.constantDialog referenceListDialog)
+         (constantDialog referenceListDialog)
          ((True, ) . refTypeTableToList <$> tbl <@ typesClicked)
    return (filterJust $ fmap refTypeTableFromList . snd <$> updates, action)
 
@@ -951,19 +965,19 @@ actionRefTypes parent iconTheme tbl = do
 actionImportData :: (Gtk.IsWidget parent, EntityClass v, FromJSON v, HasEvidence v) =>
    MainDescriptor v
    -> parent    -- ^ Parent widget for dialog.
-   -> Behavior (Model v)
+   -> Changes (Model v)
    -> MomentIO (Event (ModelScript p v v (Maybe Text)), Gio.SimpleAction)
-actionImportData descriptor parent modelB = do
+actionImportData descriptor parent modelC = do
       action <- Gio.simpleActionNew "importData" Nothing
       importClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ const $
-            return ((), (False, ((), defaultValue)))
-      importE <- Old.mkGtkPopupSelect parent importDialog importClicked
+            return ((), ((), defaultValue))
+      theme <- Gtk.iconThemeGetDefault
+      importE <- mkGtkPopupSelect parent theme modelC importDialog importClicked
       (resultE, resultH) <- newEvent
       reactimate $ importE <&> (\case
          ((), Nothing) -> return ()  -- Action cancelled.
-         ((), Just fn) -> do
+         ((), Just selection) -> do
             let
-               selection = fn defaultValue
                targetId = case S.toList $ either (view _1) (view _1) selection of
                   [] -> U.nil  -- Nothing selected, so dump it in root.
                   t : _ -> t  -- Multiple selections should never happen.
@@ -983,10 +997,8 @@ actionImportData descriptor parent modelB = do
                         [] -> return $ Just $ T.pack $ "Imported from " <> path  -- No warnings.
                         warns -> do
                            let
-                              warnDialog =
-                                 AD.constantDialog $
-                                 AD.Dialog "Warning" AD.OkButton $
-                                 AD.message $ const $ const $
+                              warnDialog = constantDialog $ Dialog "Warning" OkButton $
+                                 message1 $
                                        "Warnings during import:\n\n" <>
                                        T.intercalate "\n" warns <>
                                        "\n\nPress OK to proceed, Cancel to stop."
@@ -1002,67 +1014,38 @@ actionImportData descriptor parent modelB = do
             Nothing,
             if isJust $ ent ^? entityContents . _Package then Just $ entityId ent else Nothing
          )
-      importDialog = const $ Just $ DialogWrapper id $ do
-         m <- valueB modelB
-         let
+      importDialog :: (EntityClass v, HasEvidence v) =>
+            DialogSelector' (Model v) w (Either
+                  (S.Set U.UUID, Bool)
+                  (S.Set U.UUID, v, NameClashAction))
+      importDialog m _ = Just $ Dialog "Import Data" OkButton $ validate validityCheck $
+            unionTab [("Import Model", modelImport), ("Import Excel", excelImport)]
+         where
             forest = case evalModelEdit id m $ goToRoot >> modelPackageForest of
                Left err -> cannotHappen ("Element import: " <> T.pack (show err)) mempty
                Right v -> fmap mkSelectorItem <$> v
             tree = Node (modelName m, Nothing, Just U.nil) forest
-            modelImport = UnionTabData "Import Data" _Left (S.empty, False) $ VBox [[
-                  Message $ const "Select location for import.",
-                  BigElement $ LensElement {
-                        elementEnable = pure True,
-                        elementLabel = "Import location:",
-                        elementSpec = TreeSelectorSpec [tree],
-                        elementLens = _1,
-                        elementChanged = mempty
-                     },
-                  Elements [
-                        LensElement {
-                              elementEnable = pure True,
-                              elementLabel = "Import extensions?",
-                              elementSpec = TickBox,
-                              elementLens = _2,
-                              elementChanged = mempty
-                           }
-                     ]
-               ]]
-            excelImport =
-               UnionTabData "Import Excel" _Right (S.empty, blankEvidence, CancelClash) $ VBox [[
-                     Message $ const "Select import location and type.",
-                     BigElement $ LensElement {
-                           elementEnable = pure True,
-                           elementLabel = "Import location:",
-                           elementSpec = TreeSelectorSpec [tree],
-                           elementLens = _1,
-                           elementChanged = mempty
-                        },
-                     Elements [
-                           LensElement {
-                                 elementEnable = pure True,
-                                 elementLabel = "Import type: ",
-                                 elementSpec = variantMenu,
-                                 elementLens = _2,
-                                 elementChanged = mempty
-                              },
-                           LensElement {
-                                 elementEnable = pure True,
-                                 elementLabel = "On name clash: ",
-                                 elementSpec = boundedMenu,
-                                 elementLens = _3,
-                                 elementChanged = mempty
-                              }
-                        ]
-                  ]]
-            variantMenu = MenuSpec $ sortOn (view _1) $
+            modelImport = PrismaticGadget (S.empty, False) _Left $ proc (loc1, flg1) -> do
+               _ <- message1 "Select location for import." -< ()
+               loc2 <- simpleFrame "Import location:" $ treeSelector $ const [tree] -< loc1
+               flg2 <- accum $ form Vertical [("Import extensions?", focusing id tickBox)] -< flg1
+               returnA -< (loc2, flg2)
+            excelImport = PrismaticGadget (S.empty, blankEvidence, CancelClash) _Right $
+               proc (loc1, blank1, clash1) -> do
+                  _ <- message1 "Select import location and type." -< ()
+                  loc2 <- simpleFrame "Import Location:" $ treeSelector $ const [tree] -< loc1
+                  (blank2, clash2) <- accum $ form Vertical [
+                           ("Import type:", focusing _1 variantMenu),
+                           ("On name clash:", focusing _2 boundedCombo)
+                        ] -< (blank1, clash1)
+                  returnA -< (loc2, blank2, clash2)
+            variantMenu = comboBox $ const $ sortOn menuItemLabel $
                map
-                  (\r -> (variantUserLabel $ reflectiveName r, Nothing, Nothing, r))
+                  (\r -> ComboItem (variantUserLabel $ reflectiveName r) Nothing Nothing r)
                   reflectiveDefaults
             blankEvidence = Evidence (Name "") ^. re _Evidence
             validityCheck v = S.size (either (view _1) (view _1) v) == 1
-         return $ Old.Dialog "Import Data" $
-               ValidityCheck validityCheck $ UnionTab id [modelImport, excelImport]
+
 
 {- Design Note:
 
@@ -1075,17 +1058,19 @@ complicated then it should be given its own dedicated type.
 actionExportSelection :: (Gtk.IsWidget parent, EntityClass v, ToJSON v) =>
    MainDescriptor v
    -> parent    -- ^ Parent widget for dialogs.
-   -> Behavior (Model v)
+   -> Changes (Model v)
    -> MomentIO Gio.SimpleAction
-actionExportSelection descriptor parent modelB = do
+actionExportSelection descriptor parent modelC = do
       action <- Gio.simpleActionNew "exportData" Nothing
       exportSelectionClicked <- registerIOSignal1 action Gio.onSimpleActionActivate $ \_ ->
-            return ((), (False, ((), (S.empty, False))))
-      exportE <- Old.mkGtkPopupSelect parent exportDialog exportSelectionClicked
+            return ((), ((), (S.empty, False)))
+      theme <- Gtk.iconThemeGetDefault
+      exportE <- mkGtkPopupSelect parent theme modelC exportDialog exportSelectionClicked
       let
-         exportData = snd $ queryModel id modelB (filterJust $ snd <$> exportE) $ \fn -> do
-            let (sel, metaFlag) = fn (S.empty, False)
-            makeExport sel metaFlag
+         exportData =
+               snd $
+               queryModel id (changesB modelC) (filterJust $ snd <$> exportE) $
+               uncurry makeExport
       reactimate $ exportData <&> (\dat -> do
             filters <- exportFileFilters descriptor
             void $ writeAsFile
@@ -1101,32 +1086,18 @@ actionExportSelection descriptor parent modelB = do
    where
       extension = T.dropEnd 1 (programXtn descriptor) <> "x"
       mkSelectorItem ent = (ent ^. entityName . nameText, Nothing, Just $ entityId ent)
-      exportDialog = const $ Just $ DialogWrapper id $ do
-         m <- valueB modelB
+      exportDialog m _ = Just $
          let
             forest = case evalModelEdit id m $ goToRoot >> modelPackageForest of
                Left err -> cannotHappen ("Element export: " <> T.pack (show err)) mempty
                Right v -> fmap mkSelectorItem <$> v
-         return $ Old.Dialog "Export Data" $ VBox [[
-               Message $ const "Select items to export. \
-                  \The children of the selected items will be included automatically.",
-               BigElement $ LensElement {
-                     elementEnable = pure True,
-                     elementLabel = "Export Entities",
-                     elementSpec = TreeSelectorSpec forest,
-                     elementLens = _1,
-                     elementChanged = mempty
-                  },
-               Elements [
-                     LensElement {
-                           elementEnable = pure True,
-                           elementLabel = "Export extensions?",
-                           elementSpec = TickBox,
-                           elementLens = _2,
-                           elementChanged = mempty
-                        }
-                  ]
-            ]]
+         in
+            Dialog "Export Data" OkButton $ proc (selected1, flag1) -> do
+               _ <- message1 "Select items to export. \
+                  \The children of the selected items will be included automatically." -< ()
+               selected2 <- simpleFrame "Export Entities" $ treeSelector $ const forest -< selected1
+               flag2 <- accum $ form Vertical [("Export extensions?", focusing id tickBox)] -< flag1
+               returnA -< (selected2, flag2)
 
 
 -- | Find text in the model.

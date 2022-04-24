@@ -4,9 +4,6 @@
 
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
 -}
 
 {- |

@@ -39,8 +39,7 @@ function createTheme () {
    for foo in $DIRS
    do
      type="Scalable"
-     maxsize="MaxSize=512"
-     echo -en "\n\n[$foo]\nSize=scalable\nContext=`basename $foo`\nType=$type\n$maxsize" >> index.theme
+     echo -en "\n\n[$foo]\nMinSize=1\nSize=128\nMaxSize=512\nContext=`basename $foo`\nType=$type\n" >> index.theme
    done
    echo "Updating cache"
    gtk-update-icon-cache .

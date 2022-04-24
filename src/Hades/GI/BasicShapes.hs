@@ -82,6 +82,7 @@ import qualified GI.Cairo.Render.Connector as Cairo
 import GI.Pango (AttrOp ((:=)))
 import qualified GI.Gdk.Functions as Gdk
 import qualified GI.GdkPixbuf as Gdk
+import qualified GI.Gtk as Gtk
 import qualified GI.Pango as Pango
 import qualified GI.PangoCairo as Pango
 import qualified GI.Rsvg as SVG
@@ -108,7 +109,8 @@ data HadesStyle = HadesStyle {
    lineStyle :: HadesRender (),
    textFont :: Pango.FontDescription,
    textStyle :: HadesRender (),
-   textGap :: Double  -- ^ Inter-paragraph separation as fractions of a line.
+   textGap :: Double,  -- ^ Inter-paragraph separation as fractions of a line.
+   dataIcons :: Gtk.IconTheme
 }
 
 
@@ -134,8 +136,8 @@ pangoToHades x = fromIntegral x / fromIntegral Pango.SCALE
 
 
 -- | Placeholder with hard-coded style. Colours chosen by staring at a mock-up.
-hadesConfig :: IO HadesStyle
-hadesConfig =
+hadesConfig :: Gtk.IconTheme -> IO HadesStyle
+hadesConfig thm =
    do
       font <- Pango.fontDescriptionNew
       Pango.fontDescriptionSetFamily font "Roboto,Symbola,STIX Two Text"
@@ -146,7 +148,8 @@ hadesConfig =
          lineStyle = basicLine 2 black,
          textFont = font,
          textStyle = basicText black,
-         textGap = 0.5
+         textGap = 0.5,
+         dataIcons = thm
       }
    where
       boxColor = Colour $ C.sRGB24 206 198 190

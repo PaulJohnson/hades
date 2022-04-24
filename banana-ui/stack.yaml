@@ -31,4 +31,4 @@ extra-deps:
   - kansas-comet-0.4.1
   - web-routes-0.27.14.3
 
-resolver: lts-18.27
+resolver: lts-18.28

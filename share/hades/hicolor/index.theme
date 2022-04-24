@@ -71,31 +71,40 @@ Type=Fixed
 MaxSize=512
 
 [scalable-up-to-32/status]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=status
 Type=Scalable
-MaxSize=512
+
 
 [scalable/stock/image]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=image
 Type=Scalable
-MaxSize=512
+
 
 [scalable/stock]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=stock
 Type=Scalable
-MaxSize=512
+
 
 [scalable/categories]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=categories
 Type=Scalable
-MaxSize=512
+
 
 [scalable/actions]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=actions
 Type=Scalable
-MaxSize=512

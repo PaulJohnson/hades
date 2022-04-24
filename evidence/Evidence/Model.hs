@@ -58,6 +58,7 @@ import Hades.Abstract
 import Hades.GI
 import Model.Abstract.DiagramType
 import Model.Abstract.PackageTree
+import Reactive.Banana.GI.DataIconTheme
 import Model.Reflection.NamedRelation (Relation)
 import Model.Reflection.References
 import Model.Reflection.Reflective
@@ -141,7 +142,7 @@ evidenceIconName = "evidence-doc"
 -- icon file every time.
 evidenceIconPixbuf :: Maybe Gdk.Pixbuf
 evidenceIconPixbuf = unsafePerformIO $ do
-   thm <- Gtk.iconThemeGetDefault
+   thm <- getDataIconTheme
    let sz = 16
    Gtk.iconThemeLookupIcon thm evidenceIconName sz [] >>= \case
       Nothing -> return Nothing

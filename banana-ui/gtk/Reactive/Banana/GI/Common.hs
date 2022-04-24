@@ -4,9 +4,6 @@
 
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited
 -}
 
 -- |
@@ -109,14 +106,22 @@ data IconData = IconData {
    }
 
 
--- | The icon called \"no-icon\" is a special case. Where the icon is optional this is used
--- for the @Nothing@ value. It contains the text "No Icon".
-noIconName :: IconName
-noIconName = "no-icon"
-
--- | The icon called \"blank-icon\" is a similar special case. It contains nothing.
-blankIconName :: IconName
-blankIconName = "blank-icon"
+-- | Load a named icon at "Gtk.IconSizeButton" or a broken icon if the icon is not found. The
+-- size is in pixels.
+--
+-- "Gtk.iconThemeLoadIcon" throws an error instead of returning "Nothing", so this checks first.
+safeLoadIcon :: (MonadIO m) => Gtk.IconTheme -> Text -> Int -> m (Maybe Gdk.Pixbuf)
+safeLoadIcon theme name sz =
+      Gtk.iconThemeHasIcon theme name >>= \case
+         True -> do
+            icon1 <- Gtk.iconThemeLoadIcon theme name (fromIntegral sz) []
+            f <- failIcon
+            return $ icon1 <|> f
+         False -> failIcon
+   where
+      failIcon = do
+         i <- Gtk.imageNewFromIconName Nothing (fromIntegral $ fromEnum Gtk.IconSizeButton)
+         Gtk.imageGetPixbuf i
 
 
 -- | Extract a tree of icon names from the theme. The result is a list of pairs, one for
@@ -127,8 +132,6 @@ iconThemeContents :: (MonadIO m, Gtk.IsIconTheme theme) =>
    -> (Text -> Bool)  -- ^ Filter for context names.
    -> m [(Text, [IconData])]
 iconThemeContents theme flag predicate = do
-   themeContexts <- Gtk.iconThemeListContexts theme
-   liftIO $ putStrLn $ "iconThemeContents: contexts = " <> show themeContexts
    ctxs <- sort . filter predicate <$> Gtk.iconThemeListContexts theme
    forM ctxs $ \ctx -> do
       iconNames <- sort <$> Gtk.iconThemeListIcons theme (Just ctx)

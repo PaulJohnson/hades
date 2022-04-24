@@ -5,7 +5,8 @@ Comment=hicolor Icon Theme
 Directories=scalable/categories,
 
 [scalable/categories]
-Size=scalable
+MinSize=1
+Size=128
+MaxSize=512
 Context=categories
 Type=Scalable
-MaxSize=512

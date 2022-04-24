@@ -68,20 +68,20 @@ fieldElement vExpand (Field ro _ _ multi t) = case t of
       (BuiltInDef m) -> basicGadget ro m
       DecoBoolDef (DecoBool icons colours) ->
          maybe id (coloured . bool) colours $
-         maybe id (icon . (fromMaybe "blank-icon" .) . bool) icons $
+         maybe id (icon . (fromMaybe blankIconName .) . bool) icons $
          multiMod _ExtBool tickBox
       DecoBoolDef DecoRange {} ->  -- Can't happen, but type checker can't figure that out.
          multiMod _ExtBool tickBox
       DecoIntDef (DecoRange r rm) ->
          coloured (snd <=< range _ExtInt rm) $
          (if rmapIcons rm
-            then icon (fromMaybe "blank-icon" . (fst <=< range _ExtInt rm))
+            then icon (fromMaybe blankIconName . (fst <=< range _ExtInt rm))
             else id) $
          multiMod _ExtInt $ textBox (const $ textPrism . rangePrism r)
       DecoRealDef (DecoRange r rm) ->
          coloured (snd <=< range _ExtReal rm) $
          (if rmapIcons rm
-            then icon (fromMaybe "blank-icon" . (fst <=< range _ExtReal rm))
+            then icon (fromMaybe blankIconName . (fst <=< range _ExtReal rm))
             else id) $
          multiMod _ExtReal $ textBox (const $ textPrism . rangePrism r)
       EnumDef enum1 ->
@@ -135,7 +135,7 @@ addDecoBool icons colours =
             case v ^? _ExtBool of
                Just True -> trueI
                Just False -> falseI
-               Nothing -> "blank-icon"
+               Nothing -> blankIconName
       cDeco = case colours of
          Nothing -> id
          Just (falseC, trueC) -> coloured $ \v ->
@@ -155,7 +155,7 @@ addDecoRange :: (Ord a) =>
 addDecoRange m prsm =
    let
       iDeco = if any (isJust . fst . snd) m
-         then icon $ \v -> fromMaybe "blank-icon" $ join $ do
+         then icon $ \v -> fromMaybe blankIconName $ join $ do
             v1 <- v ^? prsm
             fst <$> rangeMap m v1
          else id
@@ -174,7 +174,7 @@ addDecoEnum typ =
       tbl = M.fromList $ map (\i -> (i ^. enumItemName, i)) typ
       iDeco = if any (isJust . preview enumItemIcon) typ
          then icon $ \v ->
-               fromMaybe "blank-icon" $ tbl ^? ix (displayValue v) . enumItemIcon . _Just
+               fromMaybe blankIconName $ tbl ^? ix (displayValue v) . enumItemIcon . _Just
          else id
       cDeco = if any (isJust . preview enumItemColour) typ
          then coloured $ \v -> tbl ^? ix (displayValue v) . enumItemColour . _Just

@@ -52,6 +52,8 @@ import Control.Applicative hiding (optional)
 import Control.Arrow
 import Control.Lens hiding ((.=))
 import Control.Monad
+import Control.Monad.Trans.Class
+import Control.Monad.Trans.Reader
 import Data.Aeson
 import Data.Aeson.Types
 import qualified Data.Colour as C
@@ -494,9 +496,9 @@ diagramLayout style = withBaseType $ current >>= \case
                            (return ())
                            (layoutField v mField)
       getIcon nm = do  -- Not sure about performance here. Does GTK3 cache the pixmaps?
-         thm <- Gtk.iconThemeGetDefault
          let sz = 16
-         Gtk.iconThemeLookupIcon thm nm sz [] >>= \case
+         iconTheme <- lift $ asks dataIcons
+         Gtk.iconThemeLookupIcon iconTheme nm sz [] >>= \case
             Nothing -> return Nothing
             Just info -> Just <$> Gtk.iconInfoLoadIcon info
       colourText Nothing _ _ = Pango.attrListNew

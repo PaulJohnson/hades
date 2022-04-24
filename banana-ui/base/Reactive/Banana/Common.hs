@@ -1,8 +1,5 @@
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
 -}
 
 -- |
@@ -212,6 +209,16 @@ instance Default Colour where def = Colour $ C.sRGB24 128 128 128  -- Gray
 
 -- | Name of an icon, as text.
 type IconName = Text
+
+
+-- | The icon called \"no-icon\" is a special case. Where the icon is optional this is used
+-- for the @Nothing@ value. It contains the text "No Icon".
+noIconName :: IconName
+noIconName = "no-icon"
+
+-- | The icon called \"blank-icon\" is a similar special case. It contains nothing.
+blankIconName :: IconName
+blankIconName = "blank-icon"
 
 
 -- | Format and read the date.

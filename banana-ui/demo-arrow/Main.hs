@@ -48,12 +48,14 @@ main = do
    -- Gtk.containerAdd buttons showTreeTableButton
    Gtk.containerAdd window buttons
    Gtk.widgetShowAll window
+   iconTheme <- Gtk.iconThemeGetDefault
    net <- compile $ do -- MomentIO
       -- Connect the test dialog button.
       testCount <- registerIOSignal showDialogButton Gtk.onButtonClicked $ return ((), (+1))
       activateDialog <- accumE (0 :: Int) testCount <&> fmap popupParameters
       resultE <- AD.mkGtkPopupSelect
             window
+            iconTheme
             (pure ())
             (constantDialog demoDialog)
             activateDialog
@@ -77,6 +79,7 @@ main = do
       notebookActivate <- accumE 0 notebookCount <&> fmap notebookParameters
       resultUnion <- AD.mkGtkPopupSelect
             window
+            iconTheme
             (pure ())
             (constantDialog notebookDialog)
             notebookActivate
@@ -90,6 +93,7 @@ main = do
       condActivate <- accumE 0 condCount <&> fmap notebookParameters -- Same data as notebook
       resultUnion1 <- AD.mkGtkPopupSelect
             window
+            iconTheme
             (pure ())
             (constantDialog condDialog)
             condActivate
@@ -103,6 +107,7 @@ main = do
       loopActivate <- accumE 0 loopCount <&> fmap (,0)
       resultLoop <- AD.mkGtkPopupSelect
             window
+            iconTheme
             (pure ())
             (constantDialog loopDialog1)
             loopActivate

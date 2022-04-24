@@ -4,11 +4,8 @@
 Copyright © Paul Johnson 2019. See LICENSE file for details.
 
 This file is part of the Haskell Diagram Editing System (HADES) software.
-
-
 -}
 
--- |
 module Model.GI.Export (
    previewFolder,
    previewReport,
@@ -41,6 +38,7 @@ import Hades.GI.BasicShapes
 import Hades.GI.Saving
 import Model.Abstract.DiagramType
 import Model.Abstract.PackageTree
+import Reactive.Banana.GI.DataIconTheme
 import Model.GI.ModelDiagrams
 import Model.Report.Base
 import Model.Report.Dialogs
@@ -189,15 +187,15 @@ writeReportToFile format title model blks imgs = do
          ReportDocx fmt target -> makeDocx (Just fmt) title target blks imageMap
          ReportTemplate template target -> insertDocx template target blks imageMap
 
+
 -- | The binary data associated with each ImageRef. Within the result elements the first item
 -- is a PNG, the second is an optional SVG.
-getImageResources :: (HasDiagrams HadesRender v) =>
-   Model v -> [ImageRef] -> IO ImageMap
+getImageResources :: (HasDiagrams HadesRender v) => Model v -> [ImageRef] -> IO ImageMap
 getImageResources model refs = do
-      theme <- GI.iconThemeGetDefault
+      iconTheme <- getDataIconTheme
       results <- forM refs $ \ref -> do
-         png <- fromMaybe nullPng <$> binaryResourceFunc theme ref PngTarget
-         svg <- binaryResourceFunc theme ref SvgTarget
+         png <- fromMaybe nullPng <$> binaryResourceFunc iconTheme ref PngTarget
+         svg <- binaryResourceFunc iconTheme ref SvgTarget
          return (ref, (png, svg))
       return $ M.fromList results
    where
@@ -205,9 +203,9 @@ getImageResources model refs = do
       nullPng = BL.fromStrict $ B64.decodeLenient
          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA1\
          \BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII="
-      binaryResourceFunc theme (IconRef iconName) PngTarget =
-         -- 48x48 icon taken because that is what the Diametric theme has available.
-         GI.iconThemeLookupIcon theme iconName 48 [GI.IconLookupFlagsNoSvg] >>= \case
+      binaryResourceFunc iconTheme (IconRef iconName) PngTarget =
+         -- 48x48 icon taken because that is what the Diametric iconTheme has available.
+         GI.iconThemeLookupIcon iconTheme iconName 48 [GI.IconLookupFlagsNoSvg] >>= \case
             Nothing -> return Nothing
             Just info -> GI.iconInfoGetFilename info >>= \case
                Nothing -> return Nothing
@@ -215,9 +213,9 @@ getImageResources model refs = do
                   if takeExtension iconPath == ".png"
                      then Just <$> BL.readFile iconPath
                      else return Nothing
-      binaryResourceFunc theme (IconRef iconName) SvgTarget =
+      binaryResourceFunc iconTheme (IconRef iconName) SvgTarget =
          -- Any resolution except 48x48. Otherwise we still get the PNG.
-         GI.iconThemeLookupIcon theme iconName 128 [GI.IconLookupFlagsForceSvg] >>= \case
+         GI.iconThemeLookupIcon iconTheme iconName 128 [GI.IconLookupFlagsForceSvg] >>= \case
             Nothing -> return Nothing
             Just info -> GI.iconInfoGetFilename info >>= \case
                Nothing -> return Nothing
@@ -225,7 +223,7 @@ getImageResources model refs = do
                   if takeExtension iconPath == ".svg"
                      then Just <$> BL.readFile iconPath
                      else return Nothing
-      binaryResourceFunc _ (DiagramRef modelId) PngTarget =
+      binaryResourceFunc iconTheme (DiagramRef modelId) PngTarget =
          fromRight (return Nothing) $ evalModelEdit id model $ do  -- ModelEdit (IO BL.ByteString)
             goToEntity modelId
             current >>= \case
@@ -233,10 +231,10 @@ getImageResources model refs = do
                Just e ->
                   getDiagramWrapper e >>= \case
                      Just (DiagramWrapper _ dgram _ prsm _ ctrl _ _) -> do
-                        let (draw, size) = renderForExport prsm model ctrl dgram
+                        let (draw, size) = renderForExport iconTheme prsm model ctrl dgram
                         return $ Just <$> renderOnPng (72*2) size draw
                      _ -> return $ return Nothing  -- No diagram. Shouldn't happen.
-      binaryResourceFunc _ (DiagramRef modelId) SvgTarget =
+      binaryResourceFunc iconTheme (DiagramRef modelId) SvgTarget =
          fromRight (return Nothing) $ evalModelEdit id model $ do  -- ModelEdit (IO BL.ByteString)
             goToEntity modelId
             current >>= \case
@@ -244,7 +242,7 @@ getImageResources model refs = do
                Just e ->
                   getDiagramWrapper e >>= \case
                      Just (DiagramWrapper _ dgram _ prsm _ ctrl _ _) -> return $ do  -- IO
-                        let (draw, (w, h)) = renderForExport prsm model ctrl dgram
+                        let (draw, (w, h)) = renderForExport iconTheme prsm model ctrl dgram
                         svgPath <- emptySystemTempFile "dsm-.svg"
                         withSVGSurface svgPath w h $ \surface -> do
                            renderWith surface draw

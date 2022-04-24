@@ -18,6 +18,7 @@ library
       Reactive.Banana.GI.ArrowDialog
       Reactive.Banana.GI.Common
       Reactive.Banana.GI.Connect
+      Reactive.Banana.GI.DataIconTheme
       Reactive.Banana.GI.Dialog
       Reactive.Banana.GI.ErrorBox
       Reactive.Banana.GI.Menu

@@ -4,12 +4,9 @@
 
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited 
 -}
 
-{- |
+{- | This module is deprecated. Some parts are bitrotted. Do not use in new code.
 
 __Reactive dialogs using lenses.__
 
@@ -42,9 +39,6 @@ module Reactive.Banana.Dialog (
    simpleTextBox,
    typedTextBox,
    maybeTextBox,
-   simpleMenu,
-   rangeMenu,
-   boundedMenu,
    isStandardContext,
    gtkIconStandardContexts
 ) where
@@ -52,7 +46,7 @@ module Reactive.Banana.Dialog (
 import Control.Event.Handler
 import Control.Lens
 import Data.Set (Set)
-import Data.Text (Text, pack)
+import Data.Text (Text)
 import Data.Time.Calendar
 import Data.Tree
 import Reactive.Banana.Common
@@ -225,8 +219,6 @@ promoteElement lns (LinkDecorated linkF e) =
 --
 -- [@FixedSpec@] A field that cannot be edited.
 --
--- [@MenuSpec@] A menu of options. Note that separators and sub-menus are not supported.
---
 -- [@TickBox@] Tick for True, untick for False.
 --
 -- [@DateSpec@] A text field which will accept dates in most common formats and display them
@@ -259,18 +251,11 @@ data DialogSpecifier a where
       (a -> Text) -> Maybe (DialogSelector a) -> DialogSpecifier a
    -- | Select a single item from a list. The tuple contains the item label,
    -- an optional icon name, an optional background colour, and the item itself.
-   MenuSpec :: (Eq a) => [(Text, Maybe Text, Maybe Colour, a)] -> DialogSpecifier a
-   -- | Select items from a tree or list. Only nodes with a @Just@ value may be
-   -- picked, and branches with no valid children will be trimmed. The @a@ values in the
-   -- forest must all be distinct. The texts are the node name and optional node tooltip.
    TreeSelectorSpec :: (Ord a) =>
       Forest (Text, Maybe Text, Maybe a) -> DialogSpecifier (Set a)
    TickBox :: DialogSpecifier Bool
    DateSpec :: DateFormat -> DialogSpecifier Day
    DateSpecMaybe :: DateFormat -> DialogSpecifier (Maybe Day)
-   IconSpec :: (Text -> Bool) -> DialogSpecifier Text
-   -- | Select an icon. The argument is a predicate for the icon context name.
-   IconSpecMaybe :: (Text -> Bool) -> DialogSpecifier (Maybe Text)
    ColourSpec :: DialogSpecifier Colour
    ColourSpecMaybe :: DialogSpecifier (Maybe Colour)
    -- | Present a list of items in a table.
@@ -322,24 +307,6 @@ typedTextBox = TextBoxSpec textPrism
 -- | A text box for "Maybe" values. A blank entry equates to "Nothing".
 maybeTextBox :: (Show a, Read a) => DialogSpecifier (Maybe a)
 maybeTextBox = TextBoxSpec $ prismToMaybe textPrism
-
-
--- | A menu for a list of showable items.
-simpleMenu :: (Show a, Eq a) => [a] -> DialogSpecifier a
-simpleMenu = MenuSpec . map (\x -> (pack $ show x, Nothing, Nothing, x))
-
-
--- | A menu for a range within an enumerated type.
-rangeMenu :: (Enum a, Show a, Eq a) => (a, a) -> DialogSpecifier a
-rangeMenu (x1, x2) = simpleMenu [x1 .. x2]
-
-
--- | A menu for the whole of an enumerated type.
---
--- Be careful what you use this for. @boundedMenu :: DialogSpecifier Int@ will compile,
--- but will run out of memory trying to generate an entry for every value.
-boundedMenu :: (Bounded a, Enum a, Show a, Eq a) => DialogSpecifier a
-boundedMenu = rangeMenu (minBound, maxBound)
 
 
 -- | True if the string is a member of the standard icon contexts.

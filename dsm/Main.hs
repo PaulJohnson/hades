@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
 
@@ -15,19 +16,18 @@ import DSM.SafetyCase
 import qualified GI.Gtk as Gtk
 import GSN.FieldNames
 import Paths_dsm
+import Reactive.Banana.GI.DataIconTheme
 
 
 modelDescriptor :: IO (MainDescriptor SafetyModel)
 modelDescriptor = do
-   paths <- iconPaths
-   icons <- dialogIcons
+   icons <- iconPaths
    return MainDescriptor {
       programName = "dsm",
       programTitle = "Diametric Safety Case Manager 1.3",
       programXtn = "dsm",
       programStock = entityIcon,
-      programIconDirs = paths,
-      programDialogIcons = icons,
+      programIconDirs = icons,
       programFirstLoad = Just "initial-model.dsm",
       programAfterLoad = return ()
    }
@@ -35,18 +35,12 @@ modelDescriptor = do
 
 main :: IO ()
 main = do
-   desc <- modelDescriptor
-   modelMain desc
+   dataTheme <- getDataIconTheme
+   dataDir <- getDataDir
+   Gtk.iconThemeSetCustomTheme dataTheme $ Just "Diametric"
+   Gtk.iconThemeSetSearchPath dataTheme [dataDir]
+   modelMain =<< modelDescriptor
 
 
 iconPaths :: IO [FilePath]
 iconPaths = sequence [causalityIcons, gsnIcons]
-
-
-dialogIcons :: IO Gtk.IconTheme
-dialogIcons = do
-   base <- getDataDir
-   r <- Gtk.iconThemeNew
-   Gtk.iconThemeSetCustomTheme r $ Just "Diametric"
-   Gtk.iconThemeSetSearchPath r [base]
-   return r

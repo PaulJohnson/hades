@@ -305,7 +305,7 @@ entityEditor
       selectionB
       modelC
    = mdo
-      style <- liftIO hadesConfig
+      style <- liftIO $ hadesConfig iconTheme
       {- Create the diagram widget and set up the reactive circuit for edits. The diagram
          outputs are executed by "hadesActionExecute", which returns a value in the ModelScript
          monad. This has to sent out unevaluated so that any updates to the model can be applied
@@ -926,12 +926,13 @@ renderOnPng res (w, h) drawing = do
 -- The diagram is moved to the top left corner and 10
 -- points of padding is added around each side.
 renderForExport :: (HadesRender ~ Paint d, Connectable d, Base d ~ ModelScript p v w) =>
-   Traversal' v w   -- ^ Relationship between diagram and model entities.
+   Gtk.IconTheme
+   -> Traversal' v w   -- ^ Relationship between diagram and model entities.
    -> Model v       -- ^ Model containing this diagram.
    -> ViewContext d   -- ^ Application context, including how the diagram is to be rendered.
    -> Diagram d     -- ^ Diagram to render.
    -> (Cairo.Render (), (Double, Double))
-renderForExport prsm model ctx d =
+renderForExport iconTheme prsm model ctx d =
       let
          viewOrder = reverse $ d ^. diagramOrder
          dState = unsafePerformIO $ mkDiagramState ctx 1 d
@@ -954,7 +955,7 @@ renderForExport prsm model ctx d =
             NoBox -> (0, 0)
             BoundBox p _ -> (p ^. pX, p ^. pY)
          render = do
-            style <- liftIO hadesConfig
+            style <- liftIO $ hadesConfig iconTheme
             Cairo.translate (-xOff) (-yOff)
             Cairo.scale staticScale staticScale
             runReaderT paint style

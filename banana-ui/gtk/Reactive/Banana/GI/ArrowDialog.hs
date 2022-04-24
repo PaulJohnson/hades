@@ -3,9 +3,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-
 Copyright © Paul Johnson 2019. See LICENSE file for details.
-
-This file is part of the banana-ui-gtk library. The banana-ui-gtk library is
-proprietary and confidential. Copying is prohibited
 -}
 
 {- |
@@ -915,8 +912,8 @@ renderGadget _ wInit _ initial _ e1 b1 (Optional _ (DateBox fmt)) =
 renderGadget iconTheme wInit _ initial _ e b (Optional _ (IconBox predicate)) =
    {-# SCC "renderGadget_Optional_IconBox" #-} do
       currentName <- liftIO $ newIORef $ initial ^. gdValue
-      icon1 <- safeLoadIcon iconTheme $ fromMaybe "no-icon" $ initial ^. gdValue
-      pic <- Gtk.imageNewFromPixbuf $ Just icon1
+      icon1 <- safeLoadIcon iconTheme (fromMaybe noIconName $ initial ^. gdValue) iconSize
+      pic <- Gtk.imageNewFromPixbuf icon1
       Gtk.set pic [#sensitive := True]
       button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
       liftIO $ wInit pic
@@ -927,13 +924,9 @@ renderGadget iconTheme wInit _ initial _ e b (Optional _ (IconBox predicate)) =
       void $ Gtk.onWidgetDestroy button $ stop1 >> stop2
       (nameE, handler) <- newEvent
       void $ Gtk.onButtonPressed button $ do
-         -- Debug code
-         ps <- Gtk.iconThemeGetSearchPath iconTheme
-         putStrLn $ "IconBox theme search path = " <> show ps
-         -- End debug
          icons <- withWaitCursor button $ iconThemeContents iconTheme False predicate
          iconDialog pic icons $ \newIcon -> do
-            let newValue = if newIcon == "no-icon" then Nothing else Just newIcon
+            let newValue = if newIcon == noIconName then Nothing else Just newIcon
             Gtk.set pic [#iconName := newIcon]
             handler $ GadgetData True newValue
       w1 <- Gtk.toWidget button
@@ -950,8 +943,8 @@ renderGadget iconTheme wInit _ initial _ e b (Optional _ (IconBox predicate)) =
          oldName <- readIORef ref
          when (oldName /= v) $ do
             writeIORef ref v
-            icon1 <- safeLoadIcon iconTheme $ fromMaybe "no-icon" v
-            Gtk.imageSetFromPixbuf pic $ Just icon1
+            icon1 <- safeLoadIcon iconTheme (fromMaybe noIconName v) iconSize
+            Gtk.imageSetFromPixbuf pic icon1
 
 renderGadget _ wInit _ initial _ e1 b1 (Optional _ ColourBox) =
    {-# SCC "renderGadget_Optional_ColourBox" #-} do
@@ -1154,11 +1147,7 @@ renderGadget iconTheme wInit env initial envC e b (Icon iconF g) = {-# SCC "rend
       boxWidget <- Gtk.boxNew Gtk.OrientationHorizontal 0
       inner <- renderGadget iconTheme wInit env initial envC e b g
       liftIO $ wInit boxWidget
-      icon1 <- Gtk.iconThemeLoadIcon
-            iconTheme
-            (iconF $ initial ^. gdValue)
-            (fromIntegral $ fromEnum Gtk.IconSizeButton)
-            []
+      icon1 <- safeLoadIcon iconTheme (iconF $ initial ^. gdValue) iconSize
       imageWidget <- case icon1 of   -- If not found display broken icon rather than nothing.
          Just i -> Gtk.imageNewFromPixbuf $ Just i
          Nothing -> Gtk.imageNewFromIconName Nothing (fromIntegral $ fromEnum Gtk.IconSizeButton)
@@ -1643,7 +1632,7 @@ renderGadget _ wInit _ initial _ e b DisplayMemo = {-# SCC "renderGadget_Display
          Gtk.textBufferSetText buf txt (-1)
          Gtk.popoverPopup pop
 
-renderGadget _ wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_Combo" #-} do
+renderGadget iconTheme wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_Combo" #-} do
       store <- MV.seqStoreNew $ makeEntries env
       MV.customStoreSetColumn store (MV.makeColumnIdString 0) (view _1) -- Item name
       MV.customStoreSetColumn store (MV.makeColumnIdString 1) (view _2) -- Icon name
@@ -1659,7 +1648,10 @@ renderGadget _ wInit env initial _ e b (Combo entriesF) = {-# SCC "renderGadget_
       menuIcon <- Gtk.cellRendererPixbufNew
       when (any (isJust . menuItemIcon) (entriesF env)) $ do
          Gtk.cellLayoutPackStart menuWidget menuIcon False
-         MV.cellLayoutSetAttributes menuWidget menuIcon store $ \i -> [#iconName := i ^. _2]
+         MV.cellLayoutSetDataFunction menuWidget menuIcon store $ \i -> do
+            safeLoadIcon iconTheme (i ^. _2) iconSize >>= \case
+               Just pb -> Gtk.set menuIcon [#pixbuf := pb]
+               Nothing -> Gtk.set menuIcon [#iconName := ""]
       Gtk.cellLayoutPackStart menuWidget menuText True
       MV.cellLayoutSetDataFunction menuWidget menuText store $ \(nm, _, clr, fg, _) -> do
          if clr /= ""
@@ -1988,8 +1980,8 @@ renderGadget _ wInit _ initial _ e b (DateBox fmt) = {-# SCC "renderGadget_DateB
 
 renderGadget iconTheme wInit _ initial _ e b (IconBox predicate) = {-# SCC "renderGadget_IconBox" #-} do
       currentName <- liftIO $ newIORef $ initial ^. gdValue
-      icon1 <- safeLoadIcon iconTheme $ initial ^. gdValue
-      pic <- Gtk.imageNewFromPixbuf $ Just icon1
+      icon1 <- safeLoadIcon iconTheme (initial ^. gdValue) iconSize
+      pic <- Gtk.imageNewFromPixbuf icon1
       Gtk.set pic [#sensitive := True]
       liftIO $ wInit pic
       button <- Gtk.new Gtk.Button [#image := pic, #alwaysShowImage := True]
@@ -2022,8 +2014,9 @@ renderGadget iconTheme wInit _ initial _ e b (IconBox predicate) = {-# SCC "rend
          oldName <- readIORef ref
          when (oldName /= v) $ do
             writeIORef ref v
-            icon1 <- safeLoadIcon iconTheme v
-            Gtk.imageSetFromPixbuf pic $ Just icon1
+            safeLoadIcon iconTheme v iconSize >>= \case
+               Just icon1 -> Gtk.imageSetFromPixbuf pic $ Just icon1
+               Nothing -> return ()
 
 renderGadget _ wInit _ initial _ e b ColourBox = {-# SCC "renderGadget_ColourBox" #-} do
       entry <- Gtk.new Gtk.Entry [#hexpand := True]
@@ -2200,6 +2193,7 @@ renderGadget iconTheme wInit _ initial envC e b (Table flags columns nested) =
    {-# SCC "renderGadget_Table" #-} do
       (vw, store, activated, userEdit) <-
          mkTableView
+               iconTheme
                flags
                (isJust nested)
                columns
@@ -2979,34 +2973,6 @@ boxWidgets wInit orient ws = do
    return $ Just w
 
 
--- | Load a named icon at "Gtk.IconSizeButton" or a broken icon if the icon is not found.
---
--- "Gtk.iconThemeLoadIcon" throws an error instead of returning "Nothing", so this checks first.
-safeLoadIcon :: (MonadIO m) => Gtk.IconTheme -> Text -> m Gdk.Pixbuf
-safeLoadIcon theme name =
-      Gtk.iconThemeHasIcon theme name >>= \case
-         True -> do
-            icon1 <- Gtk.iconThemeLoadIcon theme name sz []
-            maybe failIcon return icon1
-         False -> failIcon
-   where
-      sz = fromIntegral $ fromEnum Gtk.IconSizeButton
-      failIcon = do
-         i <- Gtk.imageNewFromIconName Nothing (fromIntegral $ fromEnum Gtk.IconSizeButton)
-         Gtk.imageGetPixbuf i >>= \case
-            Just pix -> return pix
-            Nothing ->  -- Ultimate fallback. Should never happen.
-               Gdk.pixbufNewFromXpmData [
-                  "! XPM2",
-                  "4 4 2 1",
-                  "* c #000000",
-                  ". c #ffffff",
-                  "*..*",
-                  ".**.",
-                  ".**.",
-                  "*..*"]
-
-
 -- Specialisations of Nothing to satisfy the type system.
 noAdjustment :: Maybe Gtk.Adjustment
 noAdjustment = Nothing
@@ -3022,3 +2988,7 @@ noTreeIter = Nothing
 
 noPixbuf :: Maybe Gdk.Pixbuf
 noPixbuf = Nothing
+
+-- Size of data icons in dialogs.
+iconSize :: Int
+iconSize = 48
