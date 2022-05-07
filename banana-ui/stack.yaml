@@ -9,7 +9,6 @@ packages:
   - webits
   - uuid-gen
   - demo-arrow
-  - demo-gi
   - demo-webit
 
 allow-newer: true

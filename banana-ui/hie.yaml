@@ -7,9 +7,6 @@ cradle:
     - path: "demo-arrow/"
       component: "demo-arrow:exe:demo-arrow"
 
-    - path: "demo-gi/"
-      component: "demo-dialog-gi:exe:demo-dialog-gi"
-
     - path: "demo-webit/"
       component: "demo-webit:exe:demo-webit"
 

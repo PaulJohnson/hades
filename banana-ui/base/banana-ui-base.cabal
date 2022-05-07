@@ -17,7 +17,6 @@ library
       Data.VTree
       Reactive.Banana.ArrowDialog
       Reactive.Banana.Common
-      Reactive.Banana.Dialog
       Reactive.Banana.GadgetPrimitives
       Reactive.Banana.Menu
       Reactive.Banana.Table
