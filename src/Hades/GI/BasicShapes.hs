@@ -897,7 +897,7 @@ drawCornerLetter (BoundBox _ (Point x y)) c = do
    Pango.setAttributeEndIndex attr 2
    attrs <- Pango.attrListNew
    Pango.attrListInsert attrs attr
-   rect <- fst <$> Pango.layoutGetPixelExtents layout
+   rect <- fst <$> Pango.layoutGetExtents layout
    w <- pangoToHades <$> Pango.getRectangleWidth rect
    h <- pangoToHades <$> Pango.getRectangleHeight rect
    join $ asks textStyle
