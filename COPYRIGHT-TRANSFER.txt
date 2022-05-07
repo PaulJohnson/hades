@@ -1,9 +1,0 @@
-I, Paul Johnson, sole Director of Diametric Software Ltd, hereby transfer the copyright in the
-Diametric Safety Case Manager and associated HADES (Haskell Diagram Editing System) software
-from Diametric Software Ltd to myself.
-
-Date: 3rd March 2022.
-
-Paul Johnson,
-Director,
-Diametric Software Ltd.
