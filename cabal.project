@@ -1,8 +1,5 @@
 packages:
    banana-ui/base/banana-ui-base.cabal
    banana-ui/gtk/banana-ui-gtk.cabal
-   causality/causality.cabal
    dsm/dsm.cabal
-   gsn/gsn.cabal
    hades.cabal
-   stress-test/stress.cabal

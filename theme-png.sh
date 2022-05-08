@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Generate 48x48 PNG versions of the SVG icons.
+# Generate 48x48 PNG versions of the SVG icons. The argument is the top level theme directory.
 
 find $1/scalable -type d | sed -e "s/^/mkdir -p -v /" -e "s/scalable/48x48/" | bash
 

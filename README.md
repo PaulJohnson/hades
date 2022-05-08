@@ -54,8 +54,6 @@ Debian family prerequisites:
 
     `apt-get install libgtk-3-dev librsvg2-dev libpq-dev gobject-introspection libgirepository1.0-dev`
 
-
-
 Then install the Haskell Stack:
 
     `wget -qO- https://get.haskellstack.org/ | sh`

@@ -1,13 +1,13 @@
 cabal-version: >=1.18
 name:          banana-ui-base
-version:       1.2.14
+version:       2.0.0
 license:       BSD3
 license-file:  LICENSE
 copyright:     © 2020 Paul Johnson
 maintainer:    paul@cogito.org.uk
 author:        Paul Johnson
 synopsis:      GTK integrationfor Reactive Banana.
-description:   Declarative user interfaces for GTK3 and Reactive Banana.
+description:   Declarative user interfaces for Reactive Banana.
 category:      FRP, Graphics
 build-type:    Simple
 

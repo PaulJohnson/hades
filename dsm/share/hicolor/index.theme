@@ -1,0 +1,18 @@
+[Icon Theme]
+Name=hicolor
+Comment=hicolor Icon Theme
+
+Directories=scalable/categories,48x48/categories,
+
+[48x48/categories]
+Size=48
+Context=categories
+Type=Fixed
+MaxSize=512
+
+[scalable/categories]
+MinSize=1
+Size=128
+MaxSize=512
+Context=categories
+Type=Scalable

@@ -52,15 +52,6 @@ entry.find-string {
       min-height: 10em;
    }
 
-.get-trial-button * {
-      background-color: #aaff7f;
-      font-size: 14px;
-   }
-
-.get-trial-dialog entry {
-      min-width: 20em
-   }
-
 .clickable-list {
       padding: 2px 1px;
       min-width: 10em;

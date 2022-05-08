@@ -8,8 +8,6 @@ packages:
   - gtk
   - webits
   - uuid-gen
-  - demo-arrow
-  - demo-webit
 
 allow-newer: true
   # For gi-cairo-* extra deps.

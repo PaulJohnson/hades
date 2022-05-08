@@ -49,8 +49,6 @@ function createTheme () {
 }
 
 
-createTheme "causality/hicolor"
-createTheme "evidence/hicolor"
-createTheme "gsn/hicolor"
-createTheme "share/hades/hicolor"
-createTheme "dsm/Diametric"
+createTheme "dsm/share/Diametric"
+createTheme "dsm/share/hicolor"
+createTheme "hades/share/hicolor"

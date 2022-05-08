@@ -4,15 +4,11 @@
 flags: {}
 extra-package-dbs: []
 packages:
-   - .
-   - causality
+   - hades
    - dsm
-   - gsn
-   - stress-test
    - banana-ui/base
    - banana-ui/gtk
    - banana-ui/uuid-gen
-   # Extensions to reactive-banana not yet pulled into latest version.
 
 
 allow-newer: true
@@ -36,6 +32,7 @@ extra-deps:
    - git: https://github.com/PaulJohnson/reactive-banana.git
      commit: 684dd9eeabfaa66928d51515634bae0e53d3773c
      subdir: reactive-banana
+     # Extensions to reactive-banana not yet pulled into latest version.
    - QuickCheck-GenT-0.2.2
    - regex-posix-clib-2.7
    - text-icu-0.7.1.0
