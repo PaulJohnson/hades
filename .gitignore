@@ -20,3 +20,5 @@ Docker/secret/
 WindowsFiles/
 attrib/msys2/
 Packages/
+hie.yaml
+banana-ui/hie.yaml

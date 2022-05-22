@@ -46,10 +46,10 @@ import Model.Report.Document
 import Model.Report.Docx
 import Model.Report.Docx.Document
 import Model.Report.Html
+import Paths_hades
 import Reactive.Banana.GI.ErrorBox
 import System.Directory
 import System.FilePath
-import System.Hades.DataFiles
 import System.IO
 import System.IO.Error
 import System.IO.Temp
@@ -129,7 +129,7 @@ formatReportHtml ::
    -> ImageMap
    -> IO ()
 formatReportHtml title path blks imageMap = do
-      dataDir <- getProgramDataFolder
+      dataDir <- getDataDir
       stylesheet <- BL.readFile $ dataDir </> "report.css"
       let
          imageFunc =

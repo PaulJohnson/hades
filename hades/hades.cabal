@@ -9,33 +9,33 @@ author: Paul Johnson
 maintainer: paul@cogito.org.uk
 synopsis: Haskell Diagram Editing System (HADES)
 category: Graphics
+data-dir: share
 data-files:
-   share/hicolor/scalable-up-to-32/status/*.svg
-   share/hicolor/16x16/stock/image/*.png
-   share/hicolor/16x16/actions/*.symbolic.png
-   share/hicolor/24x24/actions/*.symbolic.png
-   share/hicolor/32x32/actions/*.symbolic.png
-   share/hicolor/48x48/actions/*.symbolic.png
-   share/hicolor/48x48/actions/*.png
-   share/hicolor/48x48/categories/*.png
-   share/hicolor/48x48/stock/image/*.png
-   share/hicolor/64x64/actions/*.symbolic.png
-   share/hicolor/96x96/actions/*.symbolic.png
-   share/hicolor/scalable/categories/*.svg
-   share/hicolor/scalable/stock/image/*.svg
-   share/hicolor/scalable/actions/*.svg
-   share/hicolor/index.theme
-   share/hicolor/icon-theme.cache
-   share/editor-ui.glade
-   share/hades-gtk.css
-   share/report.css
-   share/welcome.svg
-   share/docx/_rels/.rels
-   share/docx/docProps/*.xml
-   share/docx/word/_rels/document.xml.rels
-   share/docx/word/theme/theme1.xml
-   share/docx/word/*.xml
-   share/docx/[Content_Types].xml
+   hicolor/scalable-up-to-32/status/*.svg
+   hicolor/16x16/stock/image/*.png
+   hicolor/16x16/actions/*.symbolic.png
+   hicolor/24x24/actions/*.symbolic.png
+   hicolor/32x32/actions/*.symbolic.png
+   hicolor/48x48/actions/*.symbolic.png
+   hicolor/48x48/actions/*.png
+   hicolor/48x48/categories/*.png
+   hicolor/48x48/stock/image/*.png
+   hicolor/64x64/actions/*.symbolic.png
+   hicolor/96x96/actions/*.symbolic.png
+   hicolor/scalable/categories/*.svg
+   hicolor/scalable/stock/image/*.svg
+   hicolor/scalable/actions/*.svg
+   hicolor/index.theme
+   hicolor/icon-theme.cache
+   editor-ui.glade
+   hades-gtk.css
+   report.css
+   docx/_rels/.rels
+   docx/docProps/*.xml
+   docx/word/_rels/document.xml.rels
+   docx/word/theme/theme1.xml
+   docx/word/*.xml
+   docx/[Content_Types].xml
 
 library
    exposed-modules:

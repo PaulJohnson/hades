@@ -8,8 +8,7 @@ This file is part of the Haskell Diagram Editing System (HADES) software.
 
 module App.ModelMain (
    MainDescriptor (..),
-   modelMain,
-   getProgramDataFolder
+   modelMain
 ) where
 
 import App.Welcome
@@ -74,7 +73,6 @@ import System.Directory
 import System.Environment
 import System.FilePath
 import System.Hades.Autosave
-import System.Hades.DataFiles
 import System.Hades.EditLock
 import Reactive.Banana.GI.Common
 
@@ -101,11 +99,17 @@ data MainDescriptor v = MainDescriptor {
    programXtn :: Text,   -- ^ Save file extension (without the dot).
    programStock :: Entity v -> Text,  -- ^ Stock icon names for type @v@.
    programIconDirs :: [FilePath],  -- Folders to be added to the default icon theme search path.
-   programFirstLoad :: Maybe FilePath,
-      -- ^ File to load when first started, relative to data directory @share/hades/@.
-   programAfterLoad :: ModelEdit v v ()
+   programAfterLoad :: ModelEdit v v (),
       -- ^ This will be applied after a model is opened. Use it to update models in old
       -- formats. It MUST be idempotent.
+   programDocs :: FilePath,
+      -- ^ Folder where application-specific documentation files are stored. This must contain
+      -- @LICENSE.txt@, either @Manual.pdf@ (Linux) or
+      -- @Manual.html@ (Windows), @Support.html@, @Credits.html and @welcome.svg@.
+      -- See 'manualFile' for details of the Windows PDF issue.
+   programSamples :: Maybe FilePath
+      -- ^ The program may provide some example files which will be offered for loading from the
+      -- welcome screen. This is the path of the folder containing them.
 }
 
 
@@ -313,7 +317,6 @@ modelMain ::
       HasDiagrams p v, p ~ HadesRender, HasEvidence v) =>
    MainDescriptor v -> IO ()
 modelMain descriptor = do
-   iconTheme <- getDataIconTheme
    -- Set working directory to be the user's document folder.
    catch
       (getUserDocumentsDirectory >>= setCurrentDirectory)
@@ -329,29 +332,28 @@ modelMain descriptor = do
          setEnv "FC_DEBUG" "1024"  -- Debug code: monitor config file loading.
    -- Initialise GTK and add application-specific settings.
    void $ Gtk.init Nothing
-   dataDir <- getProgramDataFolder
+   dataDir <- getDataDir
    -- Set up application GUI
    builder <- Gtk.builderNewFromFile $ T.pack $ dataDir </> "editor-ui.glade"
    window <- Gtk.builderGetObject builder "app-window" >>= \case
       Nothing -> fail "Cannot get app-window"
       Just win -> Gtk.unsafeCastTo Gtk.ApplicationWindow win
+   systemIconTheme <- Gtk.iconThemeGetDefault
+   dataIconTheme <- getDataIconTheme
    do  -- Set up GTK parameters
-      theme <- Gtk.iconThemeGetDefault
-      evidenceIcons  <- getEvidenceDataFolder
       let
-         hadesIcons = dataDir
-         iconPaths = programIconDirs descriptor ++ [hadesIcons, evidenceIcons]
-      mapM_ (Gtk.iconThemeAppendSearchPath theme) iconPaths
+         iconPaths = programIconDirs descriptor ++ [dataDir]
+      mapM_ (Gtk.iconThemeAppendSearchPath systemIconTheme) iconPaths
       let pri = fromIntegral Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
       screen <- Gtk.windowGetScreen window
       bc <- bananaCss
       Gtk.styleContextAddProviderForScreen screen bc pri
       hadesCss <- Gtk.cssProviderNew
-      getDataFileName "share/hades/hades-gtk.css" >>= Gtk.cssProviderLoadFromPath hadesCss . T.pack
+      getDataFileName "share/hades-gtk.css" >>= Gtk.cssProviderLoadFromPath hadesCss . T.pack
       Gtk.styleContextAddProviderForScreen screen hadesCss pri
       Gtk.windowSetDefaultIconName "diametric"
       Gtk.set window [
-            Gtk.windowRole := ("\\hades\\Main" :: Text),
+            Gtk.windowRole := T.pack (pathSeparator : "hades" </> "Main"),
             Gtk.windowTitle := programTitle descriptor <> ": <unknown>"]
    bx <- Gtk.builderGetObject builder "main-box" >>= \case
       Nothing -> fail "Cannot get application main-box widget."
@@ -374,7 +376,7 @@ modelMain descriptor = do
    -- Show the Welcome screen unless this has been disabled or we have a command-line filename.
    initialFilePath <- case fileToLoad options of
       Just path -> return $ Just path
-      Nothing -> welcomeScreen window iconTheme False
+      Nothing -> welcomeScreen window False (programDocs descriptor) (programSamples descriptor)
    initialModel <- case initialFilePath of
       Nothing -> return (Nothing, emptyModel "Model")
       Just target ->
@@ -431,7 +433,7 @@ modelMain descriptor = do
                actionDisplayFile "helpCredits" $ dataDir </> "documentation" </> "Credits.html"
             ]
          mapM_ (Gio.actionMapAddAction window) fileActions
-         actionExportDiagram window iconTheme exportB >>= Gio.actionMapAddAction window
+         actionExportDiagram window dataIconTheme exportB >>= Gio.actionMapAddAction window
          gen <- fromPoll newGenerator  -- Used to execute import events.
          -- Track the current file in the window title.
          let
@@ -452,10 +454,10 @@ modelMain descriptor = do
                -- Connect up the dialog actions.
                -- This also drops any previous instances of these actions from old editors.
                (fieldEvents, fieldAction) <-
-                     actionFields window iconTheme (modelFields <$> changesB modelC)
+                     actionFields window dataIconTheme (modelFields <$> changesB modelC)
                Gio.actionMapAddAction window fieldAction
                (refTypeEvents, refTypeAction) <-
-                     actionRefTypes window iconTheme (modelRefTypes <$> changesB modelC)
+                     actionRefTypes window dataIconTheme (modelRefTypes <$> changesB modelC)
                Gio.actionMapAddAction window refTypeAction
                selectionExport <- actionExportSelection descriptor window modelC
                Gio.actionMapAddAction window selectionExport
@@ -468,7 +470,7 @@ modelMain descriptor = do
 
                output <- editorWindows
                      window
-                     iconTheme
+                     dataIconTheme
                      (programStock descriptor)
 
                      newModel
@@ -501,7 +503,7 @@ modelMain descriptor = do
                         refTypeUpdate <$> changesB modelC <@> refTypeEvents
                      ]
                -- Connect up the extension menu.
-               modelExtensionUpdates <- extensionMenu window iconTheme builder modelC
+               modelExtensionUpdates <- extensionMenu window dataIconTheme builder modelC
                -- Model updates.
                let
                   modelUpdates = editorUpdates output
@@ -1163,14 +1165,12 @@ actionAbout desc parent modelB = do
       return (never, action)
    where
       displayAbout model = do
-         dataDir <- getProgramDataFolder
-         licenseBytes <- liftIO $ LB.readFile $ dataDir </> "documentation" </> "LICENSE.txt"
+         licenseBytes <- liftIO $ LB.readFile $ programDocs desc </> "LICENSE.txt"
          let
             licenseText = decodeUtf8With lenientDecode $ LB.toStrict licenseBytes
          about <- Gtk.new Gtk.AboutDialog [
                #comments :=
-                  "The best modelling tool for safety cases and hazards.\n\
-                  \Current model contains " <>
+                  "Current model contains " <>
                   T.pack (show $ M.size $ modelContents model) <> " entities.",
                #copyright := "Copyright © Paul Johnson 2020. Licensed under BSD3 terms. \
                   \See License for details.",

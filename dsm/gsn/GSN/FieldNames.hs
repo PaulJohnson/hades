@@ -17,7 +17,6 @@ module GSN.FieldNames where
 import Control.Lens
 import Model.Reflection.Types
 import Model.Reflection.Values (Variant (..))
-import Paths_dsm
 
 
 goalVariant :: Variant a
@@ -59,8 +58,3 @@ developedField = fieldsByName builtInFields ^?! ix "Developed" . to fieldId
 
 cardinalityField :: FieldId
 cardinalityField = fieldsByName builtInFields ^?! ix "Cardinality" . to fieldId
-
-
--- | Path for GTK icons associated with GSN entities.
-gsnIcons :: IO FilePath
-gsnIcons = getDataDir

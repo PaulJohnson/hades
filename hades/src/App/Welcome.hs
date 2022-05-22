@@ -28,7 +28,6 @@ import Reactive.Banana.ArrowDialog
 import Reactive.Banana.GI.ArrowDialog
 import System.Directory
 import System.FilePath
-import System.Hades.DataFiles
 
 
 data WelcomeResult = WelcomeResult {
@@ -44,16 +43,23 @@ welcomeExample = lens _welcomeExample $ \r p -> r{_welcomeExample = p}
 
 
 -- | Display a welcome screen unless the Boolean @force@ argument is @False@ and user has
--- previously clicked the \"Don't show me this again\" box.
-welcomeScreen :: (Gtk.IsWidget parent) => parent -> Gtk.IconTheme -> Bool -> IO (Maybe FilePath)
-welcomeScreen parent iconTheme force = do
-   dataDir <- getProgramDataFolder
+-- previously clicked the \"Don't show me this again\" box. Returns an initial example file to load,
+-- or @Nothing@ for a blank file.
+welcomeScreen :: (Gtk.IsWidget parent) =>
+   parent
+   -> Bool   -- ^ Force showing the welcome screen.
+   -> FilePath  -- ^ Documentation folder, including manual file and @welcome.svg@.
+   -> Maybe FilePath  -- ^ Folder holding example files, if any.
+   -> IO (Maybe FilePath)
+welcomeScreen parent force docFolder sampleFolder = do
+   iconTheme <- Gtk.iconThemeGetDefault
    let
-      imageFile = dataDir </> "welcome.svg"
-      docFile = dataDir </> "documentation" </> manualFile
+      imageFile = docFolder </> "welcome.svg"
+      docFile = docFolder </> manualFile
    uri <- GLib.filenameToUri docFile Nothing
-   let sampleFolder = dataDir </> "examples"
-   examplePaths <- catch (sort <$> listDirectory sampleFolder) $ \(_ :: IOException) -> return []
+   examplePaths <- case sampleFolder of
+      Just f -> catch (sort <$> listDirectory f) $ \(_ :: IOException) -> return []
+      Nothing -> return []
    let examples = map (\p -> (T.pack $ takeBaseName p, p)) examplePaths
    flagPath <- welcomeFlagFile
    don'tShow <- doesFileExist flagPath
@@ -68,7 +74,7 @@ welcomeScreen parent iconTheme force = do
                catch
                   (if r ^. welcomeDon'tShow then writeFile flagPath "" else removeFile flagPath)
                   (\(_ :: IOException) -> return ())  -- Ignore file-not-found errors.
-               return $ (sampleFolder </>) <$> (r ^. welcomeExample)
+               return $ (</>) <$> sampleFolder <*> (r ^. welcomeExample)
       else
          return Nothing
 

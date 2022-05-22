@@ -8,23 +8,25 @@ author: Paul Johnson
 maintainer: paul@cogito.org.uk
 synopsis: Diametric Safety Case Manager
 category: Modelling
+data-dir: share
 data-files:
-   share/Diametric/48x48/general/*.png
-   share/Diametric/48x48/road-signs/*.png
-   share/Diametric/scalable/general/*.svg
-   share/Diametric/scalable/road-signs/*.svg
-   share/Diametric/icon-theme.cache
-   share/Diametric/index.theme
-   share/documentation/Manual.html
-   share/documentation/Manual.pdf
-   share/documentation/Support.html
-   share/documentation/theme.css
-   share/documentation/LICENSE.txt
-   share/hicolor/48x48/categories/*.png
-   share/hicolor/scalable/categories/*.svg
-   share/hicolor/index.theme
-   share/hicolor/icon-theme.cache
-   share/examples/*.dsm
+   Diametric/48x48/general/*.png
+   Diametric/48x48/road-signs/*.png
+   Diametric/scalable/general/*.svg
+   Diametric/scalable/road-signs/*.svg
+   Diametric/icon-theme.cache
+   Diametric/index.theme
+   documentation/Manual.html
+   documentation/Manual.pdf
+   documentation/Support.html
+   documentation/theme.css
+   documentation/LICENSE.txt
+   documentation/welcome.svg
+   hicolor/48x48/categories/*.png
+   hicolor/scalable/categories/*.svg
+   hicolor/index.theme
+   hicolor/icon-theme.cache
+   examples/*.dsm
 
 library
    exposed-modules:

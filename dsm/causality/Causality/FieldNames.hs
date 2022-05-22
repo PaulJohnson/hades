@@ -18,7 +18,6 @@ import Control.Lens
 import Model.Reflection.NamedRelation (Relation)
 import Model.Reflection.Types (FieldId, fieldsByName, builtInFields, fieldId)
 import Model.Reflection.Values (Variant (..))
-import Paths_dsm
 
 
 temporalEdgeVariant :: Variant a
@@ -86,7 +85,3 @@ arrowHeadInstance = "Instance input"
 
 arrowTailInstance :: Relation
 arrowTailInstance = "Instance output"
-
--- | Path for icons associated with causal and risk model types.
-causalityIcons :: IO FilePath
-causalityIcons = getDataDir

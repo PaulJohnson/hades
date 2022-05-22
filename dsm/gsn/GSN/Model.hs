@@ -61,8 +61,7 @@ module GSN.Model (
    gsnToolbar,
    gsnStockItem,
    -- * Utilities
-   dottedNumbers,
-   gsnIcons
+   dottedNumbers
 ) where
 
 import App.Appearance

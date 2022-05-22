@@ -40,19 +40,17 @@ import Data.Time
 import Data.Time.Clock.POSIX
 import Model.Report.Docx.Document
 import Model.Report.Docx.Utils
+import Paths_hades
 import System.Directory
 import System.Environment
 import System.FilePath
-import System.Hades.DataFiles
 import qualified Text.XML.Light as X
 import qualified Text.XML.Light.Cursor as X
 
 
 -- | The directory where the Word skeleton files are stored.
 getSkeletonDir :: IO FilePath
-getSkeletonDir = do
-   dataDir <- getProgramDataFolder
-   return $ dataDir </> "docx"
+getSkeletonDir = getDataFileName "docx"
 
 
 -- | Read the named styles from the styles.xml file in the skeleton. Missing styles are silently

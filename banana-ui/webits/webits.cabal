@@ -7,7 +7,7 @@ license-file: LICENSE
 copyright: © 2021 Paul Johnson
 author: Paul Johnson
 maintainer: paul@cogito.org.uk
-synopsis: Enterprise Diametric Safety Case Manager
+synopsis: Web interface to UI gadgets.
 category: Graphics
 data-files:
    JS/favicon.ico
@@ -21,7 +21,6 @@ data-files:
    JQuery/*.min.css
    JQuery/*.js
    JQuery/*.min.js
-
 
 library
    hs-source-dirs: src
@@ -80,7 +79,7 @@ library
 executable demo-webit
    main-is: Main.hs
    hs-source-dirs: demo-webit
-   other-modules: Dialog, Matrix, Menu, Types, Paths_webits
+   other-modules: Dialog Matrix Menu Types Paths_webits
    default-language: Haskell2010
    default-extensions: Arrows DeriveFunctor ExistentialQuantification
                        ExtendedDefaultRules FlexibleContexts FlexibleInstances
@@ -90,6 +89,10 @@ executable demo-webit
                        TupleSections TypeFamilies ViewPatterns
    -- Vanilla compile.
    ghc-options: -Wall -j -threaded
+   data-dir: demo-webit
+   data-files:
+      Testcard_F.jpg
+      words.txt
 
    -- Threadscope.
    -- ghc-options: -Wall -j -threaded -eventlog -rtsopts
@@ -118,7 +121,7 @@ executable demo-webit
       webits -any
 
 
-test-suite test
+test-suite tests
    type: exitcode-stdio-1.0
    main-is: TestMain.hs
    hs-source-dirs: test

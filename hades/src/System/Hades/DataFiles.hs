@@ -7,13 +7,8 @@ This file is part of the Haskell Diagram Editing System (HADES) software.
 -}
 
 module System.Hades.DataFiles (
-   getProgramDataFolder,
-   getEvidenceDataFolder,
    getUserName
 ) where
-
-import Paths_hades
-import System.FilePath
 
 
 -- Import and re-export the OS function for finding the users name, depending on the platform.
@@ -29,12 +24,3 @@ getUserName = do
    pw <- getUserEntryForID euid
    return (userName pw)
 #endif
-
-
--- | The folder where the data files are stored.
-getProgramDataFolder :: IO FilePath
-getProgramDataFolder = (</> "share" </> "hades") <$> getDataDir
-
--- | The folder where the evidence data files (currently just icons) are stored.
-getEvidenceDataFolder :: IO FilePath
-getEvidenceDataFolder = (</> "evidence") <$> getDataDir

@@ -10,7 +10,7 @@ synopsis:      GTK integration for Reactive Banana.
 description:   Declarative user interfaces for GTK3 and Reactive Banana.
 category:      FRP, Graphics
 build-type:    Simple
-data-files: banana-gtk.css
+data-files:    banana-gtk.css
 
 library
    hs-source-dirs: src
