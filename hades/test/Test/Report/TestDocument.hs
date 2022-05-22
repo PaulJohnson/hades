@@ -9,19 +9,23 @@ This file is part of the Haskell Diagram Editing System (HADES) software.
 -- |
 module Test.Report.TestDocument where
 
-import Data.ByteString as B
+import qualified Data.ByteString as B
 import System.IO
 import Model.Report.Document
 import Model.Report.Docx
 import Model.Report.Html
 import qualified Text.Blaze.Html.Renderer.Utf8 as H
+import System.Directory
+import System.FilePath
 
 
 runDocumentTest :: IO Bool
 runDocumentTest = do
-   makeDocx Nothing "Test Document" "demo-files/testWordDoc.docx" testDoc mempty
+   temp <- getTemporaryDirectory
+   putStrLn $ "Writing test documents in " <> temp
+   makeDocx Nothing "Test Document" (temp </> "testWordDoc.docx") testDoc mempty
    let html = mkHtmlDocument mempty mempty testDoc
-   withFile "demo-files/testHtml.html" WriteMode $ \h ->
+   withFile (temp </> "testHtml.html") WriteMode $ \h ->
       H.renderHtmlToByteStringIO (B.hPut h) html
    return True
 

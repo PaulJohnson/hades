@@ -208,6 +208,8 @@ test-suite tests
         bytestring -any,
         containers -any,
         crypto-api -any,
+        directory -any,
+        filepath -any,
         gi-gtk -any,
         hades -any,
         HUnit -any,
@@ -218,4 +220,4 @@ test-suite tests
         text -any,
         time -any,
         uuid -any,
-        HUnit -any
+        uuid-gen -any
