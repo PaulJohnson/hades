@@ -1,8 +1,8 @@
-cabal-version: 1.18
+cabal-version: 2.4
 name: webits
 version: 0.1.1
 build-type: Simple
-license: BSD3
+license: BSD-3-Clause
 license-file: LICENSE
 copyright: © 2021 Paul Johnson
 author: Paul Johnson
@@ -43,36 +43,35 @@ library
                        TupleSections TypeFamilies ViewPatterns
    ghc-options: -Wall -j
    build-depends:
-      aeson -any,
-      base >= 4.8,
-      base64-bytestring -any,
-      banana-ui-base -any,
-      blank-canvas -any,
-      blaze-html -any,
-      blaze-markup -any,
-      bytestring -any,
-      clay -any,
-      colour -any,
-      containers -any,
-      directory -any,
-      filepath -any,
-      http-types -any,
-      image-type -any,
-      javascript-bridge -any,
-      lens -any,
-      lens-aeson -any,
-      modern-uri -any,
-      mtl -any,
-      scotty -any,
-      stm -any,
-      text -any,
-      transformers -any,
-      unordered-containers -any,
-      uuid -any,
-      uuid-gen -any,
-      vector -any,
-      wai -any,
-      warp -any,
+      aeson,
+      base >=4.14 && < 4.15,
+      base64-bytestring,
+      banana-ui-base,
+      blank-canvas,
+      blaze-html,
+      blaze-markup,
+      bytestring,
+      clay,
+      colour,
+      containers,
+      directory,
+      filepath,
+      http-types,
+      image-type,
+      javascript-bridge,
+      lens,
+      lens-aeson,
+      modern-uri,
+      mtl,
+      scotty,
+      stm,
+      text,
+      transformers,
+      unordered-containers,
+      uuid,
+      vector,
+      wai,
+      warp,
       hspec,
       QuickCheck
 
@@ -100,25 +99,25 @@ executable demo-webit
    -- Profiling.
    -- ghc-options: -Wall -j -threaded -prof -fprof-auto
    build-depends:
-      aeson -any,
-      base >=4.7 && <5,
-      banana-ui-base -any,
-      blaze-html -any,
-      clay -any,
-      colour -any,
-      containers -any,
-      http-types -any,
-      javascript-bridge -any,
-      lens -any,
-      modern-uri -any,
-      mtl -any,
-      random -any,
-      QuickCheck -any,
-      scotty -any,
-      stm -any,
+      aeson,
+      base >=4.14 && < 4.15,
+      banana-ui-base,
+      blaze-html,
+      clay,
+      colour,
+      containers,
+      http-types,
+      javascript-bridge,
+      lens,
+      modern-uri,
+      mtl,
+      random,
+      QuickCheck,
+      scotty,
+      stm,
       text >= 1.2,
-      time -any,
-      webits -any
+      time,
+      webits
 
 
 test-suite tests
@@ -133,7 +132,7 @@ test-suite tests
                        RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
                        TupleSections TypeFamilies ViewPatterns
    build-depends:
-      base,
+      base >=4.14 && < 4.15,
       Cabal >= 1.9.2,
       containers,
       hspec,

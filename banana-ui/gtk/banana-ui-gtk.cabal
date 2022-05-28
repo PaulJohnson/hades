@@ -1,7 +1,7 @@
-cabal-version: >=1.18
+cabal-version: 2.4
 name:          banana-ui-gtk
 version:       1.2.14
-license:       BSD3
+license:       BSD-3-Clause
 license-file:  LICENSE
 copyright:     © 2020 Paul Johnson
 maintainer:    paul@cogito.org.uk
@@ -31,38 +31,38 @@ library
       MultiWayIf OverloadedStrings Rank2Types RankNTypes RecursiveDo
       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
       ViewPatterns
-   ghc-options:        -Wall -j -O2
+   ghc-options:        -Wall
    other-modules: Paths_banana_ui_gtk
    autogen-modules: Paths_banana_ui_gtk
    build-depends:
-      base >=4.7,
-      banana-ui-base -any,
-      bytestring -any,
-      colour -any,
+      base >=4.14 && < 4.15,
+      banana-ui-base,
+      bytestring,
+      colour,
       containers >=0.5,
-      data-default -any,
-      gi-cairo -any,
-      gi-cairo-connector -any,
-      gi-cairo-render -any,
-      gi-gdk -any,
-      gi-gdkpixbuf -any,
-      gi-gio -any,
-      gi-glib -any,
-      gi-gobject -any,
-      gi-gtk -any,
-      gi-gtk-hs -any,
-      gi-pango -any,
-      haskell-gi-base -any,
+      data-default,
+      gi-cairo,
+      gi-cairo-connector,
+      gi-cairo-render,
+      gi-gdk,
+      gi-gdkpixbuf,
+      gi-gio,
+      gi-glib,
+      gi-gobject,
+      gi-gtk,
+      gi-gtk-hs,
+      gi-pango,
+      haskell-gi-base,
       haskell-gi-overloading >=1.0,
-      lens -any,
-      mtl -any,
-      random -any,
-      reactive-banana -any,
-      text -any,
-      time -any,
-      transformers -any,
-      -- uuid -any,
-      vector -any
+      lens,
+      mtl,
+      random,
+      reactive-banana,
+      text,
+      time,
+      transformers,
+      -- uuid,
+      vector
 
 executable demo-arrow
    hs-source-dirs: demo-arrow
@@ -73,17 +73,17 @@ executable demo-arrow
       Demo.Notebook
       Demo.Table
    default-language: Haskell2010
-   ghc-options:      -Wall -j
+   ghc-options:      -Wall
    build-depends:
-      base >=4.7 && <5,
-      banana-ui-base -any,
-      banana-ui-gtk -any,
-      colour -any,
-      containers -any,
-      data-default -any,
-      gi-gtk -any,
-      lens -any,
+      base >=4.14 && < 4.15,
+      banana-ui-base,
+      banana-ui-gtk,
+      colour,
+      containers,
+      data-default,
+      gi-gtk,
+      lens,
       reactive-banana >=1.1,
       text >=1.2,
-      time -any,
-      banana-ui-gtk -any
+      time,
+      banana-ui-gtk

@@ -1,13 +1,14 @@
-cabal-version: >=1.18
+cabal-version: 2.4
 name: hades
+synopsis: Haskell Diagram Editing System (HADES)
+description: Library for diagram notations representing models of systems.
 version: 2.0.0
 build-type: Simple
-license: BSD3
+license: BSD-3-Clause
 license-file: LICENSE
 copyright: © 2020 Paul Johnson
 author: Paul Johnson
 maintainer: paul@cogito.org.uk
-synopsis: Haskell Diagram Editing System (HADES)
 category: Graphics
 data-dir: share
 data-files:
@@ -112,77 +113,76 @@ library
                         MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
                         RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
                         TupleSections TypeFamilies ViewPatterns
-   ghc-options: -Wall -j
+   ghc-options: -Wall
    build-depends:
-      aeson -any,
-      array -any,
-      banana-ui-base -any,
-      banana-ui-gtk -any,
-      base >=4.8,
-      blaze-html -any,
-      blaze-markup -any,
-      bytestring -any,
-      colour -any,
-      conduit-extra -any,
-      containers -any,
-      data-default -any,
-      directory -any,
-      email-validate -any,
-      filepath -any,
-      fgl -any,
-      filelock -any,
-      filepath -any,
-      free -any,
-      gi-cairo -any,
-      gi-cairo-connector -any,
-      gi-cairo-render -any,
-      gi-gdk -any,
-      gi-gdkpixbuf -any,
-      gi-gio -any,
-      gi-glib -any,
-      gi-gobject -any,
-      gi-gtk -any,
-      gi-gtk-hs -any,
-      gi-pango -any,
-      gi-pangocairo -any,
-      gi-rsvg -any,
+      aeson,
+      array,
+      banana-ui-base,
+      banana-ui-gtk,
+      base >=4.14 && < 4.15,
+      blaze-html,
+      blaze-markup,
+      bytestring,
+      colour,
+      conduit-extra,
+      containers,
+      data-default,
+      directory,
+      email-validate,
+      filepath,
+      fgl,
+      filelock,
+      filepath,
+      free,
+      gi-cairo,
+      gi-cairo-connector,
+      gi-cairo-render,
+      gi-gdk,
+      gi-gdkpixbuf,
+      gi-gio,
+      gi-glib,
+      gi-gobject,
+      gi-gtk,
+      gi-gtk-hs,
+      gi-pango,
+      gi-pangocairo,
+      gi-rsvg,
       haskell-gi-overloading >=1.0,
-      haskell-gi-base -any,
-      http-conduit -any,
-      http-types -any,
-      JuicyPixels -any,
-      lens -any,
-      lens-xml -any,
-      megaparsec -any,
-      mtl -any,
-      network-uri -any,
-      optparse-applicative -any,
-      parser-combinators -any,
-      reactive-banana -any,
-      stm -any,
-      temporary -any,
-      text -any,
-      text-icu -any,
-      time -any,
-      transformers -any,
-      unordered-containers -any,
-      uuid -any,
-      uuid-gen -any,
-      vector -any,
-      xlsx -any,
-      xml -any,
-      zip-archive -any
+      haskell-gi-base,
+      http-conduit,
+      http-types,
+      JuicyPixels,
+      lens,
+      lens-xml,
+      megaparsec,
+      mtl,
+      network-uri,
+      optparse-applicative,
+      parser-combinators,
+      reactive-banana,
+      stm,
+      temporary,
+      text,
+      text-icu,
+      time,
+      transformers,
+      unordered-containers,
+      uuid,
+      vector,
+      xlsx,
+      xml,
+      zip-archive
 
    if os(windows)
         build-depends:
-            Win32 -any,
-            HUnit -any,
-            base64-bytestring -any
+            Win32,
+            HUnit,
+            base64-bytestring
    else
         build-depends:
-            unix -any,
-            HUnit -any,
-            base64-bytestring -any
+            unix,
+            HUnit,
+            base64-bytestring
 
 
 test-suite tests
@@ -201,23 +201,22 @@ test-suite tests
                         MultiParamTypeClasses OverloadedStrings Rank2Types RankNTypes
                         RecursiveDo ScopedTypeVariables TemplateHaskell TupleSections
                         TypeFamilies ViewPatterns
-    ghc-options: -Wall -j
+    ghc-options: -Wall
     build-depends:
-        base -any,
-        blaze-html -any,
-        bytestring -any,
-        containers -any,
-        crypto-api -any,
-        directory -any,
-        filepath -any,
-        gi-gtk -any,
-        hades -any,
-        HUnit -any,
-        lens -any,
-        megaparsec -any,
-        mtl -any,
-        QuickCheck -any,
-        text -any,
-        time -any,
-        uuid -any,
-        uuid-gen -any
+        base >=4.14 && < 4.15,
+        blaze-html,
+        bytestring,
+        containers,
+        crypto-api,
+        directory,
+        filepath,
+        gi-gtk,
+        hades,
+        HUnit,
+        lens,
+        megaparsec,
+        mtl,
+        QuickCheck,
+        text,
+        time,
+        uuid

@@ -336,7 +336,8 @@ createIconMenu iconsData = do
       n <- elemIndex icon g
       return (gn, n)
     updateIcon groups icon _ wId1 =
-      let unhighlight =
+      let
+        unhighlight =
           "$(" <> webitSelector wId1 <> " + ' img.icon-display').removeAttr('style');"
       in case locateIcon groups icon of
         Nothing -> unhighlight
@@ -499,9 +500,9 @@ elmerScotty route htmlHead iconData action = do
         htmlHead
         -- Import bundled Fancytree core, jQuery and associated CSS.
         H.link
-        ! HA.href "//cdn.jsdelivr.net/npm/jquery.fancytree@2.38/dist/skin-win8/\
+          ! HA.href "//cdn.jsdelivr.net/npm/jquery.fancytree@2.38/dist/skin-win8/\
                     \ui.fancytree.min.css"
-        ! HA.rel "stylesheet"
+          ! HA.rel "stylesheet"
         H.link ! HA.href "assets/JQuery/jquery-ui.min.css" ! HA.rel "stylesheet"
         H.script ! HA.src "assets/JQuery/external/jquery/jquery.js" $ ""
         H.script ! HA.src "assets/JQuery/jquery-ui.min.js" $ ""

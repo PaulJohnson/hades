@@ -893,7 +893,8 @@ renderGadget env i (Intercept dblClick dSel g) = {-# SCC renderGadget_Intercept 
     JavaScript script = webitEvent (webitId box) ()
   box <- makeWebitContainer1 "div" [(prop, LT.toStrict script)]
   clickChan <- addWebitChannel box :: Elmer (TChan ())
-  let vEvent = ((),) . view gdValue <$>
+  let
+    vEvent = ((),) . view gdValue <$>
       (tStateBehaviour (gadgetOutput inner) <* readTChan clickChan)
   clickResult <- mkWebitPopupSelect env dSel vEvent
   elmerDaemon box $ liftIO $ atomically $ do
@@ -1412,7 +1413,8 @@ renderGadget e i (FixedText textFunc mSel) = {-# SCC renderGadget_FixedText #-} 
     i1 <- liftIO $ atomically $ tStateDup i
     case mSel of
       Just dSel -> do
-        let vEvent = ((),) . view gdValue <$>
+        let
+          vEvent = ((),) . view gdValue <$>
             (tStateBehaviour i <* tStateEvent (webitState webit))
         clickResult <- mkWebitPopupSelect e dSel vEvent
         (out, outWriter) <- newTStateIO initial
@@ -1451,7 +1453,8 @@ renderGadget e i (FixedMemo size _ textFunc mSel) = {-# SCC renderGadget_FixedMe
     i1 <- liftIO $ atomically $ tStateDup i
     case mSel of
       Just dSel -> do
-        let vEvent = ((),) . view gdValue <$>
+        let
+          vEvent = ((),) . view gdValue <$>
             (tStateBehaviour i <* tStateEvent (webitState webit))
         clickResult <- mkWebitPopupSelect e dSel vEvent
         (out, outWriter) <- newTStateIO initial
@@ -1850,7 +1853,8 @@ renderGadget e i (ForestTable headerGroups lensForest) = {-# SCC renderGadget_Fo
         attribs = [("rowspan", T.pack $ show n) | n > 1]
       cells <- forM gs $ \g -> do
         cell <- makeWebitContainer1 "td" attribs
-        let g2 = focusingOver (getLens lns1) $
+        let
+          g2 = focusingOver (getLens lns1) $
             G.send (Just . Right . (k,)) <<< sendMap (Just . Left) g
         contents <- renderGadget e i g2
         mapM_ (showWebit cell) $ gadgetView contents
@@ -1889,7 +1893,8 @@ renderGadget e i (ForestEditor labelFunc menuFunc legalParent dSel) =
     -- If a DialogSelector is provided then process double-click events.
     forM_ dSel $ \selector -> do
       dblClicks <- addWebitChannel webit  -- Gets the ModelIndex of the double-clicked item.
-      let getClick = do
+      let
+        getClick = do
           click <- readTChan dblClicks
           case readMaybe click of
             Just click2 -> do

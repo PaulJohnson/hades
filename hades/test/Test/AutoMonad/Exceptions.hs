@@ -51,7 +51,8 @@ testMachine :: Integer -> TestMachine Void
 testMachine t =
     catchAutoT ( do
         total <- lift get
-        let msg = "Last total = " <> T.pack (show t) <>
+        let
+          msg = "Last total = " <> T.pack (show t) <>
             ". Running total = " <> T.pack (show total) <> ".  "
         p1 <- getParameter (Just msg) 1
         p2 <- getParameter (Just $ "Got " <> T.pack (show p1) <> ".  ") 2

@@ -8,7 +8,6 @@ packages:
    - dsm
    - banana-ui/base
    - banana-ui/gtk
-   - banana-ui/uuid-gen
 
 
 allow-newer: true

@@ -1,7 +1,7 @@
-cabal-version: >=1.18
+cabal-version: 2.4
 name:          banana-ui-base
 version:       2.0.0
-license:       BSD3
+license:       BSD-3-Clause
 license-file:  LICENSE
 copyright:     © 2020 Paul Johnson
 maintainer:    paul@cogito.org.uk
@@ -14,6 +14,7 @@ build-type:    Simple
 library
    exposed-modules:
       Data.Default.Orphan
+      Data.UUID.Generate
       Data.VTree
       Reactive.Banana.ArrowDialog
       Reactive.Banana.Common
@@ -30,15 +31,17 @@ library
       ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
       ViewPatterns
 
-   ghc-options:        -Wall -j -O2
+   ghc-options:        -Wall
    build-depends:
-      base >=4.7,
-      bytestring -any,
-      colour -any,
+      base >=4.14 && < 4.15,
+      bytestring,
+      colour,
       containers >=0.5,
-      data-default -any,
-      lens -any,
-      reactive-banana -any,
-      text -any,
-      time -any,
-      vector -any
+      data-default,
+      DRBG,
+      lens,
+      reactive-banana,
+      text,
+      time,
+      uuid,
+      vector

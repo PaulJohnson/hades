@@ -7,7 +7,6 @@ packages:
   - base
   - gtk
   - webits
-  - uuid-gen
 
 allow-newer: true
   # For gi-cairo-* extra deps.

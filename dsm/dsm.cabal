@@ -1,8 +1,9 @@
-cabal-version: >=1.18
+cabal-version: 2.4
 name: dsm
+description: Safety case modelling tool based on the HADES library.
 version: 2.0.0
 build-type: Simple
-license: BSD3
+license: BSD-3-Clause
 copyright: © 2020 Paul Johnson
 author: Paul Johnson
 maintainer: paul@cogito.org.uk
@@ -45,29 +46,29 @@ library
                        OverloadedStrings Rank2Types RankNTypes RecursiveDo
                        ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
                        ViewPatterns
-   ghc-options:        -Wall -j -O2
+   ghc-options:        -Wall
    build-depends:
-      aeson -any,
-      banana-ui-base -any,
-      banana-ui-gtk -any,
-      base -any,
-      base64-bytestring -any,
-      colour -any,
-      containers -any,
-      gi-cairo -any,
-      gi-cairo-render -any,
-      gi-gtk -any,
-      gi-pango -any,
-      gi-pangocairo -any,
-      hades -any,
-      lens -any,
-      mtl -any,
-      reactive-banana -any,
-      text -any,
-      transformers -any,
-      uuid -any,
-      unordered-containers -any,
-      vector -any
+      aeson,
+      banana-ui-base,
+      banana-ui-gtk,
+      base >=4.14 && < 4.15,
+      base64-bytestring,
+      colour,
+      containers,
+      gi-cairo,
+      gi-cairo-render,
+      gi-gtk,
+      gi-pango,
+      gi-pangocairo,
+      hades,
+      lens,
+      mtl,
+      reactive-banana,
+      text,
+      transformers,
+      uuid,
+      unordered-containers,
+      vector
 
 executable dsm
    main-is: Main.hs
@@ -81,31 +82,28 @@ executable dsm
                         ScopedTypeVariables TemplateHaskell TupleSections TypeFamilies
                         ViewPatterns
    build-depends:
-      aeson -any,
-      banana-ui-base -any,
-      banana-ui-gtk -any,
-      base -any,
-      base64-bytestring -any,
-      containers -any,
-      dsm -any,
-      filepath -any,
-      gi-cairo -any,
-      gi-gtk -any,
-      gi-pango -any,
-      gi-pangocairo -any,
-      hades -any,
-      lens -any,
-      mtl -any,
-      reactive-banana -any,
-      text -any,
-      uuid -any,
-      unordered-containers -any,
-      vector -any
+      aeson,
+      banana-ui-base,
+      banana-ui-gtk,
+      base >=4.14 && < 4.15,
+      base64-bytestring,
+      containers,
+      dsm,
+      filepath,
+      gi-cairo,
+      gi-gtk,
+      gi-pango,
+      gi-pangocairo,
+      hades,
+      lens,
+      mtl,
+      reactive-banana,
+      text,
+      uuid,
+      unordered-containers,
+      vector
 
    if os(windows)
-      ghc-options: -optl-mwindows -Wall -j -O2
-      -- ghc-options: -Wall -j -O2
+      ghc-options: -optl-mwindows -Wall
    else
-      -- ghc-options: -Wall -j +RTS -A32m -RTS
-      -- ghc-options: -Wall -j
-      ghc-options: -Wall -j
+      ghc-options: -Wall
