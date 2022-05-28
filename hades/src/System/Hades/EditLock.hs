@@ -23,10 +23,10 @@ it has been deleted, leading to a "File not found" error.
 -}
 
 module System.Hades.EditLock (
-   EditLock,
-   EditLockResult (..),
-   tryEditLock,
-   dropEditLock
+  EditLock,
+  EditLockResult (..),
+  tryEditLock,
+  dropEditLock
 ) where
 
 import Control.Exception
@@ -41,9 +41,9 @@ data EditLock = EditLock FilePath FileLock
 
 
 data EditLockResult =
-   EditLockSuccessful EditLock
-   | EditLockFailed Text  -- ^ Message explaining why the lock acquisition failed.
-   | EditLockError IOException
+  EditLockSuccessful EditLock
+  | EditLockFailed Text  -- ^ Message explaining why the lock acquisition failed.
+  | EditLockError IOException
 
 
 {- |
@@ -63,29 +63,29 @@ the directory is read-only) then it returns an "IOException".
 -}
 tryEditLock :: FilePath -> IO EditLockResult
 tryEditLock p = flip catchIOError (return . EditLockError) $ do
-   perm <- getPermissions p
-   if writable perm
-      then do
-         let p1 = lockFileName p
-         tryLockFile p1 Shared >>= \case
-            Nothing ->  -- File is already locked.
-               return $ EditLockFailed $ T.pack p <> " is currently being edited."
-            Just l ->
-               return $ EditLockSuccessful $ EditLock p1 l
-      else return $ EditLockFailed $ T.pack p <> " is not writeable by you"
+  perm <- getPermissions p
+  if writable perm
+    then do
+      let p1 = lockFileName p
+      tryLockFile p1 Shared >>= \case
+        Nothing ->  -- File is already locked.
+          return $ EditLockFailed $ T.pack p <> " is currently being edited."
+        Just l ->
+          return $ EditLockSuccessful $ EditLock p1 l
+    else return $ EditLockFailed $ T.pack p <> " is not writeable by you"
 
 
 -- | Drop the lock on the file and delete the lockfile.
 dropEditLock :: EditLock -> IO ()
 dropEditLock (EditLock p l) = flip catchIOError (const $ return ()) $ do
-   -- Ignore any errors here; probably the file doesn't exist, or permissions have changed
-   -- or something. The worst that can happen is that a stale lock file is left hanging around.
-   unlockFile l
-   removeFile p
+  -- Ignore any errors here; probably the file doesn't exist, or permissions have changed
+  -- or something. The worst that can happen is that a stale lock file is left hanging around.
+  unlockFile l
+  removeFile p
 
 
 -- | The name of the lock file.
 lockFileName :: FilePath -> FilePath
 lockFileName p =
-   let (d, f) = splitFileName p
-   in d </> "$" <> f <> "$"
+  let (d, f) = splitFileName p
+  in d </> "$" <> f <> "$"

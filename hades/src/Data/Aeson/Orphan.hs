@@ -28,10 +28,10 @@ import Data.Colour.SRGB
 import qualified Data.Text as T
 
 instance (RealFrac a, Floating a) => ToJSON (Colour a) where
-   toJSON = toJSON . sRGB24show
+  toJSON = toJSON . sRGB24show
 
 instance (RealFrac a, Floating a) => FromJSON (Colour a) where
-   parseJSON = withText "Colour" $ \str ->
-      case sRGB24reads $ T.unpack $ T.dropAround isSpace str of
-         [(c, "")] -> return c
-         _ -> fail $ "Colour not parsed: " ++ show str
+  parseJSON = withText "Colour" $ \str ->
+    case sRGB24reads $ T.unpack $ T.dropAround isSpace str of
+      [(c, "")] -> return c
+      _ -> fail $ "Colour not parsed: " ++ show str

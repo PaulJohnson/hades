@@ -17,24 +17,24 @@ This module is intended to be imported qualified.
 -}
 
 module Model.Reflection.NamedRelation (
-   Relation,
-   edgeFromRelation,
-   edgeToRelation,
-   NamedRelation (),
-   empty,
-   insert,
-   delete,
-   deleteRelation,
-   deleteAll,
-   member,
-   relation,
-   relations,
-   union,
-   intersection,
-   check,
-   toList,
-   fromList,
-   renameRelation
+  Relation,
+  edgeFromRelation,
+  edgeToRelation,
+  NamedRelation (),
+  empty,
+  insert,
+  delete,
+  deleteRelation,
+  deleteAll,
+  member,
+  relation,
+  relations,
+  union,
+  intersection,
+  check,
+  toList,
+  fromList,
+  renameRelation
 ) where
 
 import Control.Monad.Except
@@ -68,10 +68,10 @@ edgeToRelation = "Arrow Head"
 newtype NamedRelation a = NamedRelation (Map a (Set (a, Relation))) deriving Eq
 
 instance (Ord a, ToJSON a) => ToJSON (NamedRelation a) where
-   toJSON = toJSON . toList
+  toJSON = toJSON . toList
 
 instance (Ord a, FromJSON a) => FromJSON (NamedRelation a) where
-   parseJSON = withArray "named relations" $ \v -> fromList <$> mapM parseJSON (V.toList v)
+  parseJSON = withArray "named relations" $ \v -> fromList <$> mapM parseJSON (V.toList v)
 
 
 -- | Empty relation.
@@ -83,16 +83,16 @@ empty = NamedRelation M.empty
 -- then no change is made.
 insert :: (Ord a) => a -> a -> Relation -> NamedRelation a -> NamedRelation a
 insert v1 v2 txt (NamedRelation er) = NamedRelation $ addItem v1 v2 $ addItem v2 v1 er
-   where
-      addItem v1' v2' = M.insertWith S.union v1' (S.singleton (v2', txt))
+  where
+    addItem v1' v2' = M.insertWith S.union v1' (S.singleton (v2', txt))
 
 
 -- | Delete the association between these entities. No-op if it doesn't exist.
 delete :: (Ord a) => a -> a -> Relation -> NamedRelation a -> NamedRelation a
 delete v1 v2 txt (NamedRelation er) = NamedRelation $ remove v1 v2 $ remove v2 v1 er
-   where
-      remove v1' v2' = M.update (remove2 v2') v1'
-      remove2 v s = let ns = S.delete (v, txt) s in if S.null ns then Nothing else Just ns
+  where
+    remove v1' v2' = M.update (remove2 v2') v1'
+    remove2 v s = let ns = S.delete (v, txt) s in if S.null ns then Nothing else Just ns
 
 
 -- | Delete any associations this entity has via this relation.
@@ -113,7 +113,7 @@ member v1 v2 txt = S.member (v2, txt) . relations v1
 -- | The set of entities that the argument is linked to by the specified relationship.
 relation :: (Ord a) => a -> Relation -> NamedRelation a -> Set a
 relation v r (NamedRelation nr) =
-   S.map fst $ S.filter ((== r) . snd) $ M.findWithDefault S.empty v nr
+  S.map fst $ S.filter ((== r) . snd) $ M.findWithDefault S.empty v nr
 
 
 -- | The set of all relations that the argument has.
@@ -129,7 +129,7 @@ union (NamedRelation r1) (NamedRelation r2) = NamedRelation $ M.unionWith S.unio
 -- | The intersection of the relations.
 intersection :: (Ord a) => NamedRelation a -> NamedRelation a -> NamedRelation a
 intersection (NamedRelation r1) (NamedRelation r2) =
-   NamedRelation $ clean $ M.intersectionWith S.intersection r1 r2
+  NamedRelation $ clean $ M.intersectionWith S.intersection r1 r2
 
 
 -- | Verify that the NamedRelation is properly symmetric, so for every relation @a -> (b, name)@
@@ -137,14 +137,14 @@ intersection (NamedRelation r1) (NamedRelation r2) =
 -- problem is found.
 check :: (MonadError Text m, Ord a, Show a) => NamedRelation a -> m ()
 check r = unless (null results) $ throwError $ T.intercalate "\n" results
-   where
-      results = mapMaybe checkPair prs
-      prs = concatMap (\(v1, rs) -> map (\(v2, txt) -> (v1, v2, txt)) rs) $ toList r
-      checkPair (v1, v2, txt) =
-         if member v2 v1 txt r
-            then Nothing
-            else Just $ T.pack $ show v1 ++ " >-" ++ T.unpack txt ++ "->" ++ show v2 ++
-                  " has no converse."
+  where
+    results = mapMaybe checkPair prs
+    prs = concatMap (\(v1, rs) -> map (\(v2, txt) -> (v1, v2, txt)) rs) $ toList r
+    checkPair (v1, v2, txt) =
+      if member v2 v1 txt r
+        then Nothing
+        else Just $ T.pack $ show v1 ++ " >-" ++ T.unpack txt ++ "->" ++ show v2 ++
+            " has no converse."
 
 
 -- | Internal utility to remove any empty sets.
@@ -160,13 +160,13 @@ toList (NamedRelation r) = M.toList $ M.mapWithKey (\k -> filter ((>= k) . fst) 
 -- | Convert a list into a "NamedRelation". Convers of "toList".
 fromList :: (Ord a) => [(a, [(a, Relation)])] -> NamedRelation a
 fromList inputs = foldr (\(v1, v2, txt) r -> insert v1 v2 txt r) empty prs
-   where
-      prs = concatMap (\(v1, rs) -> map (\(v2, txt) -> (v1, v2, txt)) rs) inputs
+  where
+    prs = concatMap (\(v1, rs) -> map (\(v2, txt) -> (v1, v2, txt)) rs) inputs
 
 
 -- | Change all instances of the first relation to the second.
 renameRelation :: (Ord a) => Relation -> Relation -> NamedRelation a -> NamedRelation a
 renameRelation oldRel newRel nr = fromList $ map changeName $ toList nr
-   where
-      changeName (v1, rels) = (v1, map changeName2 rels)
-      changeName2 (v2, nm) = if nm == oldRel then (v2, newRel) else (v2, nm)
+  where
+    changeName (v1, rels) = (v1, map changeName2 rels)
+    changeName2 (v2, nm) = if nm == oldRel then (v2, newRel) else (v2, nm)

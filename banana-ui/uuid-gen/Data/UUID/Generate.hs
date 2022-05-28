@@ -24,14 +24,14 @@ In theory this module could use any instance of "CryptoRandomGen", but in practi
 specialised to "Generator" to simplify the types.
 -}
 module Data.UUID.Generate (
-   Generator,
-   uuidStreamIO,
-   uuidStream,
-   newGenerator,
-   generateUUID,
-   -- ** Re-exported for convenience.
-   CryptoRandomGen (..),
-   splitGen
+  Generator,
+  uuidStreamIO,
+  uuidStream,
+  newGenerator,
+  generateUUID,
+  -- ** Re-exported for convenience.
+  CryptoRandomGen (..),
+  splitGen
 ) where
 
 import Crypto.Random.DRBG
@@ -52,15 +52,15 @@ type Generator = CtrDRBG
 {-# NOINLINE theGenerator #-}
 theGenerator :: IORef Generator
 theGenerator = unsafePerformIO $ do
-   rng <- newGenIO :: IO CtrDRBG
-   newIORef rng
+  rng <- newGenIO :: IO CtrDRBG
+  newIORef rng
 
 
 newGenerator :: IO Generator
 newGenerator = atomicModifyIORef' theGenerator $ \g ->
-   case splitGen g of
-      Left err -> error $ show err  -- Should never happen: 2^48 bytes are available.
-      Right v -> v
+  case splitGen g of
+    Left err -> error $ show err  -- Should never happen: 2^48 bytes are available.
+    Right v -> v
 
 
 -- | A stream of UUIDs seeded by the entropy pool.
@@ -80,9 +80,9 @@ uuidStream = unfoldr $ either (const Nothing) Just . generateUUID
 -- | Produce one UUID. Should never fail.
 generateUUID :: Generator -> Either Text (UUID, Generator)
 generateUUID g1 = case genBytes 16 g1 of
-   Left err -> Left $ pack $ "UUID generator: " ++ show err
-   --  The generator is good for 2 to the power 48 UUIDs per session, so this should never happen.
-   Right (bs, g2) -> case fromByteString $ LBS.fromStrict bs of
-      Nothing -> Left $ pack "UUID generator conversion error"
-      --  The conversion should always succeed when given 16 bytes.
-      Just uuid -> Right (uuid, g2)
+  Left err -> Left $ pack $ "UUID generator: " ++ show err
+  --  The generator is good for 2 to the power 48 UUIDs per session, so this should never happen.
+  Right (bs, g2) -> case fromByteString $ LBS.fromStrict bs of
+    Nothing -> Left $ pack "UUID generator conversion error"
+    --  The conversion should always succeed when given 16 bytes.
+    Just uuid -> Right (uuid, g2)

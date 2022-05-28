@@ -32,19 +32,19 @@ import Types
 
 demoDialogPage :: H.Html
 demoDialogPage = do
-   H.head $ do
-      H.title "Demo Webits"
-      H.link ! HA.rel "shortcut icon" ! HA.type_ "image/x-icon" ! HA.href "/favicon.ico"
-      standardHeader
-   H.body (H.p (H.text loremIpsum))
+  H.head $ do
+    H.title "Demo Webits"
+    H.link ! HA.rel "shortcut icon" ! HA.type_ "image/x-icon" ! HA.href "/favicon.ico"
+    standardHeader
+  H.body (H.p (H.text loremIpsum))
 
 
 demoTableColumns :: Table DemoTable
 demoTableColumns = [
-      mkField "Boolean" boolField (Just boolIcon) EditBool (Just boolColour),
-      mkField "Number" numberField Nothing (EditEntry textPrism) Nothing,
-      mkField "Icon" iconField Nothing (EditIcon (const True)) Nothing
-   ]
+    mkField "Boolean" boolField (Just boolIcon) EditBool (Just boolColour),
+    mkField "Number" numberField Nothing (EditEntry textPrism) Nothing,
+    mkField "Icon" iconField Nothing (EditIcon (const True)) Nothing
+  ]
 
 
 boolIcon :: Bool -> IconName
@@ -59,51 +59,51 @@ boolColour False = Colour darkred
 
 demoTableForm :: Dialog' e w DemoTable
 demoTableForm = Dialog "Edit table row" OkApplyButton $ accum $ form Vertical [
-      ("Boolean", focusing boolField $ coloured (Just . boolColour) $ icon boolIcon tickBox),
-      ("Number", focusing numberField typedTextBox),
-      ("Icon", focusing iconField $ iconBox $ const True)
-   ]
+    ("Boolean", focusing boolField $ coloured (Just . boolColour) $ icon boolIcon tickBox),
+    ("Number", focusing numberField typedTextBox),
+    ("Icon", focusing iconField $ iconBox $ const True)
+  ]
 
 
 demoDialog :: Dialog' (Forest (Text, Maybe Text, Maybe Int)) w DemoData
 demoDialog = Dialog "Demo Dialog" OkApplyButton $
-   proc dat -> do
-      out <- accum $ box Vertical [[
-            form Vertical [
-                  ("Demo Text:", focusing demoText displayMemo),
-                  ("Demo Number:", focusing demoNum $
-                        accum (buttonBar [("Increment", (+1)), ("Decrement", subtract 1)])
-                        <<< typedTextBox
-                     ),
-                  ("Demo Choice:", focusing demoEnum boundedRadio),
-                  ("Demo Boolean:", focusing demoBool tickBox),
-                  ("Demo Date:", focusing demoDate $ dateBox shortDate),
-                  ("Demo Icon:", focusing demoIcon $ iconBox (const True)),
-                  ("Demo Colour:", focusing demoColour colourBox),
-                  ("Demo Set:", focusing demoSet demoSetPopup)
-               ],
-            focusing demoTable $ table
-               [TableAdd "new row" $ DemoTable False 0 noIconName, TableDelete, TableShuffle]
-               demoTableColumns
-               Nothing
-               --  (Just $ constantDialog demoTableForm)
-         ]]  -< dat
-      _ <- simpleFrame "Clickable" $
-               clickableSingle (T.pack . show) >>>
-               message (\_ v -> "Clicked = " <> T.pack (show v))
-            -< [1..10 :: Int]
-      _ <- displayMemo <<< arr (\v -> T.pack $
-            "The secret code is: " <> show (v ^. demoEnum) <> show (v ^. demoNum)) -< out
-      _ <- displayMemo
-            <<< arr (\(v :: Maybe Int) -> T.pack $ "The random value is: " <> maybe "" show v)
-            <<< buttonIO "Randomise" (const $ const $ randomRIO (0,100)) -< ()
-      returnA -< out
+  proc dat -> do
+    out <- accum $ box Vertical [[
+        form Vertical [
+            ("Demo Text:", focusing demoText displayMemo),
+            ("Demo Number:", focusing demoNum $
+                accum (buttonBar [("Increment", (+1)), ("Decrement", subtract 1)])
+                <<< typedTextBox
+              ),
+            ("Demo Choice:", focusing demoEnum boundedRadio),
+            ("Demo Boolean:", focusing demoBool tickBox),
+            ("Demo Date:", focusing demoDate $ dateBox shortDate),
+            ("Demo Icon:", focusing demoIcon $ iconBox (const True)),
+            ("Demo Colour:", focusing demoColour colourBox),
+            ("Demo Set:", focusing demoSet demoSetPopup)
+          ],
+        focusing demoTable $ table
+          [TableAdd "new row" $ DemoTable False 0 noIconName, TableDelete, TableShuffle]
+          demoTableColumns
+          Nothing
+          --  (Just $ constantDialog demoTableForm)
+      ]]  -< dat
+    _ <- simpleFrame "Clickable" $
+          clickableSingle (T.pack . show) >>>
+          message (\_ v -> "Clicked = " <> T.pack (show v))
+        -< [1..10 :: Int]
+    _ <- displayMemo <<< arr (\v -> T.pack $
+        "The secret code is: " <> show (v ^. demoEnum) <> show (v ^. demoNum)) -< out
+    _ <- displayMemo
+        <<< arr (\(v :: Maybe Int) -> T.pack $ "The random value is: " <> maybe "" show v)
+        <<< buttonIO "Randomise" (const $ const $ randomRIO (0,100)) -< ()
+    returnA -< out
 
 
 
 demoSetPopup :: Gadget' (Forest (Text, Maybe Text, Maybe Int)) w (Set Int)
 demoSetPopup = textPopup (const showSet) $ const $ const $ Just demoForestSelection
-   where showSet = T.intercalate ", " . map (T.pack . show) . S.toList
+  where showSet = T.intercalate ", " . map (T.pack . show) . S.toList
 
 demoForestSelection :: Dialog' (Forest (Text, Maybe Text, Maybe Int)) w (Set Int)
 demoForestSelection = Dialog "Demo Tree Selection" OkApplyButton $ treeSelector id

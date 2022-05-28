@@ -15,15 +15,15 @@ import Reactive.Banana.ArrowDialog
 
 itemDialog :: Gadget' () () (Either Integer Text)
 itemDialog = unionTab [
-      ("Left", PrismaticGadget 0 _Left $
-            accum $ form Vertical [("Number:", focusing id typedTextBox)]),
-      ("Right", PrismaticGadget "" _Right $
-            accum $ form Vertical [("Text:", focusing id simpleTextBox)])
-   ]
+    ("Left", PrismaticGadget 0 _Left $
+        accum $ form Vertical [("Number:", focusing id typedTextBox)]),
+    ("Right", PrismaticGadget "" _Right $
+        accum $ form Vertical [("Text:", focusing id simpleTextBox)])
+  ]
 
 notebookDialog :: Dialog () () (Either Integer Text) (Either Integer Text)
 notebookDialog = Dialog {
-      dialogTitle = "Notebook Test",
-      dialogButtons = OkApplyButton,
-      dialogGadget = itemDialog
-   }
+    dialogTitle = "Notebook Test",
+    dialogButtons = OkApplyButton,
+    dialogGadget = itemDialog
+  }

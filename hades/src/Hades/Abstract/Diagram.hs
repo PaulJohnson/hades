@@ -10,22 +10,22 @@ This file is part of the Haskell Diagram Editing System (HADES) software.
 --
 -- This module handles diagrams in their most abstract form.
 module Hades.Abstract.Diagram (
-   DiagramId,
-   HasId (..),
-   Diagram,
-   diagramContents,
-   diagramOrder,
-   emptyDiagram,
-   diagramToList,
-   diagramFromList,
-   diagramList,
-   diagramAdd,
-   diagramDelete,
-   diagramModify,
-   diagramMoveUp,
-   diagramMoveDown,
-   diagramMoveTop,
-   diagramMoveBottom
+  DiagramId,
+  HasId (..),
+  Diagram,
+  diagramContents,
+  diagramOrder,
+  emptyDiagram,
+  diagramToList,
+  diagramFromList,
+  diagramList,
+  diagramAdd,
+  diagramDelete,
+  diagramModify,
+  diagramMoveUp,
+  diagramMoveDown,
+  diagramMoveTop,
+  diagramMoveBottom
 ) where
 
 
@@ -42,32 +42,32 @@ type DiagramId = UUID
 
 -- | Things that carry a unique ID with them.
 class HasId a where
-   identifier :: a -> DiagramId
+  identifier :: a -> DiagramId
 
 
 -- | The type of diagrams. The "Monoid" instance places the first diagram in front of the second.
 -- If the two diagrams share DiagramIds then those from the first diagram will be used.
 data Diagram v = Diagram {
-      _diagramContents :: Map DiagramId v,
-         -- ^ Each element has a "DiagramId", which is used as a form of weak pointer.
-      _diagramOrder :: [DiagramId]
-         -- ^ Order of the contents from front to back.
-   } deriving Eq
+    _diagramContents :: Map DiagramId v,
+      -- ^ Each element has a "DiagramId", which is used as a form of weak pointer.
+    _diagramOrder :: [DiagramId]
+      -- ^ Order of the contents from front to back.
+  } deriving Eq
 
 instance Semigroup (Diagram v) where
-   d1 <> d2 = Diagram {
-         _diagramContents = _diagramContents d1 `mappend` _diagramContents d2,
-         _diagramOrder = nub $ _diagramOrder d1 ++ _diagramOrder d2
-      }
+  d1 <> d2 = Diagram {
+      _diagramContents = _diagramContents d1 `mappend` _diagramContents d2,
+      _diagramOrder = nub $ _diagramOrder d1 ++ _diagramOrder d2
+    }
 
 instance Monoid (Diagram v) where
-   mempty = emptyDiagram
+  mempty = emptyDiagram
 
 instance (ToJSON v) => ToJSON (Diagram v) where
-   toJSON = toJSON . diagramToList
+  toJSON = toJSON . diagramToList
 
 instance (FromJSON v, HasId v) => FromJSON (Diagram v) where
-   parseJSON v = diagramFromList <$> parseJSON v
+  parseJSON v = diagramFromList <$> parseJSON v
 
 
 -- Template Haskell is not used for lens definitions because of painful problems
@@ -109,10 +109,10 @@ diagramList = lens diagramToList $ const diagramFromList
 -- it replaces the old one.
 diagramAdd :: (HasId v) => v -> Diagram v -> Diagram v
 diagramAdd item (Diagram contents order) = Diagram newContents newOrder
-   where
-      newContents = M.insert (identifier item) item contents
-      newOrder = uuid : if M.member uuid contents then delete uuid order else order
-         where uuid = identifier item
+  where
+    newContents = M.insert (identifier item) item contents
+    newOrder = uuid : if M.member uuid contents then delete uuid order else order
+      where uuid = identifier item
 
 
 -- | Remove an element from the diagram by its "DiagramId".
@@ -129,40 +129,40 @@ diagramModify f uuid (Diagram contents order) = Diagram (M.adjust f uuid content
 -- | Move a diagram element up one in the order, unless its already at the top.
 diagramMoveUp :: DiagramId -> Diagram v -> Diagram v
 diagramMoveUp uuid (Diagram contents order) =
-      Diagram contents $ if null ids1 then order else concat [ids1a, [uuid], ids1b, ids2]
-   where
-      (ids1, ids2) = contentsSplit uuid order
-      (ids1a, ids1b) = splitAt (length ids1 - 1) ids1
+    Diagram contents $ if null ids1 then order else concat [ids1a, [uuid], ids1b, ids2]
+  where
+    (ids1, ids2) = contentsSplit uuid order
+    (ids1a, ids1b) = splitAt (length ids1 - 1) ids1
 
 
 -- Move a diagram element down one in the order, unless its already at the bottom.
 diagramMoveDown :: DiagramId -> Diagram v -> Diagram v
 diagramMoveDown uuid (Diagram contents order) =
-      Diagram contents $ if null ids2 then order else concat [ids1, [ids2a, uuid], ids2b]
-   where
-      (ids1, ids2) = contentsSplit uuid order
-      (ids2a : ids2b) = ids2  -- Safe because they are only used when ids2 is not null.
+    Diagram contents $ if null ids2 then order else concat [ids1, [ids2a, uuid], ids2b]
+  where
+    (ids1, ids2) = contentsSplit uuid order
+    (ids2a : ids2b) = ids2  -- Safe because they are only used when ids2 is not null.
 
 
 -- | Move a diagram element to the top.
 diagramMoveTop :: DiagramId -> Diagram v -> Diagram v
 diagramMoveTop uuid (Diagram contents order) =
-      Diagram contents $ if null ids1 then order else uuid : ids1 ++ ids2
-   where
-      (ids1, ids2) = contentsSplit uuid order
+    Diagram contents $ if null ids1 then order else uuid : ids1 ++ ids2
+  where
+    (ids1, ids2) = contentsSplit uuid order
 
 
 -- | Move a diagram element to the bottom.
 diagramMoveBottom :: DiagramId -> Diagram v -> Diagram v
 diagramMoveBottom uuid (Diagram contents order) =
-      Diagram contents $ if null ids2 then order else concat [ids1, ids2, [uuid]]
-   where
-      (ids1, ids2) = contentsSplit uuid order
+    Diagram contents $ if null ids2 then order else concat [ids1, ids2, [uuid]]
+  where
+    (ids1, ids2) = contentsSplit uuid order
 
 
 -- | Private utility function. Splits the list at the "DiagramId"
 -- and returns those before and those after.
 contentsSplit :: DiagramId -> [DiagramId] -> ([DiagramId], [DiagramId])
 contentsSplit uuid ids = (ids1, drop 1 ids2)
-   where
-      (ids1, ids2) = break (== uuid) ids
+  where
+    (ids1, ids2) = break (== uuid) ids

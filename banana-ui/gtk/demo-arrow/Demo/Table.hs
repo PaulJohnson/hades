@@ -34,13 +34,13 @@ enumIcon Woo = "weather-overcast"
 
 
 data TableData = TableData {
-   _tableText :: Text,
-   _tableNum :: Int,
-   _tableEnum :: DemoEnum,
-   _tableDate :: Day,
-   _tableColour :: Colour,
-   _tableIcon :: Text,
-   _tableCombo :: Text
+  _tableText :: Text,
+  _tableNum :: Int,
+  _tableEnum :: DemoEnum,
+  _tableDate :: Day,
+  _tableColour :: Colour,
+  _tableIcon :: Text,
+  _tableCombo :: Text
 } deriving (Eq, Show)
 
 tableText :: Lens' TableData Text
@@ -75,29 +75,29 @@ comboOptions = ["One", "Two", "Three", "Four", "Five"]
 
 demoTableSpec :: Table TableData
 demoTableSpec = [
-      mkField "Text" tableText Nothing (EditEntry id) Nothing,
-      mkField "Number" tableNum (Just numIcon) (EditEntry textPrism) (Just numColour),
-      mkField "Enumeration" tableEnum (Just enumIcon) (enumField allValues) (Just enumColour),
-      mkField "Date" tableDate Nothing (EditDate shortDate) Nothing,
-      mkField "Colour" tableColour Nothing EditColour Nothing,
-      mkField "Icon" tableIcon Nothing (EditIcon $ const True) Nothing,
-      mkField "Combo" tableCombo Nothing (EditCombo comboOptions) Nothing
-   ]
-   where
-      numIcon n
-         | n < 25 = "face-sad"
-         | n < 50 = "face-plain"
-         | n < 75 = "face-smile"
-         | otherwise = "face-smile-big"
-      numColour n
-         | n < 0 = Colour C.red
-         | n < 100 = Colour $ blend (fromIntegral n / 100) C.green C.red
-         | otherwise = Colour C.green
+    mkField "Text" tableText Nothing (EditEntry id) Nothing,
+    mkField "Number" tableNum (Just numIcon) (EditEntry textPrism) (Just numColour),
+    mkField "Enumeration" tableEnum (Just enumIcon) (enumField allValues) (Just enumColour),
+    mkField "Date" tableDate Nothing (EditDate shortDate) Nothing,
+    mkField "Colour" tableColour Nothing EditColour Nothing,
+    mkField "Icon" tableIcon Nothing (EditIcon $ const True) Nothing,
+    mkField "Combo" tableCombo Nothing (EditCombo comboOptions) Nothing
+  ]
+  where
+    numIcon n
+      | n < 25 = "face-sad"
+      | n < 50 = "face-plain"
+      | n < 75 = "face-smile"
+      | otherwise = "face-smile-big"
+    numColour n
+      | n < 0 = Colour C.red
+      | n < 100 = Colour $ blend (fromIntegral n / 100) C.green C.red
+      | otherwise = Colour C.green
 
 
 testTable :: [TableData]
 testTable = [
-      TableData "One row" 23 Wibble (fromGregorian 2016 6 24) (Colour C.red) "go-home" "One",
-      TableData "Second row" 74 Baz (fromGregorian 2017 7 25) (Colour C.blue) "" "Two",
-      TableData "Third row" 92 Bar (fromGregorian 2018 8 26) (Colour C.green) "" ""
-   ]
+    TableData "One row" 23 Wibble (fromGregorian 2016 6 24) (Colour C.red) "go-home" "One",
+    TableData "Second row" 74 Baz (fromGregorian 2017 7 25) (Colour C.blue) "" "Two",
+    TableData "Third row" 92 Bar (fromGregorian 2018 8 26) (Colour C.green) "" ""
+  ]

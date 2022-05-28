@@ -14,11 +14,11 @@ These libraries import the "Hades.Abstract" component modules.
 -}
 
 module Hades.GI (
-   module Hades.GI.BasicShapes,
-   module Hades.GI.MouseMachine,
-   module Hades.GI.Rendering,
-   module Hades.GI.Saving,
-   module Hades.GI.Toolbar
+  module Hades.GI.BasicShapes,
+  module Hades.GI.MouseMachine,
+  module Hades.GI.Rendering,
+  module Hades.GI.Saving,
+  module Hades.GI.Toolbar
 ) where
 
 import Hades.GI.BasicShapes

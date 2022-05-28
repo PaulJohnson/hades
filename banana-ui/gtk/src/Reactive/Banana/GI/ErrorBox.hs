@@ -21,24 +21,24 @@ import System.IO.Unsafe
 -- | Displays an error box warning of an \"unexpected event\".
 cannotHappen :: Text -> a -> a
 cannotHappen err v = unsafePerformIO $ do
-   errorBox (Nothing :: Maybe Gtk.Widget) $ msg <> err
-   return v
-   where
-      msg = "An unexpected event has occured. \
-         \Please save your work in a new file and report this bug.\n\n"
+  errorBox (Nothing :: Maybe Gtk.Widget) $ msg <> err
+  return v
+  where
+    msg = "An unexpected event has occured. \
+      \Please save your work in a new file and report this bug.\n\n"
 
 
 -- | A standard error dialog.
 errorBox :: (MonadIO m, Gtk.IsWidget parent) => Maybe parent -> Text -> m ()
 errorBox parent msg = liftIO $ do  -- Error dialog box.
-   box <- Gtk.new Gtk.MessageDialog [
-         #messageType := Gtk.MessageTypeError,
-         #buttons := Gtk.ButtonsTypeClose,
-         #text := msg,
-         #modal := True
-      ]
-   forM_ parent $ \p -> do
-      parentWin <- Gtk.castTo Gtk.Window =<< Gtk.widgetGetToplevel p
-      forM_ parentWin $ \w -> Gtk.set box [#transientFor := w]
-   void $ Gtk.dialogRun box
-   Gtk.widgetDestroy box
+  box <- Gtk.new Gtk.MessageDialog [
+      #messageType := Gtk.MessageTypeError,
+      #buttons := Gtk.ButtonsTypeClose,
+      #text := msg,
+      #modal := True
+    ]
+  forM_ parent $ \p -> do
+    parentWin <- Gtk.castTo Gtk.Window =<< Gtk.widgetGetToplevel p
+    forM_ parentWin $ \w -> Gtk.set box [#transientFor := w]
+  void $ Gtk.dialogRun box
+  Gtk.widgetDestroy box

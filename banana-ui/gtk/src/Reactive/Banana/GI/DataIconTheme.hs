@@ -22,8 +22,8 @@ bypass the GTK functionality, which would be a lot of work to do properly. For n
 use the GTK Icon Theme type.
 -}
 module Reactive.Banana.GI.DataIconTheme (
-   setDataIconTheme,
-   getDataIconTheme
+  setDataIconTheme,
+  getDataIconTheme
 ) where
 
 import Control.Monad.IO.Class
@@ -46,5 +46,5 @@ getDataIconTheme = liftIO $ readIORef theDataIconTheme
 {-# NOINLINE theDataIconTheme #-}
 theDataIconTheme :: IORef Gtk.IconTheme
 theDataIconTheme = unsafePerformIO $ do
-   thm <- Gtk.iconThemeNew
-   newIORef thm
+  thm <- Gtk.iconThemeNew
+  newIORef thm

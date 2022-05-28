@@ -24,23 +24,23 @@ makeSelection _ x = x
 
 itemDialogs :: Gadget' () () (Either Integer Text)
 itemDialogs = cond [
-      PrismaticGadget 0 _Left $
-            accum $ form Vertical [("Number:", focusing id typedTextBox)],
-      PrismaticGadget "" _Right $
-            accum $ form Vertical [("Text:", focusing id simpleTextBox)]
-   ]
+    PrismaticGadget 0 _Left $
+        accum $ form Vertical [("Number:", focusing id typedTextBox)],
+    PrismaticGadget "" _Right $
+        accum $ form Vertical [("Text:", focusing id simpleTextBox)]
+  ]
 
 sideMenu :: Gadget' () () Side
 sideMenu = comboBox $ const [
-      ComboItem "Number" Nothing Nothing LeftSide,
-      ComboItem "Text" Nothing Nothing RightSide
-   ]
+    ComboItem "Number" Nothing Nothing LeftSide,
+    ComboItem "Text" Nothing Nothing RightSide
+  ]
 
 condDialog :: Dialog () () (Either Integer Text) (Either Integer Text)
 condDialog = Dialog {
-      dialogTitle = "Conditional Test",
-      dialogButtons = OkApplyButton,
-      dialogGadget = proc input -> do
-         s <- sideMenu -< case input of {Left {} -> LeftSide; Right {} -> RightSide}
-         itemDialogs -< makeSelection s input
-   }
+    dialogTitle = "Conditional Test",
+    dialogButtons = OkApplyButton,
+    dialogGadget = proc input -> do
+      s <- sideMenu -< case input of {Left {} -> LeftSide; Right {} -> RightSide}
+      itemDialogs -< makeSelection s input
+  }

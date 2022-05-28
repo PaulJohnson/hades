@@ -7,10 +7,10 @@ Copyright © Paul Johnson 2019. See LICENSE file for details.
 -- Statically defined menus.
 
 module Reactive.Banana.Menu (
-   Menu (..),
-   MenuItem (..),
-   menuItem,
-   subMenu
+  Menu (..),
+  MenuItem (..),
+  menuItem,
+  subMenu
 ) where
 
 import Data.Text (Text)
@@ -19,25 +19,25 @@ import Data.Text (Text)
 newtype Menu a = Menu [[MenuItem a]] deriving (Eq)
 
 instance Functor Menu where
-   fmap f (Menu items) = Menu $ map (map (fmap f)) items
+  fmap f (Menu items) = Menu $ map (map (fmap f)) items
 
 instance Semigroup (Menu a) where
-   Menu m1 <> Menu m2  = Menu $ m1 <> m2
+  Menu m1 <> Menu m2  = Menu $ m1 <> m2
 
 instance Monoid (Menu a) where
-   mempty = Menu []
+  mempty = Menu []
 
 
 -- | The selection of a menu item triggers an @Event a@.
 --
 -- Use @pure True@ if the item is always enabled.
 data MenuItem a = MenuItem {
-      menuLabel :: Text,
-      menuValue :: Either (Menu a) a  -- ^ @Left@ for a sub-menu, @Right@ for an item.
-   } deriving (Eq)
+    menuLabel :: Text,
+    menuValue :: Either (Menu a) a  -- ^ @Left@ for a sub-menu, @Right@ for an item.
+  } deriving (Eq)
 
 instance Functor MenuItem where
-   fmap f (MenuItem str v) = MenuItem str $ either (Left . fmap f) (Right . f) v
+  fmap f (MenuItem str v) = MenuItem str $ either (Left . fmap f) (Right . f) v
 
 
 -- | A single menu item which is always enabled.

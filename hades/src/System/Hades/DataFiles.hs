@@ -7,7 +7,7 @@ This file is part of the Haskell Diagram Editing System (HADES) software.
 -}
 
 module System.Hades.DataFiles (
-   getUserName
+  getUserName
 ) where
 
 
@@ -19,8 +19,8 @@ import System.Posix.User (getRealUserID, getUserEntryForID, userName)
 -- | The name of the user running the program as provided by the operating system.
 getUserName :: IO String
 getUserName = do
-   -- getLoginName does not work with xrdp due to utmp not set. And this is more secure anyway.
-   euid <- getRealUserID
-   pw <- getUserEntryForID euid
-   return (userName pw)
+  -- getLoginName does not work with xrdp due to utmp not set. And this is more secure anyway.
+  euid <- getRealUserID
+  pw <- getUserEntryForID euid
+  return (userName pw)
 #endif

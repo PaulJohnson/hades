@@ -13,27 +13,27 @@ This module defines extension values based on reflective types.
 -}
 
 module Model.Reflection.Values (
-   ExtValue (..),
-   _ExtNone,
-   _ExtBool,
-   _ExtInt,
-   _ExtReal,
-   _ExtText,
-   _ExtDate,
-   valueMaybe,
-   displayValue,
-   Variant (Variant),
-   variantName,
-   variantCoerce,
-   Extensions,
-   ExtensionValues,
-   extValue,
-   valueTypeName,
-   validateMulti,
-   validateExtension,
-   validateField,
-   extTypeError,
-   valueSearch
+  ExtValue (..),
+  _ExtNone,
+  _ExtBool,
+  _ExtInt,
+  _ExtReal,
+  _ExtText,
+  _ExtDate,
+  valueMaybe,
+  displayValue,
+  Variant (Variant),
+  variantName,
+  variantCoerce,
+  Extensions,
+  ExtensionValues,
+  extValue,
+  valueTypeName,
+  validateMulti,
+  validateExtension,
+  validateField,
+  extTypeError,
+  valueSearch
 ) where
 
 import Control.Lens hiding ((.=))
@@ -59,46 +59,46 @@ import Text.NaturalOrder
 -- it currently holds. This enables users to switch between variants without losing data.
 -- The name of the currently selected variant is held in the text field at the front.
 data ExtValue =
-   ExtNone  -- ^ The default value.
-   | ExtBool Bool
-   | ExtInt Integer
-   | ExtReal Double
-   | ExtText Text
-   | ExtDate Day
-   deriving (Eq, Show)
+  ExtNone  -- ^ The default value.
+  | ExtBool Bool
+  | ExtInt Integer
+  | ExtReal Double
+  | ExtText Text
+  | ExtDate Day
+  deriving (Eq, Show)
 
 instance Ord ExtValue where
-   compare ExtNone ExtNone          = EQ
-   compare (ExtBool x) (ExtBool y)  = compare x y
-   compare (ExtInt x) (ExtInt y)    = compare x y
-   compare (ExtInt x) (ExtReal y)   = compare (fromIntegral x) y
-   compare (ExtReal x) (ExtInt y)   = compare x (fromIntegral y)
-   compare (ExtReal x) (ExtReal y)  = compare x y
-   compare (ExtText x) (ExtText y)  = naturalOrder x y
-   compare (ExtDate x) (ExtDate y)  = compare x y
-   compare x y                      = compare (displayValue x) (displayValue y)
+  compare ExtNone ExtNone          = EQ
+  compare (ExtBool x) (ExtBool y)  = compare x y
+  compare (ExtInt x) (ExtInt y)    = compare x y
+  compare (ExtInt x) (ExtReal y)   = compare (fromIntegral x) y
+  compare (ExtReal x) (ExtInt y)   = compare x (fromIntegral y)
+  compare (ExtReal x) (ExtReal y)  = compare x y
+  compare (ExtText x) (ExtText y)  = naturalOrder x y
+  compare (ExtDate x) (ExtDate y)  = compare x y
+  compare x y                      = compare (displayValue x) (displayValue y)
 
 instance Default ExtValue where
-   def = ExtNone
+  def = ExtNone
 
 instance ToJSON ExtValue where
-   toJSON ExtNone = object ["type" ..= "none"]
-   toJSON (ExtBool b) = object ["type" ..= "bool", "value" .= b]
-   toJSON (ExtInt i) = object ["type" ..= "int", "value" .= i]
-   toJSON (ExtReal d) = object ["type" ..= "real", "value" .= d]
-   toJSON (ExtText t) = object ["type" ..= "text", "value" .= t]
-   toJSON (ExtDate d) = object ["type" ..= "date", "value" .= d]
+  toJSON ExtNone = object ["type" ..= "none"]
+  toJSON (ExtBool b) = object ["type" ..= "bool", "value" .= b]
+  toJSON (ExtInt i) = object ["type" ..= "int", "value" .= i]
+  toJSON (ExtReal d) = object ["type" ..= "real", "value" .= d]
+  toJSON (ExtText t) = object ["type" ..= "text", "value" .= t]
+  toJSON (ExtDate d) = object ["type" ..= "date", "value" .= d]
 
 instance FromJSON ExtValue where
-   parseJSON = withObject "Extension value" $ \obj ->
-      obj .: "type" >>= \case
-         "none" -> return ExtNone
-         "bool" -> ExtBool <$> obj .: "value"
-         "int" -> ExtInt <$> obj .: "value"
-         "real" -> ExtReal <$> obj .: "value"
-         "text" -> ExtText <$> obj .: "value"
-         "date" -> ExtDate <$> obj .: "value"
-         str -> fail $ "Unrecognised Extension Value type: " <> str
+  parseJSON = withObject "Extension value" $ \obj ->
+    obj .: "type" >>= \case
+      "none" -> return ExtNone
+      "bool" -> ExtBool <$> obj .: "value"
+      "int" -> ExtInt <$> obj .: "value"
+      "real" -> ExtReal <$> obj .: "value"
+      "text" -> ExtText <$> obj .: "value"
+      "date" -> ExtDate <$> obj .: "value"
+      str -> fail $ "Unrecognised Extension Value type: " <> str
 
 _ExtNone :: Prism' ExtValue ()
 _ExtNone = prism (const ExtNone) $ \case {ExtNone -> Right (); v -> Left v}
@@ -122,9 +122,9 @@ _ExtDate = prism ExtDate $ \case {ExtDate d -> Right d; v -> Left v}
 -- | Convert a prism into a lens. "Nothing" maps to "ExtNone"
 valueMaybe :: Prism' ExtValue a -> Lens' ExtValue (Maybe a)
 valueMaybe prsm = lens (preview prsm) setter
-   where
-      setter s Nothing = if isJust $ s ^? prsm then ExtNone else s
-      setter _ (Just v) = v ^. re prsm
+  where
+    setter s Nothing = if isJust $ s ^? prsm then ExtNone else s
+    setter _ (Just v) = v ^. re prsm
 
 
 -- | Name of the type of value.
@@ -162,7 +162,7 @@ validateExtension (BuiltInDef ModelInt) ExtInt {} = []
 validateExtension (BuiltInDef ModelReal) ExtReal {} = []
 validateExtension (BuiltInDef ModelText) ExtText {} = []
 validateExtension (BuiltInDef ModelURL) (ExtText url) =
-   ["Invalid URL: " <> url | isURIReference $ T.unpack url]
+  ["Invalid URL: " <> url | isURIReference $ T.unpack url]
 validateExtension (BuiltInDef ModelNote) ExtText {} = []
 validateExtension (BuiltInDef ModelDate) ExtDate {} = []
 validateExtension DecoBoolDef {} ExtBool {} = []
@@ -175,11 +175,11 @@ validateExtension typ val = [extTypeError typ val]
 -- | Validate the field multiplicity and type against the value held in the @Map@.
 validateField :: Field -> Map FieldId ExtValue -> [Text]
 validateField (Field _ fid nm multi typ) values =
-   validateMulti nm multi mVal ++ case mVal of
-      Nothing -> []
-      Just v -> validateExtension typ v
-   where
-      mVal = M.lookup fid values
+  validateMulti nm multi mVal ++ case mVal of
+    Nothing -> []
+    Just v -> validateExtension typ v
+  where
+    mVal = M.lookup fid values
 
 
 
@@ -192,19 +192,19 @@ extTypeError t v = "Type error: expected " <> typeDescription t <> ", got " <> v
 newtype Variant a = Variant {_variantName :: Text} deriving (Eq, Ord)
 
 instance Show (Variant a) where
-   show (Variant txt) = T.unpack txt
+  show (Variant txt) = T.unpack txt
 
 instance ToJSON (Variant a) where
-   toJSON (Variant txt) = toJSON txt
+  toJSON (Variant txt) = toJSON txt
 
 instance ToJSONKey (Variant a) where
-   toJSONKey = toJSONKeyText _variantName
+  toJSONKey = toJSONKeyText _variantName
 
 instance FromJSON (Variant a) where
-   parseJSON v = Variant <$> parseJSON v
+  parseJSON v = Variant <$> parseJSON v
 
 instance FromJSONKey (Variant a) where
-   fromJSONKey = FromJSONKeyText Variant
+  fromJSONKey = FromJSONKeyText Variant
 
 
 variantName :: Iso' (Variant a) Text
@@ -230,9 +230,9 @@ type ExtensionValues = Map FieldId ExtValue
 -- > extValue :: FieldId -> Lens' ExtensionValues ExtValue
 extValue :: (Ord k) => k -> Lens' (Map k ExtValue) ExtValue
 extValue fName = lens (M.findWithDefault ExtNone fName) setter
-   where
-      setter tbl ExtNone = M.delete fName tbl
-      setter tbl v = M.insert fName v tbl
+  where
+    setter tbl ExtNone = M.delete fName tbl
+    setter tbl v = M.insert fName v tbl
 
 
 -- | Find any values that match the given search string. The result is a list of fields where
@@ -240,12 +240,12 @@ extValue fName = lens (M.findWithDefault ExtNone fName) setter
 -- their text representation. If the boolean is @True@ then the search is case-blind.
 valueSearch :: Bool -> Text -> ExtensionValues -> [(FieldId, Int)]
 valueSearch caseBlind needle = concatMap search . M.toList
-   where
-      search :: (FieldId, ExtValue) -> [(FieldId, Int)]
-      search (fName, v) =
-         map ((fName, ) . T.length . fst) $
-         T.breakOnAll needle1 $
-         caseF $
-         displayValue v
-      caseF = if caseBlind then T.toCaseFold else id
-      needle1 = caseF needle
+  where
+    search :: (FieldId, ExtValue) -> [(FieldId, Int)]
+    search (fName, v) =
+      map ((fName, ) . T.length . fst) $
+      T.breakOnAll needle1 $
+      caseF $
+      displayValue v
+    caseF = if caseBlind then T.toCaseFold else id
+    needle1 = caseF needle

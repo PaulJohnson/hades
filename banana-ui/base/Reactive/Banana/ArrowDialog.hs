@@ -21,124 +21,124 @@ than the modified whole.
 -}
 
 module Reactive.Banana.ArrowDialog (
-   -- * Basic Types
-   ComboItem (..),
-   ClickableItem (..),
-   Orientation (..),
-   MemoBoxSize (..),
-   FilePathPurpose (..),
-   FilePathFilterItem (..),
-   FilePathFilter,
-   -- * Gadget Types
-   Gadget,
-   Gadget',
-   GadgetF,
-   GadgetF',
-   PrismaticGadget (..),
-   Lens1 (..),
-   TreeOper (..),
-   -- * Basic Combinators
-   focusing,
-   focusingOver,
-   prismatic,
-   prismaticOver,
-   traversing,
-   traversingOver,
-   accum,
-   initially,
-   getInitial,
-   getEnv,
-   getInitialEnv,
-   withEnv,
-   send,
-   sendMap,
-   sendEmpty,
-   -- * Dynamic Gadgets
-   exec,
-   cond,
-   unionTab,
-   -- * Decorations
-   enabled,
-   optional,
-   optionalOver,
-   intercept,
-   icon,
-   coloured,
-   linked,
-   styled,
-   styled1,
-   frame,
-   plainFrame,
-   simpleFrame,
-   message,
-   message1,
-   scrolled,
-   -- * Grouping
-   form,
-   tabForm,
-   box,
-   grid,
-   forestTable,
-   -- * Data Validation
-   validate,
-   validateOver,
-   validate1,
-   validateText,
-   validateTextOver,
-   validateText1,
-   -- * Data Entry Fields
-   textBox,
-   simpleTextBox,
-   typedTextBox,
-   maybeTextBox,
-   displayText,
-   memoBox,
-   displayMemo,
-   clickableList,
-   clickableSingle,
-   clickableDouble,
-   comboBox,
-   simpleCombo,
-   rangeCombo,
-   boundedCombo,
-   radio,
-   simpleRadio,
-   rangeRadio,
-   boundedRadio,
-   tickBox,
-   dateBox,
-   iconBox,
-   colourBox,
-   imageDisplay,
-   treeSelector,
-   forestEditor,
-   filePathSelector,
-   table,
-   buttonBar,
-   image,
-   readOnlyText,
-   readOnlyMemo,
-   buttonIO,
-   -- * Pop-up Dialogs
-   textPopup,
-   memoPopup,
-   -- GTK Icon Utilities
-   isStandardContext,
-   gtkIconStandardContexts,
-   -- * Dialogs
-   DialogButtons (..),
-   Dialog (..),
-   Dialog',
-   promoteDialog,
-   DialogSelector,
-   DialogSelector',
-   promoteDialogSelector,
-   constantDialog,
-   -- * Debugging
-   showGadget,
-   traceGadget,
-   traceGadgetOver,
-   traceGadget1
+  -- * Basic Types
+  ComboItem (..),
+  ClickableItem (..),
+  Orientation (..),
+  MemoBoxSize (..),
+  FilePathPurpose (..),
+  FilePathFilterItem (..),
+  FilePathFilter,
+  -- * Gadget Types
+  Gadget,
+  Gadget',
+  GadgetF,
+  GadgetF',
+  PrismaticGadget (..),
+  Lens1 (..),
+  TreeOper (..),
+  -- * Basic Combinators
+  focusing,
+  focusingOver,
+  prismatic,
+  prismaticOver,
+  traversing,
+  traversingOver,
+  accum,
+  initially,
+  getInitial,
+  getEnv,
+  getInitialEnv,
+  withEnv,
+  send,
+  sendMap,
+  sendEmpty,
+  -- * Dynamic Gadgets
+  exec,
+  cond,
+  unionTab,
+  -- * Decorations
+  enabled,
+  optional,
+  optionalOver,
+  intercept,
+  icon,
+  coloured,
+  linked,
+  styled,
+  styled1,
+  frame,
+  plainFrame,
+  simpleFrame,
+  message,
+  message1,
+  scrolled,
+  -- * Grouping
+  form,
+  tabForm,
+  box,
+  grid,
+  forestTable,
+  -- * Data Validation
+  validate,
+  validateOver,
+  validate1,
+  validateText,
+  validateTextOver,
+  validateText1,
+  -- * Data Entry Fields
+  textBox,
+  simpleTextBox,
+  typedTextBox,
+  maybeTextBox,
+  displayText,
+  memoBox,
+  displayMemo,
+  clickableList,
+  clickableSingle,
+  clickableDouble,
+  comboBox,
+  simpleCombo,
+  rangeCombo,
+  boundedCombo,
+  radio,
+  simpleRadio,
+  rangeRadio,
+  boundedRadio,
+  tickBox,
+  dateBox,
+  iconBox,
+  colourBox,
+  imageDisplay,
+  treeSelector,
+  forestEditor,
+  filePathSelector,
+  table,
+  buttonBar,
+  image,
+  readOnlyText,
+  readOnlyMemo,
+  buttonIO,
+  -- * Pop-up Dialogs
+  textPopup,
+  memoPopup,
+  -- GTK Icon Utilities
+  isStandardContext,
+  gtkIconStandardContexts,
+  -- * Dialogs
+  DialogButtons (..),
+  Dialog (..),
+  Dialog',
+  promoteDialog,
+  DialogSelector,
+  DialogSelector',
+  promoteDialogSelector,
+  constantDialog,
+  -- * Debugging
+  showGadget,
+  traceGadget,
+  traceGadgetOver,
+  traceGadget1
 ) where
 
 import Control.Arrow
@@ -168,8 +168,8 @@ focusing = Focusing
 -- | As for "focusing", but for when the inner Gadget already outputs a function.
 focusingOver :: Lens i o a b -> GadgetF e w a b -> GadgetF e w i o
 focusingOver lns g = withLens lns $ \getter _ ->
-      focusing (lens getter $ \i f -> lns %~ f $ i) g
-      -- There is probably a simple and clever way of doing this.
+    focusing (lens getter $ \i f -> lns %~ f $ i) g
+    -- There is probably a simple and clever way of doing this.
 
 
 -- | A gadget that views its inputs and outputs through a "Prism". Its output is a function which
@@ -278,10 +278,10 @@ optional = Optional
 -- | Variant of "optional" for a "GadgetF".
 optionalOver :: i -> GadgetF e w i o -> GadgetF e w (Maybe i) (Maybe o)
 optionalOver d g = Optional d g >>> arr update
-   where
-      -- update :: Maybe (i -> o) -> Maybe i -> Maybe o
-      update Nothing _ = Nothing
-      update (Just f) i = Just $ f $ fromMaybe d i
+  where
+    -- update :: Maybe (i -> o) -> Maybe i -> Maybe o
+    update Nothing _ = Nothing
+    update (Just f) i = Just $ f $ fromMaybe d i
 
 
 -- | Intercept single or double clicks (first argument @True@ for double clicks) and open a
@@ -451,15 +451,15 @@ clickableList = ClickableList
 -- | A clickableList where each item can be selected with a single click.
 clickableSingle :: (a -> Text) -> Gadget e w [a] (Maybe a)
 clickableSingle f = ClickableList <<< arr (map mkClick)
-   where
-      mkClick v = ClickableItem (f v) (Just v) Nothing mempty
+  where
+    mkClick v = ClickableItem (f v) (Just v) Nothing mempty
 
 
 -- | A clickableList where each item can be selected with a double click.
 clickableDouble :: (a -> Text) -> Gadget e w [a] (Maybe a)
 clickableDouble f = ClickableList <<< arr (map mkClick)
-   where
-      mkClick v = ClickableItem (f v) Nothing (Just v) mempty
+  where
+    mkClick v = ClickableItem (f v) Nothing (Just v) mempty
 
 
 -- | Menu selection box. Menu items are derived from the environment.
@@ -552,34 +552,34 @@ table = Table
 -- the corresponding column group. When a value changes the gadget emits the corresponding key
 -- and update function. The GTK Grid widget is given the class \"forest-table\".
 forestTable ::
-   [(Text, [(Text, GadgetF' e w a)])]
-      -- ^ Groups of columns. The name of the first group is ignored. Each column has a heading
-      -- and a gadget template.
-   -> (e -> Forest (k, Lens1 s a))
-      -- ^ The data to edit is represented as a forest of lenses, each accessing some underlying
-      -- data type. This is computed on widget creation and is not updated when the env changes.
-   -> GadgetF' e (Either w (k, a -> a)) s
+  [(Text, [(Text, GadgetF' e w a)])]
+    -- ^ Groups of columns. The name of the first group is ignored. Each column has a heading
+    -- and a gadget template.
+  -> (e -> Forest (k, Lens1 s a))
+    -- ^ The data to edit is represented as a forest of lenses, each accessing some underlying
+    -- data type. This is computed on widget creation and is not updated when the env changes.
+  -> GadgetF' e (Either w (k, a -> a)) s
 forestTable = ForestTable
 
 
 -- | Edit a forest of data items using a tree view. Items can be dragged and dropped to reorgainse
 -- them, or clicked for individual editing via the menu and dialog selector.
 forestEditor :: (Eq a) =>
-   (e -> a -> Text)   --  Text label for a tree item.
-   -> (Maybe a -> Menu (TreeOper a))  -- Edit menu for tree item.
-   -> (a -> Bool)               -- Can this item have children?
-   -> Maybe (DialogSelector e w a a)  -- Activation pops up an edit dialog.
-   -> Gadget' e w (Forest a)
+  (e -> a -> Text)   --  Text label for a tree item.
+  -> (Maybe a -> Menu (TreeOper a))  -- Edit menu for tree item.
+  -> (a -> Bool)               -- Can this item have children?
+  -> Maybe (DialogSelector e w a a)  -- Activation pops up an edit dialog.
+  -> Gadget' e w (Forest a)
 forestEditor = ForestEditor
 
 
 -- | A file selector, with a text box that pops up a native file selector dialog when clicked.
 filePathSelector ::
-   Text   -- ^ Title for the selector dialog.
-   -> FilePathPurpose
-   -> [FilePathFilter]
-   -> Bool   -- ^ Display an overwrite confirmation dialog when an existing file is selected.
-   -> Gadget' e w FilePath
+  Text   -- ^ Title for the selector dialog.
+  -> FilePathPurpose
+  -> [FilePathFilter]
+  -> Bool   -- ^ Display an overwrite confirmation dialog when an existing file is selected.
+  -> Gadget' e w FilePath
 filePathSelector = FilePathSelector
 
 -- | Text box with read-only contents. Clicking the text will pop up a dialog for the contents.
@@ -631,22 +631,22 @@ isStandardContext = (`elem` gtkIconStandardContexts)
 -- all the application icons from being shown in the icon selection dialog.
 gtkIconStandardContexts :: [Text]
 gtkIconStandardContexts = [
-      "Actions",
-      "Animations",
-      "Applications",
-      "Categories",
-      "Devices",
-      "Emblems",
-      "Emotes",
-      "FileSystems",
-      "International",
-      "Legacy",
-      "MimeTypes",
-      "Places",
-      "Status",
-      "Stock",
-      "UI"
-   ]
+    "Actions",
+    "Animations",
+    "Applications",
+    "Categories",
+    "Devices",
+    "Emblems",
+    "Emotes",
+    "FileSystems",
+    "International",
+    "Legacy",
+    "MimeTypes",
+    "Places",
+    "Status",
+    "Stock",
+    "UI"
+  ]
 
 
 -- | Print the input and output values to StdErr.

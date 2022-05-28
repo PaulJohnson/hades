@@ -26,18 +26,18 @@ qual ns nm = X.QName nm Nothing $ Just ns
 -- | Go to the root, and then as far left as possible.
 goStart :: XC.Cursor -> XC.Cursor
 goStart c = repeatWhile XC.left $ XC.root c
-   where
-      repeatWhile f v = case f v of
-         Just v1 -> repeatWhile f v1
-         Nothing -> v
+  where
+    repeatWhile f v = case f v of
+      Just v1 -> repeatWhile f v1
+      Nothing -> v
 
 
 -- Apply all the functions in order, ignoring any failures.
 applyAll :: [a -> Maybe a] -> a -> a
 applyAll [] v = v
 applyAll (f:fs) v = case f v of
-   Nothing -> applyAll fs v
-   Just v2 -> applyAll fs v2
+  Nothing -> applyAll fs v
+  Just v2 -> applyAll fs v2
 
 
 -- | Find the next content (in depth-first order) satisfying the predicate
@@ -48,9 +48,9 @@ findDF f c = if f $ XC.current c then Just c else XC.nextDF c >>= findDF f
 -- | Find the next element with this name.
 findNameDF :: X.QName -> XC.Cursor -> Maybe XC.Cursor
 findNameDF qn = findDF p
-   where
-      p (X.Elem e) = isNamed qn e
-      p _ = False
+  where
+    p (X.Elem e) = isNamed qn e
+    p _ = False
 
 
 -- | True if the element has the given name. Ignores the URI and focuses on the namespace, unlike

@@ -24,17 +24,17 @@ type MRange a = (Maybe a, Maybe a)
 
 
 data DemoData = DemoData {
-   _demoRange :: MRange Integer,
-   _demoEnum :: DemoEnum,
-   _demoTextRange :: Maybe (Text, Text),
-   _demoDate :: Day,
-   _demoTable :: [TableData],
-   _demoComment :: Text
+  _demoRange :: MRange Integer,
+  _demoEnum :: DemoEnum,
+  _demoTextRange :: Maybe (Text, Text),
+  _demoDate :: Day,
+  _demoTable :: [TableData],
+  _demoComment :: Text
 } deriving (Show)
 
 instance Default DemoData where
-   def = DemoData def Foo (Just def) today def def
-      where today = unsafePerformIO $ utctDay <$> getCurrentTime
+  def = DemoData def Foo (Just def) today def def
+    where today = unsafePerformIO $ utctDay <$> getCurrentTime
 
 
 demoRange :: Lens' DemoData (MRange Integer)
@@ -57,71 +57,71 @@ demoComment = lens _demoComment $ \s x -> s{_demoComment = x}
 
 
 validRange :: (Ord a, Show a) =>
-   (Maybe a, Maybe a) -> Maybe Text
+  (Maybe a, Maybe a) -> Maybe Text
 validRange (v1, v2) = do
-   v1a <- v1
-   v2a <- v2
-   if v1a > v2a then return "Invalid range" else Nothing
+  v1a <- v1
+  v2a <- v2
+  if v1a > v2a then return "Invalid range" else Nothing
 
 
 -- An optional range. First must be less than or equal to second.
 mRangeGadget :: (Num a, Ord a, Show a, Read a) => GadgetF' () () (MRange a)
 mRangeGadget = validateTextOver validRange $ form Vertical [
-      ("Lower bound:", focusing _1 maybeTextBox),
-      ("Upper bound:", focusing _2 maybeTextBox),
-      ("Range size:", focusing id $ readOnlyText $ \_ (mv1, mv2) ->
-            maybe "" (T.pack . show) $ subtract <$> mv1 <*> mv2)
-   ]
+    ("Lower bound:", focusing _1 maybeTextBox),
+    ("Upper bound:", focusing _2 maybeTextBox),
+    ("Range size:", focusing id $ readOnlyText $ \_ (mv1, mv2) ->
+        maybe "" (T.pack . show) $ subtract <$> mv1 <*> mv2)
+  ]
 
 
 demoDialog ::  Dialog () () DemoData DemoData
 demoDialog = Dialog "Demo Dialog" OkApplyButton $ accum $ box Vertical [[
-         frame (pure $ Just "Numerical range with optional limits") $
-            focusingOver demoRange mRangeGadget,
-         form Vertical [
-            ("Foo Selection:", focusing demoEnum boundedCombo),
-            ("Date:", focusing demoDate $ dateBox longDate)
-         ],
-         simpleFrame "Optional text range" $
-            focusingOver demoTextRange $
-            optionalOver ("", "") $
-            validateTextOver validTextRange $
-            form Horizontal [
-                  ("Lower bound:", focusing _1 simpleTextBox),
-                  ("Upper bound:", focusing _2 simpleTextBox)
-               ],
-         focusing demoTable $
-            table [TableAdd "row" blankTableRow, TableDelete, TableShuffle] demoTableSpec Nothing,
-         focusing demoComment $ memoBox MemoMedium True
-      ]]
-   where
-      validTextRange (t1, t2) =
-         if T.toCaseFold t1 > T.toCaseFold t2 then Just "Invalid text range." else Nothing
+      frame (pure $ Just "Numerical range with optional limits") $
+        focusingOver demoRange mRangeGadget,
+      form Vertical [
+        ("Foo Selection:", focusing demoEnum boundedCombo),
+        ("Date:", focusing demoDate $ dateBox longDate)
+      ],
+      simpleFrame "Optional text range" $
+        focusingOver demoTextRange $
+        optionalOver ("", "") $
+        validateTextOver validTextRange $
+        form Horizontal [
+            ("Lower bound:", focusing _1 simpleTextBox),
+            ("Upper bound:", focusing _2 simpleTextBox)
+          ],
+      focusing demoTable $
+        table [TableAdd "row" blankTableRow, TableDelete, TableShuffle] demoTableSpec Nothing,
+      focusing demoComment $ memoBox MemoMedium True
+    ]]
+  where
+    validTextRange (t1, t2) =
+      if T.toCaseFold t1 > T.toCaseFold t2 then Just "Invalid text range." else Nothing
 
 
 initialValue :: DemoData
 initialValue = DemoData
-      (Nothing, Just 5)
-      Wibble
-      (Just ("alpha", "Omega"))
-      (fromGregorian 2018 3 12)
-      testTable
-      "This is the default."
+    (Nothing, Just 5)
+    Wibble
+    (Just ("alpha", "Omega"))
+    (fromGregorian 2018 3 12)
+    testTable
+    "This is the default."
 
 testValues :: [DemoData]
 testValues = [
-      DemoData
-         (Just 2, Just 6)
-         Foo
-         (Just ("", "ZZZ"))
-         (fromGregorian 2000 1 1)
-         []
-         "The Foo Value.",
-      DemoData
-         (Just 5, Nothing)
-         Bar
-         (Just ("run", "Wimbledon"))
-         (fromGregorian 2010 1 1)
-         testTable
-         "The Bar Value."
-   ]
+    DemoData
+      (Just 2, Just 6)
+      Foo
+      (Just ("", "ZZZ"))
+      (fromGregorian 2000 1 1)
+      []
+      "The Foo Value.",
+    DemoData
+      (Just 5, Nothing)
+      Bar
+      (Just ("run", "Wimbledon"))
+      (fromGregorian 2010 1 1)
+      testTable
+      "The Bar Value."
+  ]

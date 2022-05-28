@@ -20,23 +20,23 @@ import System.FilePath
 
 modelDescriptor :: IO (MainDescriptor SafetyModel)
 modelDescriptor = do
-   baseFolder <- getDataDir
-   return MainDescriptor {
-      programName = "dsm",
-      programTitle = "Diametric Safety Case Manager",
-      programXtn = "dsm",
-      programStock = entityIcon,
-      programIconDirs = [baseFolder],
-      programAfterLoad = return (),
-      programDocs = baseFolder </> "documentation",
-      programSamples = Just $ baseFolder </> "examples"
-   }
+  baseFolder <- getDataDir
+  return MainDescriptor {
+    programName = "dsm",
+    programTitle = "Diametric Safety Case Manager",
+    programXtn = "dsm",
+    programStock = entityIcon,
+    programIconDirs = [baseFolder],
+    programAfterLoad = return (),
+    programDocs = baseFolder </> "documentation",
+    programSamples = Just $ baseFolder </> "examples"
+  }
 
 
 main :: IO ()
 main = do
-   dataTheme <- getDataIconTheme
-   dataDir <- getDataDir
-   Gtk.iconThemeSetCustomTheme dataTheme $ Just "Diametric"
-   Gtk.iconThemeSetSearchPath dataTheme [dataDir]
-   modelMain =<< modelDescriptor
+  dataTheme <- getDataIconTheme
+  dataDir <- getDataDir
+  Gtk.iconThemeSetCustomTheme dataTheme $ Just "Diametric"
+  Gtk.iconThemeSetSearchPath dataTheme [dataDir]
+  modelMain =<< modelDescriptor

@@ -17,16 +17,16 @@ here depend only on external libraries.
 -}
 
 module Hades.Abstract (
-   module Hades.Abstract.AutoMonad,
-   module Hades.Abstract.BasicShapes,
-   module Hades.Abstract.Connections,
-   module Hades.Abstract.Commands,
-   module Hades.Abstract.Delta,
-   module Hades.Abstract.Diagram,
-   module Hades.Abstract.Geometry,
-   module Hades.Abstract.Menus,
-   module Hades.Abstract.Primitives,
-   module Hades.Abstract.Toolbar
+  module Hades.Abstract.AutoMonad,
+  module Hades.Abstract.BasicShapes,
+  module Hades.Abstract.Connections,
+  module Hades.Abstract.Commands,
+  module Hades.Abstract.Delta,
+  module Hades.Abstract.Diagram,
+  module Hades.Abstract.Geometry,
+  module Hades.Abstract.Menus,
+  module Hades.Abstract.Primitives,
+  module Hades.Abstract.Toolbar
 ) where
 
 import Hades.Abstract.AutoMonad

@@ -23,6 +23,6 @@ import Reactive.Banana
 -- | A Reactive Banana wrapper for AutoMonad.
 applyEvents :: (MonadFix m, MonadMoment m) => StreamNext i o e s -> Event i -> m (Event o)
 applyEvents initial input = mdo
-   state <- stepper initial $ snd <$> result
-   let result = applyInput <$> state <@> input
-   return $ fst <$> result
+  state <- stepper initial $ snd <$> result
+  let result = applyInput <$> state <@> input
+  return $ fst <$> result
