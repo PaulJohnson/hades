@@ -54,7 +54,8 @@ instance ToJSON ConnectorEnd where
   toJSON (Unconnected pt) =
     object ["state" .= ("unconnected" :: Text), "point" .= pt]
   toJSON (Connected pt target child) =
-    let base = [
+    let
+      base = [
         "state" .= ("connected" :: Text),
         "point" .= pt,
         "target" .= target]

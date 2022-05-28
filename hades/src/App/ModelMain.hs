@@ -261,26 +261,30 @@ historyMenus undoButton otherUndo redoButton otherRedo history = do
     (undoE, undoM) <- if not $ null $ undoLog history
       then do
         (undoMenu, undoSelection) <- mkGtkMenu $ hMenu $ undoLog history
-        let act = do
+        let
+          act = do
             Gtk.menuToolButtonSetMenu undoButton undoMenu
             Gtk.widgetSetSensitive undoButton True
             forM_ otherUndo (`Gtk.widgetSetSensitive` True)
         return (undoSelection, act)
       else
-        let act = do
+        let
+          act = do
             Gtk.widgetSetSensitive undoButton False  -- SetMenu should take a Maybe for this.
             forM_ otherUndo (`Gtk.widgetSetSensitive` False)
         in return (never, act)
     (redoE, redoM) <- if not $ null $ redoLog history
       then do
         (redoMenu, redoSelection) <- mkGtkMenu $ hMenu $ redoLog history
-        let act = do
+        let
+          act = do
             Gtk.menuToolButtonSetMenu redoButton redoMenu
             Gtk.widgetSetSensitive redoButton True
             forM_ otherRedo (`Gtk.widgetSetSensitive` True)
         return (redoSelection, act)
       else
-        let act = do
+        let
+          act = do
             Gtk.widgetSetSensitive redoButton False
             forM_ otherRedo (`Gtk.widgetSetSensitive` False)
         in return (never, act)
@@ -554,7 +558,7 @@ modelMain descriptor = do
   compile hadesNet >>= actuate
   Gtk.widgetShowAll window
   let executeProgram =
-      catch Gtk.main $ \e -> do
+        catch Gtk.main $ \e -> do
           errorBox (Just window) $ T.pack $
             "An internal error has occured. I will try to recover your work. If I succeed \
             \then please save it in a new file. You may also be able to recover an older \

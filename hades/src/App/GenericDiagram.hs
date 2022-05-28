@@ -1,5 +1,4 @@
 {-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE OverloadedLabels #-}
 {-# LANGUAGE Arrows #-}
 
 {-
@@ -1285,7 +1284,8 @@ updateBox boxItem@(Box diagId modelId typ peg shape) = do
     case peg of
       Nothing -> return False  -- Box is unpegged, so leave it alone.
       Just (arrId, f) -> do -- Check if relationship still there, if not then unpeg.
-        let unpeg = do
+        let
+          unpeg = do
             let newBox = ElemBox $ boxPeg .~ Nothing $ boxItem
             updateItem newBox
             tellItem newBox

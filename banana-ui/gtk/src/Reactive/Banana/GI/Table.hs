@@ -351,9 +351,9 @@ makeRenderer iconTheme modifyStore store vw col tvCol = renderer $ fieldEditor c
                 p <- Gtk.treePathNewFromString pathStr
                 (year, month, day) <- Gtk.calendarGetDate calendar
                 let date = fromGregorian
-                    (fromIntegral year)
-                    (fromIntegral month + 1)
-                    (fromIntegral day)
+                      (fromIntegral year)
+                      (fromIntegral month + 1)
+                      (fromIntegral day)
                 modifyStore p $ fieldValue col .~ date
                 Gtk.popoverPopdown overlay
       EditColour -> do
@@ -447,9 +447,9 @@ makeRenderer iconTheme modifyStore store vw col tvCol = renderer $ fieldEditor c
               void $ Gtk.onCalendarDaySelectedDoubleClick calendar $ do
                 (year, month, day) <- Gtk.calendarGetDate calendar
                 let date = fromGregorian
-                    (fromIntegral year)
-                    (fromIntegral month + 1)
-                    (fromIntegral day)
+                      (fromIntegral year)
+                      (fromIntegral month + 1)
+                      (fromIntegral day)
                 p <- Gtk.treePathNewFromString pathStr
                 modifyStore p $ fieldValue col ?~ date
                 Gtk.popoverPopdown overlay

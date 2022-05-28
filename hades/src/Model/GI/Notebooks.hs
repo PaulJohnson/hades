@@ -143,7 +143,8 @@ splitBook handler book manager = do
                   else Gtk.OrientationHorizontal
               child1 <- Gtk.panedGetChild1 parent
               child2 <- Gtk.panedGetChild2 parent
-              if | maybe False (sameWidget w1) child1 -> do
+              if
+                | maybe False (sameWidget w1) child1 -> do
                   Gtk.containerRemove parent w1
                   newWidget <- replace orient2
                   Gtk.panedPack1 parent newWidget True True

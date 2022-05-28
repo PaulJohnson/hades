@@ -1010,7 +1010,8 @@ getArrowPoints arrowFunc =
     dragEnd shape1 action1 = do
       let transient = arrowFunc transId shape1
       action2 <- processDrag1 (return (transient, shape1)) dragShapeTo action1
-      let dragPoint = case actionCommand action2 of
+      let
+        dragPoint = case actionCommand action2 of
           Drag d -> actionLocation action2 `movePoint` d  -- Should never happen.
           EndDrag d -> actionLocation action2 `movePoint` d
           _ -> actionLocation action2
@@ -1067,7 +1068,8 @@ newDiagramBoxTool v1 dSel newItemF drawF msg =
     act <- yieldViews
     (mShape, act2) <- case actionCommand act of
       Select -> do
-        let result = BoundBox
+        let
+          result = BoundBox
             (actionLocation act `movePoint` (-100, -50))
             (actionLocation act `movePoint` (100, 50))
         return (Just result, act)

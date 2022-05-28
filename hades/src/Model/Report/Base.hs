@@ -428,7 +428,8 @@ fieldFragment fname v = do
     Just (DecoBoolDef (DecoBool boolIcons boolColours)) ->
       case v of
         ExtBool b -> do
-          let r = mconcat [
+          let
+            r = mconcat [
                 case boolIcons of
                   Just (iFalse, iTrue) ->
                     inlineIcon $ if b then iTrue else iFalse
@@ -444,7 +445,8 @@ fieldFragment fname v = do
       case v of
         ExtInt i -> case rangeMap m i of
           Just (mIcon, mColour) -> do
-            let r = mconcat [
+            let
+              r = mconcat [
                   maybe mempty inlineIcon mIcon,
                   case mColour of
                     Just c -> inColour c displayText
@@ -457,7 +459,8 @@ fieldFragment fname v = do
       case v of
         ExtReal r -> case rangeMap m r of
           Just (mIcon, mColour) -> do
-            let r1 = mconcat [
+            let
+              r1 = mconcat [
                   maybe mempty inlineIcon mIcon,
                   case mColour of
                     Just c -> inColour c displayText
@@ -470,7 +473,8 @@ fieldFragment fname v = do
       case v of
         ExtText txt -> case find ((txt ==) . view enumItemName) items of
           Just (EnumItem _ mIcon mColour) -> do
-            let r = mconcat [
+            let
+              r = mconcat [
                   maybe mempty inlineIcon mIcon,
                   case mColour of
                     Just c -> inColour c displayText

@@ -142,7 +142,8 @@ matrixCells model input matrix = do -- Either monad.
       in (M.union cells1 childCells, height)
     forestAssign _ [] = (mempty, 1)
     forestAssign (row, col) nodes =
-      let (cells, heights) = unzip $
+      let
+        (cells, heights) = unzip $
           zipWith treeAssign (zip (scanl (+) row heights) $ repeat col) nodes
       in (mconcat cells, sum heights)
     evalModel act = case evalModelEdit id model act of

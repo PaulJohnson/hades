@@ -407,8 +407,7 @@ reportRunDialog previewFlag report =
 reportWarningsDialog :: (EntityClass v) => [(ModelId, Text)] -> Dialog' (Model v) () ()
 reportWarningsDialog warnings = Dialog "Report Warnings" OkButton $ proc () -> do
     model <- getEnv -< ()
-    let tblDat =
-        map (_1 %~ (\k -> modelContents model ^? ix k . entityName . nameText)) warnings
+    let tblDat = map (_1 %~ (\k -> modelContents model ^? ix k . entityName . nameText)) warnings
     _ <- table [] tbl Nothing -< tblDat
     returnA -< ()
   where

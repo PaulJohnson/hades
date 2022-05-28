@@ -177,7 +177,8 @@ mkDialogWidget iconTheme newWidgetIO envInit envC selectorB initial inputE = do
       initial1 <- valueB valB
       case selector env initial1 of
         Nothing -> do
-          let delayedIO = do
+          let
+            delayedIO = do
               clearWidget parent
               Gtk.frameSetLabel parent Nothing
           return (never, never, delayedIO)
@@ -897,9 +898,9 @@ renderGadget _ wInit _ initial _ e1 b1 (Optional _ (DateBox fmt)) =
           (year, month, day) <- Gtk.calendarGetDate calendar
           Gtk.popoverPopdown overlay
           let date = fromGregorian
-              (fromIntegral year)
-              (fromIntegral month + 1)
-              (fromIntegral day)
+                (fromIntegral year)
+                (fromIntegral month + 1)
+                (fromIntegral day)
           return ((), date ^. re (datePrism fmt))
     return $ GadgetOut {
         gadgetView = [w],
@@ -1297,14 +1298,16 @@ renderGadget iconTheme wInit env initial envC e b (Box orient gss) = {-# SCC "re
       Vertical -> do
         boxWidget <- Gtk.new Gtk.Box [#orientation := Gtk.OrientationVertical, #spacing := 5 ]
         liftIO $ wInit boxWidget
-        let addSep = do
+        let
+          addSep = do
             sep <- Gtk.separatorNew Gtk.OrientationHorizontal
             Gtk.boxPackStart boxWidget sep False False 0
         return (boxWidget, addSep)
       Horizontal -> do
         boxWidget <- Gtk.new Gtk.Box [#orientation := Gtk.OrientationHorizontal, #spacing := 5 ]
         liftIO $ wInit boxWidget
-        let addSep = do
+        let
+          addSep = do
             sep <- Gtk.separatorNew Gtk.OrientationVertical
             Gtk.boxPackStart boxWidget sep False False 0
         return (boxWidget, addSep)
@@ -1929,10 +1932,10 @@ renderGadget _ wInit _ initial _ e b ClickableList = {-# SCC "renderGadget_Click
     menuResult <- switchE $ snd <$> menuDisplay
     void $ Gtk.onWidgetDestroy label stop1
     let resultE = GadgetData True <$> foldr1 (unionWith const) [
-          singleClickEvent,
-          doubleClickEvent,
-          Just <$> menuResult
-        ]
+            singleClickEvent,
+            doubleClickEvent,
+            Just <$> menuResult
+          ]
     w <- Gtk.toWidget evBox
     return GadgetOut {
         gadgetView = [w],
@@ -2305,7 +2308,8 @@ renderGadget iconTheme wInit env initial envC e b (ForestTable headerGroups lens
               else xs
     gadgetTree gs gss (Node (k, lns1) forest) = do
       v <- forM gs $ \g -> do
-          let g2 = focusingOver (getLens lns1) $
+          let
+            g2 = focusingOver (getLens lns1) $
               send (Just . Right . (k,)) <<< sendMap (Just . Left) g
           renderGadget iconTheme wInit env initial envC e b g2 >>= boxGadget
       forestOut <- gadgetForest gss forest
