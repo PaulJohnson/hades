@@ -43,8 +43,8 @@ import Reactive.Banana.Common
 main :: IO ()
 main = do
   putStrLn "http://localhost:3000/"
-  icons1 <- getIconData "/home/paj/.local/share/hades/Diametric/scalable/"
-  icons2 <- getIconData "/home/paj/.local/share/hades/Diametric/48x48"
+  icons1 <- getIconData "/usr/share/icons/Adwaita/scalable"
+  icons2 <- getIconData "/usr/share/icons/Adwaita/48x48"
   (initialModel, matrixKeys) <- generate $ arbitraryMatrix 10
   (modelState, modelWriter) <- newTStateIO initialModel
   let icons = mergeIconGroups $ icons1 ++ icons2

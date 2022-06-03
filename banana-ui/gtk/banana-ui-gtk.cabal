@@ -1,6 +1,6 @@
 cabal-version: 2.4
 name:          banana-ui-gtk
-version:       1.2.14
+version:       2.0.0
 license:       BSD-3-Clause
 license-file:  LICENSE
 copyright:     © 2020 Paul Johnson
@@ -36,7 +36,7 @@ library
    autogen-modules: Paths_banana_ui_gtk
    build-depends:
       base >=4.14 && < 4.15,
-      banana-ui-base,
+      banana-ui-base == 2.0.0,
       bytestring,
       colour,
       containers >=0.5,
@@ -76,7 +76,7 @@ executable demo-arrow
    ghc-options:      -Wall
    build-depends:
       base >=4.14 && < 4.15,
-      banana-ui-base,
+      banana-ui-base == 2.0.0,
       banana-ui-gtk,
       colour,
       containers,

@@ -12,34 +12,34 @@ maintainer: paul@cogito.org.uk
 category: Graphics
 data-dir: share
 data-files:
-   hicolor/scalable-up-to-32/status/*.svg
-   hicolor/16x16/stock/image/*.png
-   hicolor/16x16/actions/*.symbolic.png
-   hicolor/24x24/actions/*.symbolic.png
-   hicolor/32x32/actions/*.symbolic.png
-   hicolor/48x48/actions/*.symbolic.png
-   hicolor/48x48/actions/*.png
-   hicolor/48x48/categories/*.png
-   hicolor/48x48/stock/image/*.png
-   hicolor/64x64/actions/*.symbolic.png
-   hicolor/96x96/actions/*.symbolic.png
-   hicolor/scalable/categories/*.svg
-   hicolor/scalable/stock/image/*.svg
-   hicolor/scalable/actions/*.svg
-   hicolor/index.theme
-   hicolor/icon-theme.cache
-   editor-ui.glade
-   hades-gtk.css
-   report.css
-   docx/_rels/.rels
-   docx/docProps/*.xml
-   docx/word/_rels/document.xml.rels
-   docx/word/theme/theme1.xml
-   docx/word/*.xml
-   docx/[Content_Types].xml
+    hicolor/scalable-up-to-32/status/*.svg
+    hicolor/16x16/stock/image/*.png
+    hicolor/16x16/actions/*.symbolic.png
+    hicolor/24x24/actions/*.symbolic.png
+    hicolor/32x32/actions/*.symbolic.png
+    hicolor/48x48/actions/*.symbolic.png
+    hicolor/48x48/actions/*.png
+    hicolor/48x48/categories/*.png
+    hicolor/48x48/stock/image/*.png
+    hicolor/64x64/actions/*.symbolic.png
+    hicolor/96x96/actions/*.symbolic.png
+    hicolor/scalable/categories/*.svg
+    hicolor/scalable/stock/image/*.svg
+    hicolor/scalable/actions/*.svg
+    hicolor/index.theme
+    hicolor/icon-theme.cache
+    editor-ui.glade
+    hades-gtk.css
+    report.css
+    docx/_rels/.rels
+    docx/docProps/*.xml
+    docx/word/_rels/document.xml.rels
+    docx/word/theme/theme1.xml
+    docx/word/*.xml
+    docx/[Content_Types].xml
 
 library
-   exposed-modules:
+  exposed-modules:
       App.Appearance
       App.GenericDiagram
       App.ModelMain
@@ -103,22 +103,22 @@ library
       System.Hades.DataFiles
       System.Hades.EditLock
       Text.NaturalOrder
-   hs-source-dirs: src, evidence
-   other-modules: Paths_hades
-   autogen-modules: Paths_hades
-   default-language: Haskell2010
-   default-extensions: Arrows DeriveFunctor ExistentialQuantification
+  hs-source-dirs: src, evidence
+  other-modules: Paths_hades
+  autogen-modules: Paths_hades
+  default-language: Haskell2010
+  default-extensions: Arrows DeriveFunctor ExistentialQuantification
                         ExtendedDefaultRules FlexibleContexts FlexibleInstances
                         FunctionalDependencies GADTs GeneralizedNewtypeDeriving LambdaCase
                         MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
                         RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
                         TupleSections TypeFamilies ViewPatterns
-   ghc-options: -Wall
-   build-depends:
+  ghc-options: -Wall
+  build-depends:
       aeson,
       array,
-      banana-ui-base,
-      banana-ui-gtk,
+      banana-ui-base == 2.0.0,
+      banana-ui-gtk == 1.2.14,
       base >=4.14 && < 4.15,
       blaze-html,
       blaze-markup,
@@ -173,12 +173,12 @@ library
       xml,
       zip-archive
 
-   if os(windows)
+  if os(windows)
         build-depends:
             Win32,
             HUnit,
             base64-bytestring
-   else
+  else
         build-depends:
             unix,
             HUnit,

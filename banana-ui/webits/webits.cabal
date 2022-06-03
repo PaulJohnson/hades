@@ -8,8 +8,11 @@ copyright: © 2021 Paul Johnson
 author: Paul Johnson
 maintainer: paul@cogito.org.uk
 synopsis: Web interface to UI gadgets.
+description: Web-based front end to the arrow dialog gadgets in the banana-ui library.
 category: Graphics
 data-files:
+   Testcard_F.jpg
+   words.txt
    JS/favicon.ico
    JS/arrowDialog.js
    JS/AppendGrid.js
@@ -24,6 +27,7 @@ data-files:
 
 library
    hs-source-dirs: src
+   autogen-modules: Paths_webits
    exposed-modules:
       Control.Concurrent.TState
       Data.ForestModel
@@ -41,12 +45,12 @@ library
                        MultiParamTypeClasses MultiWayIf OverloadedStrings Rank2Types
                        RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
                        TupleSections TypeFamilies ViewPatterns
-   ghc-options: -Wall -j
+   ghc-options: -Wall
    build-depends:
       aeson,
       base >=4.14 && < 4.15,
       base64-bytestring,
-      banana-ui-base,
+      banana-ui-base == 2.0.0,
       blank-canvas,
       blaze-html,
       blaze-markup,
@@ -87,17 +91,13 @@ executable demo-webit
                        RankNTypes RecursiveDo ScopedTypeVariables TemplateHaskell
                        TupleSections TypeFamilies ViewPatterns
    -- Vanilla compile.
-   ghc-options: -Wall -j -threaded
-   data-dir: demo-webit
-   data-files:
-      Testcard_F.jpg
-      words.txt
+   ghc-options: -Wall -threaded
 
    -- Threadscope.
-   -- ghc-options: -Wall -j -threaded -eventlog -rtsopts
+   -- ghc-options: -Wall -threaded -eventlog -rtsopts
 
    -- Profiling.
-   -- ghc-options: -Wall -j -threaded -prof -fprof-auto
+   -- ghc-options: -Wall -threaded -prof -fprof-auto
    build-depends:
       aeson,
       base >=4.14 && < 4.15,
